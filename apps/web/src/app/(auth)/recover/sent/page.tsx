@@ -21,7 +21,7 @@ export default function RecoverSentPage() {
           </div>
           <h1 className={typeClassMobile("h1")}>Check your email.</h1>
           <p className="mt-2 font-display text-[16px] italic text-muted-foreground sm:text-[18px]">
-            If an account exists at that address, you'll get a reset link shortly.
+            If an account exists at that address, you&apos;ll get a reset link shortly.
           </p>
         </div>
         <div className="pt-2 text-center">
