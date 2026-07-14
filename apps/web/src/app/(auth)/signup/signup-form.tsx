@@ -23,7 +23,7 @@ export function SignupForm() {
   const {
     handleSubmit,
     control,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm<SignupValues>({
     resolver: zodResolver(signupSchema),
     mode: "onBlur",
