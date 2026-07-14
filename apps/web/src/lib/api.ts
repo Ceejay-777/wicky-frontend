@@ -9,6 +9,9 @@ export function initApiClient(): void {
   if (initialized) return;
   initialized = true;
 
+  // The api-client types its caller as `ApiCaller = <T>(c) => Promise<T>`, but
+  // this impl returns a fixed `ApiSuccess<unknown>`. The cast satisfies the
+  // generic without changing the body or the api-client package.
   configureApiClient(
     (async ({ method, path, body }) => {
       const res = await fetch(`${API_BASE}${path}`, {
