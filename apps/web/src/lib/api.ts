@@ -1,49 +1,33 @@
-import { configureApiClient } from "@wicky/api-client";
+import {
+  configureApiClient,
+  type ApiCaller,
+  ApiRequestError,
+} from "@wicky/api-client";
 import type { ApiSuccess, ApiError } from "@wicky/types";
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_BASE ?? "").replace(/\/$/, "");
+const caller: ApiCaller = (async ({ method, path, body }) => {
+  const res = await fetch(path, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
 
-let initialized = false;
-
-export function initApiClient(): void {
-  if (initialized) return;
-  initialized = true;
-
-  // The api-client types its caller as `ApiCaller = <T>(c) => Promise<T>`, but
-  // this impl returns a fixed `ApiSuccess<unknown>`. The cast satisfies the
-  // generic without changing the body or the api-client package.
-  configureApiClient(
-    (async ({ method, path, body }) => {
-      const res = await fetch(`${API_BASE}${path}`, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: body !== undefined ? JSON.stringify(body) : undefined,
-      });
-
-      if (!res.ok) {
-        let detail: string;
-        try {
-          const errBody = (await res.json()) as Partial<ApiError> & { detail?: string };
-          detail = errBody.detail ?? `Request failed with status ${res.status}`;
-        } catch {
-          detail = `Request failed with status ${res.status}`;
-        }
-        throw new ApiRequestError(detail, res.status);
-      }
-
-      if (res.status === 204) return undefined as never;
-      return (await res.json()) as ApiSuccess<unknown>;
-    }) as Parameters<typeof configureApiClient>[0],
-  );
-}
-
-export class ApiRequestError extends Error {
-  constructor(
-    message: string,
-    public status: number,
-  ) {
-    super(message);
-    this.name = "ApiRequestError";
+  if (!res.ok) {
+    let detail: string;
+    try {
+      const errBody = (await res.json()) as Partial<ApiError> & { detail?: string };
+      detail = errBody.detail ?? `Request failed with status ${res.status}`;
+    } catch {
+      detail = `Request failed with status ${res.status}`;
+    }
+    throw new ApiRequestError(detail, res.status);
   }
-}
+
+  if (res.status === 204) return undefined as never;
+  return (await res.json()) as ApiSuccess<unknown>;
+}) as ApiCaller;
+
+configureApiClient(caller);
+
+export { ApiRequestError };

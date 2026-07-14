@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Lora, Source_Sans_3, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { Providers } from "@/components/providers";
 
 const lora = Lora({
   subsets: ["latin"],
@@ -62,7 +61,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
-        <Providers>{children}</Providers>
+        {children}
       </body>
     </html>
   );
