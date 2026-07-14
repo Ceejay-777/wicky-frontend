@@ -10,7 +10,7 @@ interface RequestConfig {
   body?: unknown;
 }
 
-type ApiCaller = <T>(config: RequestConfig) => Promise<T>;
+export type ApiCaller = <T>(config: RequestConfig) => Promise<T>;
 
 let _caller: ApiCaller = () => {
   throw new Error("apiClient not initialized — call configureApiClient() first");
@@ -33,3 +33,5 @@ export const apiClient = {
 };
 
 export { type AuthSigninRequest };
+
+export { ApiRequestError } from "./errors";
