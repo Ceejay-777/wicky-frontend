@@ -5,11 +5,10 @@ import { timeOfDay } from "@/lib/learning/time";
 import { cn } from "@/lib/utils";
 
 type GreetingProps = {
-  displayName: string | null;
-  loading?: boolean;
+  displayName: string;
 };
 
-export function Greeting({ displayName, loading }: GreetingProps) {
+export function Greeting({ displayName }: GreetingProps) {
   const [word, setWord] = useState<string | null>(null);
 
   useEffect(() => {
@@ -17,7 +16,7 @@ export function Greeting({ displayName, loading }: GreetingProps) {
   }, []);
 
   const tod = word ?? "day";
-  const name = displayName ?? "there";
+  const name = displayName;
 
   return (
     <header className="px-4 pt-6 sm:px-6 sm:pt-8 lg:px-8 lg:pt-10">
@@ -28,15 +27,9 @@ export function Greeting({ displayName, loading }: GreetingProps) {
           "text-foreground"
         )}
       >
-        {loading || !displayName ? (
-          "Welcome back."
-        ) : (
-          <>
-            <span>Good </span>
-            <span className="italic">{tod}</span>
-            <span>, {name}.</span>
-          </>
-        )}
+        <span>Good </span>
+        <span className="italic">{tod}</span>
+        <span>, {name}.</span>
       </h1>
       <p className="mt-2 font-display text-[16px] italic text-muted-foreground sm:mt-3 sm:text-[18px]">
         An almanac of learning, kept up to date.

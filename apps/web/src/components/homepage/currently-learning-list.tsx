@@ -8,75 +8,15 @@ import {
   EmptyTitle,
   EmptyDescription,
 } from "@/components/ui/empty";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 import { formatPoints } from "@/lib/format/number";
 import { cn } from "@/lib/utils";
 import type { EnrolledSubject } from "@wicky/types";
 
 type CurrentlyLearningListProps = {
   subjects: EnrolledSubject[];
-  loading?: boolean;
-  error?: string | null;
-  onRetry?: () => void;
 };
 
-export function CurrentlyLearningList({
-  subjects,
-  loading,
-  error,
-  onRetry,
-}: CurrentlyLearningListProps) {
-  if (error) {
-    return (
-      <section
-        aria-labelledby="currently-learning-heading"
-        className="mt-8 sm:mt-10"
-      >
-        <SectionHeading id="currently-learning-heading">
-          Currently Learning
-        </SectionHeading>
-        <div className="border border-ink px-4 py-6 sm:px-6 sm:py-8 text-center">
-          <p className="text-[15px] text-foreground">{error}</p>
-          {onRetry ? (
-            <div className="mt-4">
-              <Button variant="outline" size="sm" onClick={onRetry}>
-                Retry
-              </Button>
-            </div>
-          ) : null}
-        </div>
-      </section>
-    );
-  }
-
-  if (loading) {
-    return (
-      <section
-        aria-labelledby="currently-learning-heading"
-        className="mt-8 sm:mt-10"
-      >
-        <SectionHeading id="currently-learning-heading">
-          Currently Learning
-        </SectionHeading>
-        <div className="border-t border-ink">
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className="flex items-center justify-between gap-4 border-b border-ink px-2 py-4 sm:px-4 sm:py-5"
-            >
-              <div className="flex-1 space-y-2">
-                <Skeleton className="h-5 w-32" />
-                <Skeleton className="h-3 w-20" />
-              </div>
-              <Skeleton className="h-4 w-16" />
-            </div>
-          ))}
-        </div>
-      </section>
-    );
-  }
-
+export function CurrentlyLearningList({ subjects }: CurrentlyLearningListProps) {
   if (subjects.length === 0) {
     return (
       <section
