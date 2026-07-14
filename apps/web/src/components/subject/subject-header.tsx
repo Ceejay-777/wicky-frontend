@@ -1,0 +1,46 @@
+import Link from "next/link";
+import { IconChevronLeft } from "@tabler/icons-react";
+import { ShareButton } from "./share-button";
+import { cn } from "@/lib/utils";
+
+type SubjectHeaderProps = {
+  name: string;
+};
+
+export function SubjectHeader({ name }: SubjectHeaderProps) {
+  const eyebrow = name.toUpperCase();
+  return (
+    <header>
+      <div className="flex items-center justify-between gap-3 px-4 pt-4 sm:px-6 sm:pt-6 lg:px-8">
+        <Link
+          href="/"
+          aria-label="Back to home"
+          className={cn(
+            "inline-flex size-11 shrink-0 items-center justify-center",
+            "text-ink transition-colors hover:bg-accent",
+            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+          )}
+        >
+          <IconChevronLeft size={20} stroke={1.5} aria-hidden="true" />
+        </Link>
+        <ShareButton />
+      </div>
+      <div className="px-4 pb-4 pt-2 sm:px-6 sm:pb-5 sm:pt-3 lg:px-8 lg:pb-6 lg:pt-4">
+        <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
+          {eyebrow}
+        </p>
+        <h1
+          className={cn(
+            "mt-1 font-display font-semibold tracking-[-0.015em]",
+            "text-[28px] leading-[1.1] text-foreground",
+            "sm:mt-1.5 sm:text-[32px] sm:tracking-[-0.018em]",
+            "lg:text-[36px] lg:tracking-[-0.02em]",
+          )}
+        >
+          {name}
+        </h1>
+      </div>
+      <hr className="border-t border-ink" />
+    </header>
+  );
+}
