@@ -1,0 +1,122 @@
+/* =====================================================================
+   Wicky — Almanac theme · Tailwind v4 (CSS-first)
+   Single source of truth: packages/config/src/theme.css
+   This file wires shadcn's semantic tokens to the almanac CSS vars,
+   then sets typography defaults that carry the almanac voice.
+   ===================================================================== */
+
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@wicky/config/theme.css";
+
+/* ---------------------------------------------------------------------
+   shadcn semantic tokens → almanac CSS variables
+   The `inline` keyword tells Tailwind v4 to read these as `var(...)`
+   references so light/dark switching works at runtime.
+   --------------------------------------------------------------------- */
+@theme inline {
+  --color-background: var(--color-paper);
+  --color-foreground: var(--color-ink);
+
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-ink);
+
+  --color-popover: var(--color-paper);
+  --color-popover-foreground: var(--color-ink);
+
+  --color-primary: var(--color-oxblood);
+  --color-primary-foreground: var(--color-on-oxblood);
+
+  --color-secondary: var(--color-forest);
+  --color-secondary-foreground: var(--color-on-forest);
+
+  --color-muted: var(--color-surface);
+  --color-muted-foreground: var(--color-ink-muted);
+
+  --color-accent: var(--color-oxblood-soft);
+  --color-accent-foreground: var(--color-oxblood);
+
+  --color-destructive: var(--color-oxblood);
+  --color-destructive-foreground: var(--color-on-oxblood);
+
+  --color-border: var(--color-border);
+  --color-input: var(--color-border);
+  --color-ring: var(--color-oxblood);
+
+  /* The almanac is mostly square */
+  --radius: 0;
+  --radius-sm: 4px;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+
+  --font-heading: var(--font-display);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-display);
+}
+
+/* ---------------------------------------------------------------------
+   Dark mode — toggled by the .dark class on <html>.
+   The almanac CSS variables in @wicky/config/theme.css already swap
+   when [data-theme="dark"] is set; the .dark block below makes sure
+   shadcn's utility classes also resolve correctly.
+   --------------------------------------------------------------------- */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------
+   Base typography — the almanac voice.
+   --------------------------------------------------------------------- */
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  code, kbd, samp, pre {
+    font-family: var(--font-mono);
+  }
+
+  ::selection {
+    background-color: var(--color-oxblood);
+    color: var(--color-on-oxblood);
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--color-oxblood);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Reduced motion — every animation collapses to instant.
+   --------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0ms !important;
+  }
+}

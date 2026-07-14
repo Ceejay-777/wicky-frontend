@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Direction A — Penguin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       Direction A — "Penguin"
+       Editorial, light, serif-led.
+       Signature: margin annotations.
+       ============================================================ */
+
+    :root {
+      /* Light */
+      --bg: #FFFFFF;
+      --surface: #F7F4EE;
+      --ink: #1A1814;
+      --accent: #A65A2E;
+      --muted: #847C72;
+      --success: #3F6B3A;
+
+      /* Dark */
+      --bg-d: #14110D;
+      --surface-d: #1E1A15;
+      --ink-d: #F2EDE4;
+      --accent-d: #C97A4A;
+      --muted-d: #6B635A;
+      --success-d: #7AA674;
+
+      --display: 'Newsreader', Georgia, serif;
+      --body: 'Inter', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+      --r-sm: 4px;
+      --r-md: 8px;
+      --r-lg: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #EFEAE0; color: var(--ink); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+    body { padding: 48px 64px; max-width: 1440px; margin: 0 auto; }
+
+    /* Header */
+    .mock-header { margin-bottom: 64px; }
+    .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+    .mock-title { font-family: var(--display); font-weight: 600; font-size: 56px; letter-spacing: -0.02em; line-height: 1.05; color: var(--ink); margin-bottom: 8px; font-variation-settings: "opsz" 60; }
+    .mock-sub { font-size: 16px; color: var(--muted); max-width: 64ch; }
+    .mock-meta { display: flex; gap: 32px; margin-top: 24px; font-size: 13px; color: var(--muted); }
+    .mock-meta b { font-weight: 500; color: var(--ink); }
+
+    /* Section */
+    .section { margin-bottom: 56px; }
+    .section-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--ink); }
+    .section-num { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+    .section-title { font-family: var(--display); font-size: 24px; font-weight: 600; font-variation-settings: "opsz" 30; }
+    .section-note { margin-left: auto; font-size: 12px; color: var(--muted); font-family: var(--mono); }
+
+    /* Compare row */
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .compare-label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; }
+
+    /* ========== Palette ========== */
+    .swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+    .swatch { display: flex; flex-direction: column; }
+    .swatch-pair { display: flex; flex-direction: column; border-radius: var(--r-md); overflow: hidden; border: 1px solid rgba(26,24,20,0.08); }
+    .swatch-light, .swatch-dark { padding: 32px 16px; min-height: 88px; display: flex; flex-direction: column; justify-content: space-between; }
+    .swatch-light { background: var(--c-light); color: var(--c-light-ink); }
+    .swatch-dark { background: var(--c-dark); color: var(--c-dark-ink); }
+    .swatch-name { font-family: var(--mono); font-size: 11px; text-transform: lowercase; letter-spacing: 0.02em; }
+    .swatch-hex { font-family: var(--mono); font-size: 11px; opacity: 0.7; }
+
+    /* ========== Type scale ========== */
+    .type-card { padding: 40px 48px; border-radius: var(--r-lg); }
+    .type-card.light { background: var(--bg); color: var(--ink); border: 1px solid rgba(26,24,20,0.08); }
+    .type-card.dark { background: var(--bg-d); color: var(--ink-d); border: 1px solid rgba(242,237,228,0.08); }
+    .type-row { display: grid; grid-template-columns: 110px 1fr 100px; align-items: baseline; padding: 12px 0; border-bottom: 1px solid rgba(127,127,127,0.12); gap: 16px; }
+    .type-row:last-child { border-bottom: 0; }
+    .type-card.dark .type-row { border-color: rgba(242,237,228,0.1); }
+    .type-label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    .type-card.dark .type-label { color: var(--muted-d); }
+    .type-spec { font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: right; }
+    .type-card.dark .type-spec { color: var(--muted-d); }
+    .t-h1 { font-family: var(--display); font-size: 44px; font-weight: 600; line-height: 1.05; letter-spacing: -0.02em; font-variation-settings: "opsz" 50; }
+    .t-h2 { font-family: var(--display); font-size: 28px; font-weight: 600; line-height: 1.15; letter-spacing: -0.015em; font-variation-settings: "opsz" 30; }
+    .t-h3 { font-family: var(--display); font-size: 20px; font-weight: 500; line-height: 1.2; font-style: italic; font-variation-settings: "opsz" 24; }
+    .t-body { font-family: var(--body); font-size: 16px; line-height: 1.55; }
+    .t-caption { font-family: var(--body); font-size: 13px; color: var(--muted); }
+    .type-card.dark .t-caption { color: var(--muted-d); }
+    .t-mono { font-family: var(--mono); font-size: 14px; }
+
+    /* ========== Card (with margin annotations) ========== */
+    .card { border-radius: var(--r-lg); padding: 40px 48px 40px 48px; position: relative; }
+    .card.light { background: var(--bg); color: var(--ink); border: 1px solid rgba(26,24,20,0.08); }
+    .card.dark { background: var(--surface-d); color: var(--ink-d); border: 1px solid rgba(242,237,228,0.06); }
+    .card-grid { display: grid; grid-template-columns: 1fr 96px; gap: 32px; }
+    .card-body { display: flex; flex-direction: column; gap: 16px; }
+    .card-meta { display: flex; gap: 16px; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+    .card-meta .topic { color: var(--accent); }
+    .card.dark .card-meta .topic { color: var(--accent-d); }
+    .card-meta .rest { color: var(--muted); }
+    .card.dark .card-meta .rest { color: var(--muted-d); }
+    .card-title { font-family: var(--display); font-size: 32px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.1; font-variation-settings: "opsz" 40; }
+    .card-desc { font-size: 15px; line-height: 1.55; max-width: 56ch; }
+    .card-desc .accent { color: var(--accent); }
+    .card.dark .card-desc .accent { color: var(--accent-d); }
+    .card-progress { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+    .progress-bar { flex: 1; height: 4px; background: rgba(127,127,127,0.15); border-radius: 2px; overflow: hidden; }
+    .card.dark .progress-bar { background: rgba(242,237,228,0.1); }
+    .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; }
+    .card.dark .progress-fill { background: var(--accent-d); }
+    .progress-pct { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+    .card.dark .progress-pct { color: var(--muted-d); }
+    .card-cta { display: flex; gap: 8px; margin-top: 12px; }
+
+    /* Margin annotation */
+    .card-margin { display: flex; flex-direction: column; gap: 14px; padding-top: 4px; }
+    .margin-item { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.02em; line-height: 1.4; }
+    .card.dark .margin-item { color: var(--muted-d); }
+    .margin-item .v { color: var(--ink); display: block; font-size: 13px; margin-top: 2px; font-family: var(--body); font-weight: 500; }
+    .card.dark .margin-item .v { color: var(--ink-d); }
+
+    /* ========== Buttons ========== */
+    .btn-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; padding: 24px 32px; border-radius: var(--r-lg); }
+    .btn-row.light { background: var(--bg); border: 1px solid rgba(26,24,20,0.08); }
+    .btn-row.dark { background: var(--bg-d); border: 1px solid rgba(242,237,228,0.06); }
+    .btn { font-family: var(--body); font-size: 14px; font-weight: 500; padding: 10px 18px; border-radius: var(--r-md); border: 1px solid transparent; cursor: pointer; transition: transform 200ms ease-out; display: inline-flex; align-items: center; gap: 8px; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-row.dark .btn-primary { background: var(--accent-d); border-color: var(--accent-d); }
+    .btn-secondary { background: transparent; color: var(--ink); border-color: var(--ink); }
+    .btn-row.dark .btn-secondary { color: var(--ink-d); border-color: var(--ink-d); }
+    .btn-ghost { background: transparent; color: var(--accent); }
+    .btn-row.dark .btn-ghost { color: var(--accent-d); }
+    .btn-ghost:hover { background: rgba(166,90,46,0.08); }
+    .btn-row.dark .btn-ghost:hover { background: rgba(201,122,74,0.1); }
+
+    .footer-note { margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(26,24,20,0.08); font-family: var(--mono); font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; }
+  </style>
+</head>
+<body>
+  <header class="mock-header">
+    <div class="eyebrow">Direction A</div>
+    <h1 class="mock-title">Penguin</h1>
+    <p class="mock-sub">Editorial, light, serif-led. The study partner that reads like a serious book. Margin annotations carry meta-information so the content stays clean.</p>
+    <div class="mock-meta">
+      <span><b>Display</b> · Newsreader</span>
+      <span><b>Body</b> · Inter</span>
+      <span><b>Mono</b> · JetBrains Mono</span>
+      <span><b>Accent</b> · #A65A2E burnt sienna</span>
+      <span><b>Default mode</b> · Light</span>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Palette</h2>
+      <span class="section-note">6 tokens · light + dark</span>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="--c-light:#FFFFFF;--c-light-ink:#1A1814;--c-dark:#14110D;--c-dark-ink:#F2EDE4">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">bg</span><span class="swatch-hex">#FFFFFF</span></div>
+          <div class="swatch-dark"><span class="swatch-name">bg · dark</span><span class="swatch-hex">#14110D</span></div>
+        </div>
+      </div>
+      <div class="swatch" style="--c-light:#F7F4EE;--c-light-ink:#1A1814;--c-dark:#1E1A15;--c-dark-ink:#F2EDE4">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">surface</span><span class="swatch-hex">#F7F4EE</span></div>
+          <div class="swatch-dark"><span class="swatch-name">surface · dark</span><span class="swatch-hex">#1E1A15</span></div>
+        </div>
+      </div>
+      <div class="swatch" style="--c-light:#1A1814;--c-light-ink:#FFFFFF;--c-dark:#F2EDE4;--c-dark-ink:#14110D">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">ink</span><span class="swatch-hex">#1A1814</span></div>
+          <div class="swatch-dark"><span class="swatch-name">ink · dark</span><span class="swatch-hex">#F2EDE4</span></div>
+        </div>
+      </div>
+      <div class="swatch" style="--c-light:#A65A2E;--c-light-ink:#FFFFFF;--c-dark:#C97A4A;--c-dark-ink:#14110D">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">accent</span><span class="swatch-hex">#A65A2E</span></div>
+          <div class="swatch-dark"><span class="swatch-name">accent · dark</span><span class="swatch-hex">#C97A4A</span></div>
+        </div>
+      </div>
+      <div class="swatch" style="--c-light:#847C72;--c-light-ink:#FFFFFF;--c-dark:#6B635A;--c-dark-ink:#F2EDE4">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">muted</span><span class="swatch-hex">#847C72</span></div>
+          <div class="swatch-dark"><span class="swatch-name">muted · dark</span><span class="swatch-hex">#6B635A</span></div>
+        </div>
+      </div>
+      <div class="swatch" style="--c-light:#3F6B3A;--c-light-ink:#FFFFFF;--c-dark:#7AA674;--c-dark-ink:#14110D">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">success</span><span class="swatch-hex">#3F6B3A</span></div>
+          <div class="swatch-dark"><span class="swatch-name">success · dark</span><span class="swatch-hex">#7AA674</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Type scale</h2>
+      <span class="section-note">display + body + mono</span>
+    </div>
+    <div class="compare">
+      <div>
+        <div class="compare-label">Light</div>
+        <div class="type-card light">
+          <div class="type-row"><span class="type-label">h1 · display</span><span class="t-h1">The American Revolution</span><span class="type-spec">44 / -0.02em</span></div>
+          <div class="type-row"><span class="type-label">h2 · display</span><span class="t-h2">Level 2 · Intermediate</span><span class="type-spec">28 / -0.015em</span></div>
+          <div class="type-row"><span class="type-label">h3 · display</span><span class="t-h3">Current topic</span><span class="type-spec">20 · italic</span></div>
+          <div class="type-row"><span class="type-label">body</span><span class="t-body">A short read on the political and economic causes of the war.</span><span class="type-spec">16 / 1.55</span></div>
+          <div class="type-row"><span class="type-label">caption</span><span class="t-caption">topic 8 of 23</span><span class="type-spec">13 · muted</span></div>
+          <div class="type-row"><span class="type-label">mono</span><span class="t-mono">+80 pts · 12h 32m</span><span class="type-spec">14 · mono</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="compare-label">Dark</div>
+        <div class="type-card dark">
+          <div class="type-row"><span class="type-label">h1 · display</span><span class="t-h1">The American Revolution</span><span class="type-spec">44 / -0.02em</span></div>
+          <div class="type-row"><span class="type-label">h2 · display</span><span class="t-h2">Level 2 · Intermediate</span><span class="type-spec">28 / -0.015em</span></div>
+          <div class="type-row"><span class="type-label">h3 · display</span><span class="t-h3">Current topic</span><span class="type-spec">20 · italic</span></div>
+          <div class="type-row"><span class="type-label">body</span><span class="t-body">A short read on the political and economic causes of the war.</span><span class="type-spec">16 / 1.55</span></div>
+          <div class="type-row"><span class="type-label">caption</span><span class="t-caption">topic 8 of 23</span><span class="type-spec">13 · muted</span></div>
+          <div class="type-row"><span class="type-label">mono</span><span class="t-mono">+80 pts · 12h 32m</span><span class="type-spec">14 · mono</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Sample card</h2>
+      <span class="section-note">margin annotation signature</span>
+    </div>
+    <div class="compare">
+      <div>
+        <div class="compare-label">Light</div>
+        <div class="card light">
+          <div class="card-grid">
+            <div class="card-body">
+              <div class="card-meta">
+                <span class="topic">US History</span>
+                <span class="rest">5 min read</span>
+              </div>
+              <h3 class="card-title">The American Revolution</h3>
+              <p class="card-desc">A short read on the political and economic causes of the war, the Continental Congress, and the path to <span class="accent">independence</span>.</p>
+              <div class="card-progress">
+                <div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div>
+                <span class="progress-pct">60%</span>
+              </div>
+              <div class="card-cta">
+                <button class="btn btn-primary">Start 5 min read →</button>
+                <button class="btn btn-ghost">Further study</button>
+              </div>
+            </div>
+            <div class="card-margin">
+              <div class="margin-item">time<span class="v">5 min</span></div>
+              <div class="margin-item">level<span class="v">2 · intermediate</span></div>
+              <div class="margin-item">topic<span class="v">8 / 23</span></div>
+              <div class="margin-item">points<span class="v">1,250</span></div>
+              <div class="margin-item">streak<span class="v">8d</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="compare-label">Dark</div>
+        <div class="card dark">
+          <div class="card-grid">
+            <div class="card-body">
+              <div class="card-meta">
+                <span class="topic">US History</span>
+                <span class="rest">5 min read</span>
+              </div>
+              <h3 class="card-title">The American Revolution</h3>
+              <p class="card-desc">A short read on the political and economic causes of the war, the Continental Congress, and the path to <span class="accent">independence</span>.</p>
+              <div class="card-progress">
+                <div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div>
+                <span class="progress-pct">60%</span>
+              </div>
+              <div class="card-cta">
+                <button class="btn btn-primary">Start 5 min read →</button>
+                <button class="btn btn-ghost">Further study</button>
+              </div>
+            </div>
+            <div class="card-margin">
+              <div class="margin-item">time<span class="v">5 min</span></div>
+              <div class="margin-item">level<span class="v">2 · intermediate</span></div>
+              <div class="margin-item">topic<span class="v">8 / 23</span></div>
+              <div class="margin-item">points<span class="v">1,250</span></div>
+              <div class="margin-item">streak<span class="v">8d</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Buttons</h2>
+      <span class="section-note">primary · secondary · ghost</span>
+    </div>
+    <div class="compare">
+      <div>
+        <div class="compare-label">Light</div>
+        <div class="btn-row light">
+          <button class="btn btn-primary">Start 5 min read</button>
+          <button class="btn btn-secondary">Review answers</button>
+          <button class="btn btn-ghost">See all learners →</button>
+        </div>
+      </div>
+      <div>
+        <div class="compare-label">Dark</div>
+        <div class="btn-row dark">
+          <button class="btn btn-primary">Start 5 min read</button>
+          <button class="btn btn-secondary">Review answers</button>
+          <button class="btn btn-ghost">See all learners →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer-note">
+    <span>Direction A — Penguin</span>
+    <span>Stop here. Tell me to keep, change, or pick another direction.</span>
+  </div>
+</body>
+</html>

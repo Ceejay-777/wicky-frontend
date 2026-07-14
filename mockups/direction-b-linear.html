@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Direction B — Linear</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       Direction B — "Linear"
+       Dark-first, warm dark, sans-only, mono accents.
+       Signature: pulsing roadmap node.
+       ============================================================ */
+
+    :root {
+      /* Dark (default) */
+      --bg: #161310;
+      --surface: #1F1B16;
+      --ink: #F2EDE4;
+      --accent: #E8896A;
+      --muted: #847C72;
+      --success: #7AA674;
+      --data: #9CA89F;
+
+      /* Light */
+      --bg-l: #FAF7F2;
+      --surface-l: #F0EBE4;
+      --ink-l: #14110D;
+      --accent-l: #D97349;
+      --muted-l: #6B635A;
+      --success-l: #3F6B3A;
+
+      --display: 'Geist', system-ui, sans-serif;
+      --body: 'Geist', system-ui, sans-serif;
+      --mono: 'Geist Mono', ui-monospace, monospace;
+
+      --r-sm: 4px;
+      --r-md: 8px;
+      --r-lg: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #0E0C0A; color: var(--ink); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+    body { padding: 48px 64px; max-width: 1440px; margin: 0 auto; }
+
+    .mock-header { margin-bottom: 64px; }
+    .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+    .mock-title { font-family: var(--display); font-weight: 600; font-size: 56px; letter-spacing: -0.03em; line-height: 1.05; color: var(--ink); margin-bottom: 8px; }
+    .mock-sub { font-size: 16px; color: var(--muted); max-width: 64ch; line-height: 1.5; }
+    .mock-meta { display: flex; gap: 28px; margin-top: 24px; font-size: 13px; color: var(--muted); }
+    .mock-meta b { font-weight: 500; color: var(--ink); }
+
+    .section { margin-bottom: 56px; }
+    .section-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid rgba(242,237,228,0.08); }
+    .section-num { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+    .section-title { font-family: var(--display); font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+    .section-note { margin-left: auto; font-size: 11px; color: var(--muted); font-family: var(--mono); }
+
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .compare-label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; padding-left: 4px; }
+
+    /* ========== Palette ========== */
+    .swatches { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+    .swatch { display: flex; flex-direction: column; }
+    .swatch-pair { display: flex; flex-direction: column; border-radius: var(--r-md); overflow: hidden; border: 1px solid rgba(242,237,228,0.06); }
+    .swatch-light, .swatch-dark { padding: 28px 14px; min-height: 80px; display: flex; flex-direction: column; justify-content: space-between; }
+    .swatch-light { background: var(--c-light); color: var(--c-light-ink); }
+    .swatch-dark { background: var(--c-dark); color: var(--c-dark-ink); }
+    .swatch-name { font-family: var(--mono); font-size: 11px; text-transform: lowercase; letter-spacing: 0.02em; }
+    .swatch-hex { font-family: var(--mono); font-size: 11px; opacity: 0.7; }
+
+    /* ========== Type scale ========== */
+    .type-card { padding: 32px 40px; border-radius: var(--r-lg); border: 1px solid rgba(242,237,228,0.06); }
+    .type-card.dark { background: var(--bg); }
+    .type-card.light { background: var(--bg-l); color: var(--ink-l); border: 1px solid rgba(20,17,13,0.08); }
+    .type-row { display: grid; grid-template-columns: 110px 1fr 110px; align-items: baseline; padding: 12px 0; border-bottom: 1px solid rgba(127,127,127,0.1); gap: 16px; }
+    .type-row:last-child { border-bottom: 0; }
+    .type-label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    .type-card.light .type-label { color: var(--muted-l); }
+    .type-spec { font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: right; }
+    .type-card.light .type-spec { color: var(--muted-l); }
+    .t-h1 { font-family: var(--display); font-size: 40px; font-weight: 600; line-height: 1.05; letter-spacing: -0.03em; }
+    .t-h2 { font-family: var(--display); font-size: 24px; font-weight: 600; line-height: 1.15; letter-spacing: -0.02em; }
+    .t-h3 { font-family: var(--display); font-size: 18px; font-weight: 500; line-height: 1.2; }
+    .t-body { font-family: var(--body); font-size: 15px; line-height: 1.55; }
+    .t-caption { font-family: var(--body); font-size: 13px; color: var(--muted); }
+    .type-card.light .t-caption { color: var(--muted-l); }
+    .t-mono { font-family: var(--mono); font-size: 14px; color: var(--data); }
+    .type-card.light .t-mono { color: var(--ink-l); }
+
+    /* ========== Card ========== */
+    .card { border-radius: var(--r-lg); padding: 32px 36px; position: relative; border: 1px solid rgba(242,237,228,0.06); }
+    .card.dark { background: var(--surface); }
+    .card.light { background: var(--surface-l); color: var(--ink-l); border: 1px solid rgba(20,17,13,0.08); }
+    .card-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .meta-tag { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 8px; border-radius: 4px; background: rgba(232,137,106,0.1); color: var(--accent); }
+    .card.light .meta-tag { color: var(--accent-l); background: rgba(217,115,73,0.1); }
+    .meta-mono { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .card.light .meta-mono { color: var(--muted-l); }
+    .card-title { font-family: var(--display); font-size: 28px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 12px; }
+    .card-desc { font-size: 14px; line-height: 1.55; color: var(--muted); margin-bottom: 24px; }
+    .card.light .card-desc { color: var(--muted-l); }
+
+    /* Roadmap with pulsing node — THE SIGNATURE */
+    .roadmap { position: relative; padding-left: 24px; margin-bottom: 24px; }
+    .roadmap::before { content: ''; position: absolute; left: 5px; top: 6px; bottom: 6px; width: 1px; background: var(--muted); opacity: 0.4; }
+    .card.light .roadmap::before { background: var(--muted-l); }
+    .roadmap-item { position: relative; padding: 8px 0; display: flex; align-items: center; gap: 12px; font-size: 13px; }
+    .roadmap-item::before { content: ''; position: absolute; left: -24px; top: 14px; width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid var(--muted); background: transparent; }
+    .roadmap-item.done::before { background: var(--ink); border-color: var(--ink); }
+    .card.light .roadmap-item.done::before { background: var(--ink-l); border-color: var(--ink-l); }
+    .roadmap-item.current::before { background: var(--accent); border-color: var(--accent); animation: pulse 2s ease-in-out infinite; }
+    .card.light .roadmap-item.current::before { background: var(--accent-l); border-color: var(--accent-l); animation: pulse 2s ease-in-out infinite; }
+    .roadmap-item.done { color: var(--muted); text-decoration: line-through; text-decoration-color: rgba(127,127,127,0.4); }
+    .card.light .roadmap-item.done { color: var(--muted-l); }
+    .roadmap-item.current { color: var(--ink); font-weight: 500; }
+    .card.light .roadmap-item.current { color: var(--ink-l); }
+    .roadmap-item .pts { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .card.light .roadmap-item .pts { color: var(--muted-l); }
+
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 currentColor; opacity: 1; }
+      50%  { box-shadow: 0 0 0 8px transparent; opacity: 0.6; }
+      100% { box-shadow: 0 0 0 0 transparent; opacity: 1; }
+    }
+
+    .card-stats { display: flex; gap: 24px; padding-top: 16px; border-top: 1px solid rgba(127,127,127,0.1); }
+    .card.light .card-stats { border-color: rgba(20,17,13,0.1); }
+    .stat { display: flex; flex-direction: column; gap: 2px; }
+    .stat-v { font-family: var(--mono); font-size: 16px; font-weight: 500; }
+    .stat-l { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .card.light .stat-l { color: var(--muted-l); }
+
+    /* ========== Buttons ========== */
+    .btn-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 24px 32px; border-radius: var(--r-lg); border: 1px solid rgba(127,127,127,0.1); }
+    .btn-row.dark { background: var(--bg); border-color: rgba(242,237,228,0.06); }
+    .btn-row.light { background: var(--bg-l); border-color: rgba(20,17,13,0.08); }
+    .btn { font-family: var(--body); font-size: 13px; font-weight: 500; padding: 9px 16px; border-radius: var(--r-md); border: 1px solid transparent; cursor: pointer; transition: background 150ms ease-out; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-primary { background: var(--accent); color: #14110D; border-color: var(--accent); }
+    .btn-row.light .btn-primary { background: var(--accent-l); border-color: var(--accent-l); color: #fff; }
+    .btn-secondary { background: transparent; color: var(--ink); border-color: rgba(242,237,228,0.15); }
+    .btn-row.light .btn-secondary { color: var(--ink-l); border-color: rgba(20,17,13,0.15); }
+    .btn-ghost { background: transparent; color: var(--accent); }
+    .btn-row.light .btn-ghost { color: var(--accent-l); }
+
+    .footer-note { margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(242,237,228,0.06); font-family: var(--mono); font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; }
+  </style>
+</head>
+<body>
+  <header class="mock-header">
+    <div class="eyebrow">Direction B</div>
+    <h1 class="mock-title">Linear</h1>
+    <p class="mock-sub">Dark-first, warm dark, sans-only. The power-user tool for learning. One pulse — on the current roadmap node — is the only motion in the system.</p>
+    <div class="mock-meta">
+      <span><b>Display + Body</b> · Geist Sans</span>
+      <span><b>Mono</b> · Geist Mono</span>
+      <span><b>Accent</b> · #E8896A coral</span>
+      <span><b>Default mode</b> · Dark</span>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Palette</h2>
+      <span class="section-note">7 tokens · dark + light</span>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="--c-light:#FAF7F2;--c-light-ink:#14110D;--c-dark:#161310;--c-dark-ink:#F2EDE4">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">bg</span><span class="swatch-hex">#161310</span></div>
+          <div class="swatch-dark"><span class="swatch-name">bg · light</span><span class="swatch-hex">#FAF7F2</span></div>
+        </div>
+      </div>
+      <div class="swatch" style="--c-light:#F0EBE4;--c-light-ink:#14110D;--c-dark:#1F1B16;--c-dark-ink:#F2EDE4">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">surface</span><span class="swatch-hex">#1F1B16</span></div>
+          <div class="swatch-dark"><span class="swatch-name">surface · light</span><span class="swatch-hex">#F0EBE4</span></div>
+        </div>
+      </div>
+      <div class="swatch" style="--c-light:#14110D;--c-light-ink:#FAF7F2;--c-dark:#F2EDE4;--c-dark-ink:#14110D">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">ink</span><span class="swatch-hex">#F2EDE4</span></div>
+          <div class="swatch-dark"><span class="swatch-name">ink · light</span><span class="swatch-hex">#14110D</span></div>
+        </div>
+      </div>
+      <div class="swatch" style="--c-light:#D97349;--c-light-ink:#fff;--c-dark:#E8896A;--c-dark-ink:#14110D">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">accent</span><span class="swatch-hex">#E8896A</span></div>
+          <div class="swatch-dark"><span class="swatch-name">accent · light</span><span class="swatch-hex">#D97349</span></div>
+        </div>
+      </div>
+      <div class="swatch" style="--c-light:#6B635A;--c-light-ink:#FAF7F2;--c-dark:#847C72;--c-dark-ink:#F2EDE4">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">muted</span><span class="swatch-hex">#847C72</span></div>
+          <div class="swatch-dark"><span class="swatch-name">muted · light</span><span class="swatch-hex">#6B635A</span></div>
+        </div>
+      </div>
+      <div class="swatch" style="--c-light:#3F6B3A;--c-light-ink:#FAF7F2;--c-dark:#7AA674;--c-dark-ink:#14110D">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">success</span><span class="swatch-hex">#7AA674</span></div>
+          <div class="swatch-dark"><span class="swatch-name">success · light</span><span class="swatch-hex">#3F6B3A</span></div>
+        </div>
+      </div>
+      <div class="swatch" style="--c-light:#14110D;--c-light-ink:#9CA89F;--c-dark:#9CA89F;--c-dark-ink:#14110D">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">data</span><span class="swatch-hex">#9CA89F</span></div>
+          <div class="swatch-dark"><span class="swatch-name">data · light</span><span class="swatch-hex">#14110D</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Type scale</h2>
+      <span class="section-note">one family · mono for data</span>
+    </div>
+    <div class="compare">
+      <div>
+        <div class="compare-label">Dark</div>
+        <div class="type-card dark">
+          <div class="type-row"><span class="type-label">h1</span><span class="t-h1">The American Revolution</span><span class="type-spec">40 / -0.03em</span></div>
+          <div class="type-row"><span class="type-label">h2</span><span class="t-h2">Level 2 — Intermediate</span><span class="type-spec">24 / -0.02em</span></div>
+          <div class="type-row"><span class="type-label">h3</span><span class="t-h3">Current topic</span><span class="type-spec">18</span></div>
+          <div class="type-row"><span class="type-label">body</span><span class="t-body">A short read on the political and economic causes of the war.</span><span class="type-spec">15 / 1.55</span></div>
+          <div class="type-row"><span class="type-label">caption</span><span class="t-caption">topic 8 of 23</span><span class="type-spec">13 · muted</span></div>
+          <div class="type-row"><span class="type-label">mono · data</span><span class="t-mono">+80 pts · 12h 32m</span><span class="type-spec">14 · mono</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="compare-label">Light</div>
+        <div class="type-card light">
+          <div class="type-row"><span class="type-label">h1</span><span class="t-h1">The American Revolution</span><span class="type-spec">40 / -0.03em</span></div>
+          <div class="type-row"><span class="type-label">h2</span><span class="t-h2">Level 2 — Intermediate</span><span class="type-spec">24 / -0.02em</span></div>
+          <div class="type-row"><span class="type-label">h3</span><span class="t-h3">Current topic</span><span class="type-spec">18</span></div>
+          <div class="type-row"><span class="type-label">body</span><span class="t-body">A short read on the political and economic causes of the war.</span><span class="type-spec">15 / 1.55</span></div>
+          <div class="type-row"><span class="type-label">caption</span><span class="t-caption">topic 8 of 23</span><span class="type-spec">13 · muted</span></div>
+          <div class="type-row"><span class="type-label">mono · data</span><span class="t-mono">+80 pts · 12h 32m</span><span class="type-spec">14 · mono</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Sample card</h2>
+      <span class="section-note">pulsing node signature — only motion in the system</span>
+    </div>
+    <div class="compare">
+      <div>
+        <div class="compare-label">Dark</div>
+        <div class="card dark">
+          <div class="card-meta">
+            <span class="meta-tag">current</span>
+            <span class="meta-mono">US-HIST-08</span>
+            <span class="meta-mono" style="margin-left:auto">5 min</span>
+          </div>
+          <h3 class="card-title">The American Revolution</h3>
+          <p class="card-desc">A short read on the political and economic causes of the war, the Continental Congress, and the path to independence.</p>
+          <div class="roadmap">
+            <div class="roadmap-item done"><span>Causes of Revolution</span><span class="pts">+30</span></div>
+            <div class="roadmap-item done"><span>First Continental Congress</span><span class="pts">+30</span></div>
+            <div class="roadmap-item done"><span>Declaration of Independence</span><span class="pts">+30</span></div>
+            <div class="roadmap-item current"><span>Legacy of the Revolution</span><span class="pts">in progress</span></div>
+            <div class="roadmap-item"><span>The Constitution</span><span class="pts">locked</span></div>
+          </div>
+          <div class="card-stats">
+            <div class="stat"><span class="stat-v">1,250</span><span class="stat-l">points</span></div>
+            <div class="stat"><span class="stat-v">8d</span><span class="stat-l">streak</span></div>
+            <div class="stat"><span class="stat-v">12h 32m</span><span class="stat-l">time</span></div>
+            <div class="stat"><span class="stat-v">60%</span><span class="stat-l">complete</span></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="compare-label">Light</div>
+        <div class="card light">
+          <div class="card-meta">
+            <span class="meta-tag">current</span>
+            <span class="meta-mono">US-HIST-08</span>
+            <span class="meta-mono" style="margin-left:auto">5 min</span>
+          </div>
+          <h3 class="card-title">The American Revolution</h3>
+          <p class="card-desc">A short read on the political and economic causes of the war, the Continental Congress, and the path to independence.</p>
+          <div class="roadmap">
+            <div class="roadmap-item done"><span>Causes of Revolution</span><span class="pts">+30</span></div>
+            <div class="roadmap-item done"><span>First Continental Congress</span><span class="pts">+30</span></div>
+            <div class="roadmap-item done"><span>Declaration of Independence</span><span class="pts">+30</span></div>
+            <div class="roadmap-item current"><span>Legacy of the Revolution</span><span class="pts">in progress</span></div>
+            <div class="roadmap-item"><span>The Constitution</span><span class="pts">locked</span></div>
+          </div>
+          <div class="card-stats">
+            <div class="stat"><span class="stat-v">1,250</span><span class="stat-l">points</span></div>
+            <div class="stat"><span class="stat-v">8d</span><span class="stat-l">streak</span></div>
+            <div class="stat"><span class="stat-v">12h 32m</span><span class="stat-l">time</span></div>
+            <div class="stat"><span class="stat-v">60%</span><span class="stat-l">complete</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Buttons</h2>
+      <span class="section-note">primary · secondary · ghost</span>
+    </div>
+    <div class="compare">
+      <div>
+        <div class="compare-label">Dark</div>
+        <div class="btn-row dark">
+          <button class="btn btn-primary">Start 5 min read →</button>
+          <button class="btn btn-secondary">Review answers</button>
+          <button class="btn btn-ghost">See all learners →</button>
+        </div>
+      </div>
+      <div>
+        <div class="compare-label">Light</div>
+        <div class="btn-row light">
+          <button class="btn btn-primary">Start 5 min read →</button>
+          <button class="btn btn-secondary">Review answers</button>
+          <button class="btn btn-ghost">See all learners →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer-note">
+    <span>Direction B — Linear</span>
+    <span>Stop here. Tell me to keep, change, or pick another direction.</span>
+  </div>
+</body>
+</html>

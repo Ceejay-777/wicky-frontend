@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Direction F — Almanac</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       Direction F — "Almanac"
+       Reference: The World Almanac, Whitaker's Almanack, Information is Beautiful (the book).
+       Data-led, dense, with personality. Oxblood is the year color, deep forest is the table color.
+       Topic reading page is the hero — paired with a key-facts sidebar.
+       ============================================================ */
+
+    :root {
+      /* Light */
+      --bg: #F0EDDF;          /* almanac cream — chroma toward green-yellow */
+      --surface: #F5F2E5;
+      --ink: #1A1814;
+      --oxblood: #7A2E2E;     /* the almanac's year color — used in dividers, "you", page numbers */
+      --forest: #2C4A3E;      /* the table color — table headers, "passed" */
+      --muted: #847C72;
+
+      /* Dark */
+      --bg-d: #14110D;
+      --surface-d: #1E1A15;
+      --ink-d: #F2EDE4;
+      --oxblood-d: #C26A6A;
+      --forest-d: #6B8C7A;
+      --muted-d: #847C72;
+
+      --display: 'Lora', Georgia, serif;
+      --body: 'Source Sans 3', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #E0DCC8; color: var(--ink); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+    body { padding: 40px 56px 80px; max-width: 1440px; margin: 0 auto; }
+
+    /* Header */
+    .head { padding: 32px 0 48px; border-bottom: 2px solid var(--ink); margin-bottom: 48px; position: relative; }
+    .head::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: repeating-linear-gradient(90deg, var(--oxblood) 0, var(--oxblood) 12px, transparent 12px, transparent 24px); }
+    .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--oxblood); margin-bottom: 10px; font-weight: 500; }
+    .head h1 { font-family: var(--display); font-weight: 600; font-size: 60px; letter-spacing: -0.02em; line-height: 1.0; color: var(--ink); margin-bottom: 14px; }
+    .head h1 .it { font-style: italic; font-weight: 500; }
+    .head h1 .yr { font-family: var(--mono); font-size: 28px; font-weight: 500; color: var(--oxblood); letter-spacing: 0; vertical-align: super; margin-left: 12px; }
+    .sub { font-size: 15px; color: var(--muted); max-width: 64ch; line-height: 1.55; }
+    .meta { display: flex; gap: 32px; margin-top: 24px; font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .meta b { font-weight: 500; color: var(--ink); }
+
+    /* Section */
+    .sec { margin-bottom: 64px; }
+    .sec-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 28px; padding-bottom: 10px; border-bottom: 1px solid var(--ink); }
+    .sec-num { font-family: var(--mono); font-size: 12px; color: var(--oxblood); font-weight: 500; }
+    .sec-title { font-family: var(--display); font-size: 26px; font-weight: 600; letter-spacing: -0.01em; }
+    .sec-note { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    .label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+
+    /* ===== 01 — Palette ===== */
+    .swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+    .sw .a, .sw .b { padding: 28px 12px 12px; min-height: 92px; display: flex; flex-direction: column; justify-content: space-between; }
+    .sw .a { background: var(--sw-light); color: var(--sw-light-ink); }
+    .sw .b { background: var(--sw-dark); color: var(--sw-dark-ink); }
+    .sw { display: flex; flex-direction: column; }
+    .sw .name { font-family: var(--display); font-size: 13px; font-weight: 500; }
+    .sw .hex { font-family: var(--mono); font-size: 9px; opacity: 0.6; }
+
+    /* ===== 02 — Type scale ===== */
+    .type-card { padding: 36px 40px; background: var(--bg); border: 1px solid rgba(26,24,20,0.1); }
+    .type-card.dark { background: var(--bg-d); color: var(--ink-d); border-color: rgba(242,237,228,0.08); }
+    .type-row { display: grid; grid-template-columns: 110px 1fr 110px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid rgba(26,24,20,0.1); gap: 16px; }
+    .type-card.dark .type-row { border-color: rgba(242,237,228,0.08); }
+    .type-row:last-child { border-bottom: 0; }
+    .type-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .type-card.dark .type-label { color: var(--muted-d); }
+    .type-spec { font-family: var(--mono); font-size: 10px; color: var(--muted); text-align: right; }
+    .type-card.dark .type-spec { color: var(--muted-d); }
+    .t-h1 { font-family: var(--display); font-size: 44px; font-weight: 600; line-height: 1.05; letter-spacing: -0.02em; }
+    .t-h2 { font-family: var(--display); font-size: 26px; font-weight: 600; line-height: 1.15; letter-spacing: -0.015em; }
+    .t-h3 { font-family: var(--display); font-size: 20px; font-weight: 500; line-height: 1.2; }
+    .t-body { font-family: var(--body); font-size: 15px; line-height: 1.6; }
+    .t-cap { font-family: var(--body); font-size: 12px; color: var(--muted); }
+    .type-card.dark .t-cap { color: var(--muted-d); }
+    .t-mono { font-family: var(--mono); font-size: 13px; }
+
+    /* ===== 03 — THE TOPIC READING PAGE (the hero) ===== */
+    .page { background: var(--bg); border: 1px solid rgba(26,24,20,0.1); }
+    .page.dark { background: var(--bg-d); color: var(--ink-d); border-color: rgba(242,237,228,0.08); }
+
+    /* Running head — almanac-style */
+    .running-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 48px; border-bottom: 3px double var(--ink); font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink); }
+    .page.dark .running-head { border-color: var(--ink-d); color: var(--ink-d); }
+    .running-head .left { color: var(--oxblood); font-weight: 500; }
+    .page.dark .running-head .left { color: var(--oxblood-d); }
+    .running-head .right { color: var(--forest); font-weight: 500; }
+    .page.dark .running-head .right { color: var(--forest-d); }
+
+    .topic { padding: 56px 48px 40px; }
+    .chapter { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.16em; color: var(--oxblood); margin-bottom: 16px; font-weight: 500; }
+    .page.dark .chapter { color: var(--oxblood-d); }
+    .topic h2 { font-family: var(--display); font-size: 52px; font-weight: 600; line-height: 1.0; letter-spacing: -0.02em; margin-bottom: 12px; color: var(--ink); }
+    .page.dark .topic h2 { color: var(--ink-d); }
+    .topic .it-sub { font-family: var(--display); font-size: 20px; font-style: italic; font-weight: 500; color: var(--muted); line-height: 1.3; margin-bottom: 36px; max-width: 48ch; }
+    .page.dark .topic .it-sub { color: var(--muted-d); }
+
+    /* Body + key-facts sidebar */
+    .body-and-facts { display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; padding: 0 48px 40px; }
+    .prose { font-family: var(--body); font-size: 16px; line-height: 1.7; color: var(--ink); }
+    .page.dark .prose { color: var(--ink-d); }
+    .prose p { margin-bottom: 20px; }
+    .prose .first { font-family: var(--display); font-size: 46px; font-weight: 600; float: left; line-height: 0.9; padding: 4px 8px 0 0; color: var(--oxblood); }
+    .page.dark .prose .first { color: var(--oxblood-d); }
+
+    /* Key facts table — THE SIGNATURE */
+    .facts { background: var(--surface); border: 1px solid var(--ink); padding: 0; }
+    .page.dark .facts { background: var(--surface-d); border-color: var(--ink-d); }
+    .facts-head { background: var(--ink); color: var(--bg); padding: 10px 16px; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 500; }
+    .page.dark .facts-head { background: var(--ink-d); color: var(--bg-d); }
+    .facts-title { padding: 12px 16px 8px; font-family: var(--display); font-size: 16px; font-weight: 600; border-bottom: 1px solid rgba(26,24,20,0.15); }
+    .page.dark .facts-title { border-color: rgba(242,237,228,0.15); }
+    .facts-row { display: grid; grid-template-columns: 100px 1fr; padding: 8px 16px; border-bottom: 1px solid rgba(26,24,20,0.08); align-items: baseline; }
+    .page.dark .facts-row { border-color: rgba(242,237,228,0.08); }
+    .facts-row:last-child { border-bottom: 0; }
+    .facts-row .k { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .facts-row .v { font-family: var(--mono); font-size: 13px; color: var(--ink); font-weight: 500; }
+    .page.dark .facts-row .v { color: var(--ink-d); }
+    .facts-row .v .you { color: var(--oxblood); font-weight: 600; }
+    .page.dark .facts-row .v .you { color: var(--oxblood-d); }
+    .facts-row .v .pass { color: var(--forest); }
+    .page.dark .facts-row .v .pass { color: var(--forest-d); }
+    .facts-footer { padding: 10px 16px; font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; border-top: 1px solid rgba(26,24,20,0.15); }
+    .page.dark .facts-footer { border-color: rgba(242,237,228,0.15); }
+
+    /* Quiz CTA below the body */
+    .foot { padding: 20px 48px; border-top: 3px double var(--ink); display: flex; align-items: center; justify-content: space-between; }
+    .page.dark .foot { border-color: var(--ink-d); }
+    .foot .left { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .btn { font-family: var(--body); font-size: 14px; font-weight: 600; padding: 12px 22px; border: 1px solid transparent; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; letter-spacing: 0.01em; }
+    .btn-primary { background: var(--oxblood); color: #F0EDDF; }
+    .page.dark .btn-primary { background: var(--oxblood-d); color: #14110D; }
+    .btn-secondary { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+    .page.dark .btn-secondary { color: var(--ink-d); border-color: var(--ink-d); }
+    .btn-ghost { background: transparent; color: var(--forest); }
+    .page.dark .btn-ghost { color: var(--forest-d); }
+
+    /* ===== 04 — Subject card (table-style) ===== */
+    .subj { background: var(--bg); border: 1px solid rgba(26,24,20,0.15); padding: 0; }
+    .subj.dark { background: var(--bg-d); color: var(--ink-d); border-color: rgba(242,237,228,0.15); }
+    .subj-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; background: var(--ink); color: var(--bg); }
+    .subj.dark .subj-head { background: var(--ink-d); color: var(--bg-d); }
+    .subj-name { font-family: var(--display); font-size: 18px; font-weight: 600; }
+    .subj-pts { font-family: var(--mono); font-size: 12px; font-weight: 600; }
+    .subj-body { padding: 20px 24px; }
+    .subj-meta { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 12px; }
+    .subj.dark .subj-meta { color: var(--muted-d); }
+    .subj-topic { font-family: var(--display); font-size: 22px; font-weight: 500; margin-bottom: 16px; line-height: 1.2; }
+    .subj-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid rgba(26,24,20,0.15); border-bottom: 1px solid rgba(26,24,20,0.15); margin-bottom: 16px; }
+    .subj.dark .subj-stats { border-color: rgba(242,237,228,0.15); }
+    .subj-stats .s { padding: 8px 0; text-align: center; border-right: 1px solid rgba(26,24,20,0.1); }
+    .subj.dark .subj-stats .s { border-color: rgba(242,237,228,0.1); }
+    .subj-stats .s:last-child { border-right: 0; }
+    .subj-stats .v { font-family: var(--mono); font-size: 14px; font-weight: 600; display: block; }
+    .subj-stats .l { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); display: block; margin-top: 2px; }
+    .subj.dark .subj-stats .l { color: var(--muted-d); }
+    .progress-line { display: flex; align-items: center; gap: 12px; }
+    .progress-line .bar { flex: 1; height: 6px; background: rgba(26,24,20,0.12); }
+    .subj.dark .progress-line .bar { background: rgba(242,237,228,0.12); }
+    .progress-line .fill { height: 100%; background: var(--oxblood); }
+    .subj.dark .progress-line .fill { background: var(--oxblood-d); }
+    .progress-line .pct { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--oxblood); }
+    .subj.dark .progress-line .pct { color: var(--oxblood-d); }
+
+    .foot-end { margin-top: 56px; padding-top: 24px; border-top: 2px solid var(--ink); font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; display: flex; justify-content: space-between; }
+  </style>
+</head>
+<body>
+  <header class="head">
+    <div class="eyebrow">Direction F · Pass 2</div>
+    <h1>The Almanac <span class="it">of</span> learning <span class="yr">MMXXVI</span></h1>
+    <p class="sub">Data, presented with personality. The topic page is a spread: reading content on the left, key facts on the right. The metrics page is a table. The leaderboard is a table. Wicky's data IS the almanac.</p>
+    <div class="meta">
+      <span><b>Display</b> · Lora</span>
+      <span><b>Body</b> · Source Sans 3</span>
+      <span><b>Mono</b> · JetBrains Mono</span>
+      <span><b>Palette</b> · full — oxblood (year) + forest (table) + ink + paper</span>
+    </div>
+  </header>
+
+  <section class="sec">
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <h2 class="sec-title">Palette</h2>
+      <span class="sec-note">oxblood is the year color · forest is the table color</span>
+    </div>
+    <div class="swatches">
+      <div class="sw" style="--sw-light:#F0EDDF;--sw-light-ink:#1A1814;--sw-dark:#14110D;--sw-dark-ink:#F2EDE4">
+        <div class="a"><span class="name">paper</span><span class="hex">#F0EDDF</span></div>
+        <div class="b"><span class="name">paper · dark</span><span class="hex">#14110D</span></div>
+      </div>
+      <div class="sw" style="--sw-light:#1A1814;--sw-light-ink:#F0EDDF;--sw-dark:#F2EDE4;--sw-dark-ink:#14110D">
+        <div class="a"><span class="name">ink</span><span class="hex">#1A1814</span></div>
+        <div class="b"><span class="name">ink · dark</span><span class="hex">#F2EDE4</span></div>
+      </div>
+      <div class="sw" style="--sw-light:#7A2E2E;--sw-light-ink:#F0EDDF;--sw-dark:#C26A6A;--sw-dark-ink:#14110D">
+        <div class="a"><span class="name">oxblood</span><span class="hex">#7A2E2E</span></div>
+        <div class="b"><span class="name">oxblood · dark</span><span class="hex">#C26A6A</span></div>
+      </div>
+      <div class="sw" style="--sw-light:#2C4A3E;--sw-light-ink:#F0EDDF;--sw-dark:#6B8C7A;--sw-dark-ink:#14110D">
+        <div class="a"><span class="name">forest</span><span class="hex">#2C4A3E</span></div>
+        <div class="b"><span class="name">forest · dark</span><span class="hex">#6B8C7A</span></div>
+      </div>
+      <div class="sw" style="--sw-light:#847C72;--sw-light-ink:#F0EDDF;--sw-dark:#847C72;--sw-dark-ink:#14110D">
+        <div class="a"><span class="name">muted</span><span class="hex">#847C72</span></div>
+        <div class="b"><span class="name">muted · dark</span><span class="hex">#847C72</span></div>
+      </div>
+      <div class="sw" style="--sw-light:#3F6B3A;--sw-light-ink:#F0EDDF;--sw-dark:#7AA674;--sw-dark-ink:#14110D">
+        <div class="a"><span class="name">verified</span><span class="hex">#3F6B3A</span></div>
+        <div class="b"><span class="name">verified · dark</span><span class="hex">#7AA674</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <h2 class="sec-title">Type scale</h2>
+      <span class="sec-note">display serif · body sans · mono for data — the almanac trio</span>
+    </div>
+    <div class="compare">
+      <div>
+        <div class="label">Light</div>
+        <div class="type-card">
+          <div class="type-row"><span class="type-label">h1 · display</span><span class="t-h1">The American Revolution</span><span class="type-spec">44 · -0.02em</span></div>
+          <div class="type-row"><span class="type-label">h2 · display</span><span class="t-h2">Causes &amp; course of the war</span><span class="type-spec">26 · -0.015em</span></div>
+          <div class="type-row"><span class="type-label">h3 · display</span><span class="t-h3">Current topic</span><span class="type-spec">20</span></div>
+          <div class="type-row"><span class="type-label">body</span><span class="t-body">By the spring of 1776, the political break had become irreconcilable.</span><span class="type-spec">15 · 1.6</span></div>
+          <div class="type-row"><span class="type-label">caption</span><span class="t-cap">topic 8 of 23</span><span class="type-spec">12</span></div>
+          <div class="type-row"><span class="type-label">mono · data</span><span class="t-mono">+80 pts · 12h 32m</span><span class="type-spec">13</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="label">Dark</div>
+        <div class="type-card dark">
+          <div class="type-row"><span class="type-label">h1 · display</span><span class="t-h1">The American Revolution</span><span class="type-spec">44 · -0.02em</span></div>
+          <div class="type-row"><span class="type-label">h2 · display</span><span class="t-h2">Causes &amp; course of the war</span><span class="type-spec">26 · -0.015em</span></div>
+          <div class="type-row"><span class="type-label">h3 · display</span><span class="t-h3">Current topic</span><span class="type-spec">20</span></div>
+          <div class="type-row"><span class="type-label">body</span><span class="t-body">By the spring of 1776, the political break had become irreconcilable.</span><span class="type-spec">15 · 1.6</span></div>
+          <div class="type-row"><span class="type-label">caption</span><span class="t-cap">topic 8 of 23</span><span class="type-spec">12</span></div>
+          <div class="type-row"><span class="type-label">mono · data</span><span class="t-mono">+80 pts · 12h 32m</span><span class="type-spec">13</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <span class="sec-num">03 · the hero</span>
+      <h2 class="sec-title">Topic reading page</h2>
+      <span class="sec-note">reading on the left · key-facts table on the right</span>
+    </div>
+    <div class="compare">
+      <div>
+        <div class="label">Light</div>
+        <article class="page">
+          <div class="running-head">
+            <span class="left">Topic 8 · US History</span>
+            <span class="right">5 min read</span>
+          </div>
+          <div class="topic">
+            <div class="chapter">Entry VIII of XXIII</div>
+            <h2>The American Revolution</h2>
+            <p class="it-sub">Causes, course, and consequences of the war, 1775–1783.</p>
+          </div>
+          <div class="body-and-facts">
+            <div class="prose">
+              <p><span class="first">B</span>y the spring of 1776, the political break between the thirteen American colonies and Great Britain had become irreconcilable. The dispute, which had begun over the right to tax, had expanded within a decade to questions of sovereignty, representation, and the meaning of subjecthood itself.</p>
+              <p>The First Continental Congress, meeting in Philadelphia in September 1774, had attempted a petition to the Crown. The petition went unanswered. The Second Continental Congress, which would become both a governing body and a wartime assembly, was already meeting when, on the night of April 18, militia riders set out from Boston to warn the countryside.</p>
+              <p>The war that followed would last eight years, span a continent, and end in a victory so improbable that the most serious contemporary observers had given the colonial cause no chance of surviving the first campaign.</p>
+            </div>
+            <aside class="facts">
+              <div class="facts-head">Key Facts</div>
+              <div class="facts-title">The American Revolution</div>
+              <div class="facts-row"><span class="k">Dates</span><span class="v">1775–1783</span></div>
+              <div class="facts-row"><span class="k">Duration</span><span class="v">8 years</span></div>
+              <div class="facts-row"><span class="k">Colonies</span><span class="v">13 of 13</span></div>
+              <div class="facts-row"><span class="k">Congresses</span><span class="v">2</span></div>
+              <div class="facts-row"><span class="k">Outcome</span><span class="v"><span class="pass">Independence</span></span></div>
+              <div class="facts-row"><span class="k">Your level</span><span class="v"><span class="you">L2 · Intermediate</span></span></div>
+              <div class="facts-row"><span class="k">Your rank</span><span class="v"><span class="you">142 of 2,418</span></span></div>
+              <div class="facts-footer">Updated 7 min ago</div>
+            </aside>
+          </div>
+          <div class="foot">
+            <span class="left">Continue at your own pace</span>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-ghost">Save for later</button>
+              <button class="btn btn-primary">Take the quiz →</button>
+            </div>
+          </div>
+        </article>
+      </div>
+      <div>
+        <div class="label">Dark</div>
+        <article class="page dark">
+          <div class="running-head">
+            <span class="left">Topic 8 · US History</span>
+            <span class="right">5 min read</span>
+          </div>
+          <div class="topic">
+            <div class="chapter">Entry VIII of XXIII</div>
+            <h2>The American Revolution</h2>
+            <p class="it-sub">Causes, course, and consequences of the war, 1775–1783.</p>
+          </div>
+          <div class="body-and-facts">
+            <div class="prose">
+              <p><span class="first">B</span>y the spring of 1776, the political break between the thirteen American colonies and Great Britain had become irreconcilable. The dispute, which had begun over the right to tax, had expanded within a decade to questions of sovereignty, representation, and the meaning of subjecthood itself.</p>
+              <p>The First Continental Congress, meeting in Philadelphia in September 1774, had attempted a petition to the Crown. The petition went unanswered. The Second Continental Congress, which would become both a governing body and a wartime assembly, was already meeting when, on the night of April 18, militia riders set out from Boston to warn the countryside.</p>
+              <p>The war that followed would last eight years, span a continent, and end in a victory so improbable that the most serious contemporary observers had given the colonial cause no chance of surviving the first campaign.</p>
+            </div>
+            <aside class="facts">
+              <div class="facts-head">Key Facts</div>
+              <div class="facts-title">The American Revolution</div>
+              <div class="facts-row"><span class="k">Dates</span><span class="v">1775–1783</span></div>
+              <div class="facts-row"><span class="k">Duration</span><span class="v">8 years</span></div>
+              <div class="facts-row"><span class="k">Colonies</span><span class="v">13 of 13</span></div>
+              <div class="facts-row"><span class="k">Congresses</span><span class="v">2</span></div>
+              <div class="facts-row"><span class="k">Outcome</span><span class="v"><span class="pass">Independence</span></span></div>
+              <div class="facts-row"><span class="k">Your level</span><span class="v"><span class="you">L2 · Intermediate</span></span></div>
+              <div class="facts-row"><span class="k">Your rank</span><span class="v"><span class="you">142 of 2,418</span></span></div>
+              <div class="facts-footer">Updated 7 min ago</div>
+            </aside>
+          </div>
+          <div class="foot">
+            <span class="left">Continue at your own pace</span>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-ghost">Save for later</button>
+              <button class="btn btn-primary">Take the quiz →</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <h2 class="sec-title">Subject card (homepage)</h2>
+      <span class="sec-note">table-styled · 3-up stat row</span>
+    </div>
+    <div class="compare">
+      <div>
+        <div class="label">Light</div>
+        <div class="subj">
+          <div class="subj-head">
+            <span class="subj-name">U.S. History</span>
+            <span class="subj-pts">1,250 pts</span>
+          </div>
+          <div class="subj-body">
+            <div class="subj-meta">Level 2 · Topic 8 of 23</div>
+            <div class="subj-topic">The American Revolution</div>
+            <div class="subj-stats">
+              <div class="s"><span class="v">8d</span><span class="l">Streak</span></div>
+              <div class="s"><span class="v">12h 32m</span><span class="l">Time</span></div>
+              <div class="s"><span class="v">60%</span><span class="l">Done</span></div>
+            </div>
+            <div class="progress-line">
+              <div class="bar"><div class="fill" style="width:60%"></div></div>
+              <span class="pct">60%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="label">Dark</div>
+        <div class="subj dark">
+          <div class="subj-head">
+            <span class="subj-name">U.S. History</span>
+            <span class="subj-pts">1,250 pts</span>
+          </div>
+          <div class="subj-body">
+            <div class="subj-meta">Level 2 · Topic 8 of 23</div>
+            <div class="subj-topic">The American Revolution</div>
+            <div class="subj-stats">
+              <div class="s"><span class="v">8d</span><span class="l">Streak</span></div>
+              <div class="s"><span class="v">12h 32m</span><span class="l">Time</span></div>
+              <div class="s"><span class="v">60%</span><span class="l">Done</span></div>
+            </div>
+            <div class="progress-line">
+              <div class="bar"><div class="fill" style="width:60%"></div></div>
+              <span class="pct">60%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot-end">
+    <span>Direction F — Almanac</span>
+    <span>Stop here. Tell me to keep, change, or pick another direction.</span>
+  </div>
+</body>
+</html>

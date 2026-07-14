@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Direction C — Atelier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       Direction C — "Atelier"
+       Light-first, off-white with brand chroma, mixed-type.
+       Signature: continuous roadmap line.
+       ============================================================ */
+
+    :root {
+      /* Light */
+      --bg: #F2EEE5;
+      --surface: #FBF8F2;
+      --ink: #1A1814;
+      --accent: #A07A2A;
+      --muted: #847C72;
+      --success: #3F6B3A;
+
+      /* Dark */
+      --bg-d: #14110D;
+      --surface-d: #1E1A15;
+      --ink-d: #F2EDE4;
+      --accent-d: #C99A3D;
+      --muted-d: #6B635A;
+      --success-d: #7AA674;
+
+      --display: 'Source Serif 4', Georgia, serif;
+      --body: 'Inter', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+      --r-sm: 6px;
+      --r-md: 10px;
+      --r-lg: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #E8E3D8; color: var(--ink); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+    body { padding: 48px 64px; max-width: 1440px; margin: 0 auto; }
+
+    .mock-header { margin-bottom: 64px; }
+    .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+    .mock-title { font-family: var(--display); font-weight: 600; font-size: 56px; letter-spacing: -0.02em; line-height: 1.05; color: var(--ink); margin-bottom: 8px; font-variation-settings: "opsz" 50; }
+    .mock-sub { font-size: 16px; color: var(--muted); max-width: 64ch; line-height: 1.5; }
+    .mock-meta { display: flex; gap: 28px; margin-top: 24px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+    .mock-meta b { font-weight: 500; color: var(--ink); }
+
+    .section { margin-bottom: 56px; }
+    .section-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid rgba(26,24,20,0.12); }
+    .section-num { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+    .section-title { font-family: var(--display); font-size: 24px; font-weight: 600; font-variation-settings: "opsz" 30; }
+    .section-note { margin-left: auto; font-size: 11px; color: var(--muted); font-family: var(--mono); }
+
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .compare-label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; }
+
+    /* ========== Palette ========== */
+    .swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+    .swatch { display: flex; flex-direction: column; }
+    .swatch-pair { display: flex; flex-direction: column; border-radius: var(--r-md); overflow: hidden; border: 1px solid rgba(26,24,20,0.08); }
+    .swatch-light, .swatch-dark { padding: 32px 16px; min-height: 88px; display: flex; flex-direction: column; justify-content: space-between; }
+    .swatch-light { background: var(--c-light); color: var(--c-light-ink); }
+    .swatch-dark { background: var(--c-dark); color: var(--c-dark-ink); }
+    .swatch-name { font-family: var(--mono); font-size: 11px; text-transform: lowercase; letter-spacing: 0.02em; }
+    .swatch-hex { font-family: var(--mono); font-size: 11px; opacity: 0.7; }
+
+    /* ========== Type scale ========== */
+    .type-card { padding: 40px 48px; border-radius: var(--r-lg); }
+    .type-card.light { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(20,17,13,0.04), 0 4px 12px rgba(20,17,13,0.06); }
+    .type-card.dark { background: var(--surface-d); color: var(--ink-d); border: 1px solid rgba(242,237,228,0.06); }
+    .type-row { display: grid; grid-template-columns: 110px 1fr 100px; align-items: baseline; padding: 12px 0; border-bottom: 1px solid rgba(127,127,127,0.12); gap: 16px; }
+    .type-row:last-child { border-bottom: 0; }
+    .type-card.dark .type-row { border-color: rgba(242,237,228,0.1); }
+    .type-label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    .type-card.dark .type-label { color: var(--muted-d); }
+    .type-spec { font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: right; }
+    .type-card.dark .type-spec { color: var(--muted-d); }
+    .t-h1 { font-family: var(--display); font-size: 44px; font-weight: 600; line-height: 1.05; letter-spacing: -0.02em; font-variation-settings: "opsz" 50; }
+    .t-h2 { font-family: var(--display); font-size: 28px; font-weight: 600; line-height: 1.15; letter-spacing: -0.015em; font-variation-settings: "opsz" 30; }
+    .t-h3 { font-family: var(--display); font-size: 20px; font-weight: 500; line-height: 1.2; font-variation-settings: "opsz" 24; }
+    .t-body { font-family: var(--body); font-size: 16px; line-height: 1.55; }
+    .t-caption { font-family: var(--body); font-size: 13px; color: var(--muted); }
+    .type-card.dark .t-caption { color: var(--muted-d); }
+    .t-mono { font-family: var(--mono); font-size: 14px; }
+
+    /* ========== Card with continuous roadmap ========== */
+    .card { border-radius: var(--r-lg); padding: 36px 44px; position: relative; }
+    .card.light { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(20,17,13,0.04), 0 4px 12px rgba(20,17,13,0.06); }
+    .card.dark { background: var(--surface-d); color: var(--ink-d); border: 1px solid rgba(242,237,228,0.06); }
+    .card-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 20px; }
+    .card-tag { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
+    .card.dark .card-tag { color: var(--accent-d); }
+    .card-time { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+    .card.dark .card-time { color: var(--muted-d); }
+    .card-title { font-family: var(--display); font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 8px; font-variation-settings: "opsz" 40; }
+    .card-desc { font-size: 15px; line-height: 1.55; max-width: 56ch; color: var(--muted); margin-bottom: 24px; }
+    .card.dark .card-desc { color: var(--muted-d); }
+
+    /* The continuous roadmap line — SIGNATURE */
+    .roadmap { position: relative; padding: 8px 0 8px 32px; margin-bottom: 24px; }
+    .roadmap::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 4px;
+      bottom: 4px;
+      width: 2px;
+      background: var(--ink);
+      opacity: 0.18;
+      border-radius: 1px;
+    }
+    .card.dark .roadmap::before { background: var(--ink-d); }
+    .roadmap-item { position: relative; padding: 10px 0; display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    .roadmap-item::before {
+      content: '';
+      position: absolute;
+      left: -28px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1.5px solid var(--ink);
+      opacity: 0.6;
+    }
+    .card.dark .roadmap-item::before { background: var(--surface-d); border-color: var(--ink-d); }
+    .roadmap-item.done::before { background: var(--ink); border-color: var(--ink); opacity: 1; }
+    .card.dark .roadmap-item.done::before { background: var(--ink-d); border-color: var(--ink-d); }
+    .roadmap-item.current::before { background: var(--accent); border-color: var(--accent); opacity: 1; box-shadow: 0 0 0 4px rgba(160,122,42,0.18); }
+    .card.dark .roadmap-item.current::before { background: var(--accent-d); border-color: var(--accent-d); box-shadow: 0 0 0 4px rgba(201,154,61,0.2); }
+    .roadmap-item.done { color: var(--muted); }
+    .card.dark .roadmap-item.done { color: var(--muted-d); }
+    .roadmap-item.current { color: var(--ink); font-weight: 500; }
+    .card.dark .roadmap-item.current { color: var(--ink-d); }
+    .roadmap-item .meta { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .card.dark .roadmap-item .meta { color: var(--muted-d); }
+
+    .card-foot { display: flex; align-items: center; gap: 24px; padding-top: 16px; border-top: 1px solid rgba(127,127,127,0.1); }
+    .card.dark .card-foot { border-color: rgba(242,237,228,0.1); }
+    .card-foot .progress { flex: 1; height: 6px; background: rgba(127,127,127,0.12); border-radius: 3px; overflow: hidden; }
+    .card-foot .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; }
+    .card.dark .card-foot .progress-fill { background: var(--accent-d); }
+    .card-foot .pct { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+    .card.dark .card-foot .pct { color: var(--muted-d); }
+
+    /* ========== Buttons ========== */
+    .btn-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 28px 32px; border-radius: var(--r-lg); }
+    .btn-row.light { background: var(--surface); box-shadow: 0 1px 2px rgba(20,17,13,0.04), 0 4px 12px rgba(20,17,13,0.06); }
+    .btn-row.dark { background: var(--surface-d); border: 1px solid rgba(242,237,228,0.06); }
+    .btn { font-family: var(--body); font-size: 14px; font-weight: 500; padding: 11px 20px; border-radius: var(--r-md); border: 1px solid transparent; cursor: pointer; transition: transform 200ms ease-out; display: inline-flex; align-items: center; gap: 8px; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-row.dark .btn-primary { background: var(--accent-d); border-color: var(--accent-d); color: #14110D; }
+    .btn-secondary { background: transparent; color: var(--ink); border-color: rgba(26,24,20,0.2); }
+    .btn-row.dark .btn-secondary { color: var(--ink-d); border-color: rgba(242,237,228,0.2); }
+    .btn-ghost { background: transparent; color: var(--accent); }
+    .btn-row.dark .btn-ghost { color: var(--accent-d); }
+    .btn-ghost:hover { background: rgba(160,122,42,0.08); }
+    .btn-row.dark .btn-ghost:hover { background: rgba(201,154,61,0.1); }
+
+    .footer-note { margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(26,24,20,0.12); font-family: var(--mono); font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; }
+  </style>
+</head>
+<body>
+  <header class="mock-header">
+    <div class="eyebrow">Direction C</div>
+    <h1 class="mock-title">Atelier</h1>
+    <p class="mock-sub">Light-first, off-white with brand chroma, mixed-type. The studio desk. The continuous roadmap line is the spine of the whole product — every screen reuses it.</p>
+    <div class="mock-meta">
+      <span><b>Display</b> · Source Serif 4</span>
+      <span><b>Body</b> · Inter</span>
+      <span><b>Mono</b> · JetBrains Mono</span>
+      <span><b>Accent</b> · #A07A2A deep mustard</span>
+      <span><b>Default mode</b> · Light</span>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Palette</h2>
+      <span class="section-note">6 tokens · light + dark</span>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="--c-light:#F2EEE5;--c-light-ink:#1A1814;--c-dark:#14110D;--c-dark-ink:#F2EDE4">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">bg</span><span class="swatch-hex">#F2EEE5</span></div>
+          <div class="swatch-dark"><span class="swatch-name">bg · dark</span><span class="swatch-hex">#14110D</span></div>
+        </div>
+      </div>
+      <div class="swatch" style="--c-light:#FBF8F2;--c-light-ink:#1A1814;--c-dark:#1E1A15;--c-dark-ink:#F2EDE4">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">surface</span><span class="swatch-hex">#FBF8F2</span></div>
+          <div class="swatch-dark"><span class="swatch-name">surface · dark</span><span class="swatch-hex">#1E1A15</span></div>
+        </div>
+      </div>
+      <div class="swatch" style="--c-light:#1A1814;--c-light-ink:#FBF8F2;--c-dark:#F2EDE4;--c-dark-ink:#14110D">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">ink</span><span class="swatch-hex">#1A1814</span></div>
+          <div class="swatch-dark"><span class="swatch-name">ink · dark</span><span class="swatch-hex">#F2EDE4</span></div>
+        </div>
+      </div>
+      <div class="swatch" style="--c-light:#A07A2A;--c-light-ink:#fff;--c-dark:#C99A3D;--c-dark-ink:#14110D">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">accent</span><span class="swatch-hex">#A07A2A</span></div>
+          <div class="swatch-dark"><span class="swatch-name">accent · dark</span><span class="swatch-hex">#C99A3D</span></div>
+        </div>
+      </div>
+      <div class="swatch" style="--c-light:#847C72;--c-light-ink:#FBF8F2;--c-dark:#6B635A;--c-dark-ink:#F2EDE4">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">muted</span><span class="swatch-hex">#847C72</span></div>
+          <div class="swatch-dark"><span class="swatch-name">muted · dark</span><span class="swatch-hex">#6B635A</span></div>
+        </div>
+      </div>
+      <div class="swatch" style="--c-light:#3F6B3A;--c-light-ink:#FBF8F2;--c-dark:#7AA674;--c-dark-ink:#14110D">
+        <div class="swatch-pair">
+          <div class="swatch-light"><span class="swatch-name">success</span><span class="swatch-hex">#3F6B3A</span></div>
+          <div class="swatch-dark"><span class="swatch-name">success · dark</span><span class="swatch-hex">#7AA674</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Type scale</h2>
+      <span class="section-note">serif display + sans body + mono data</span>
+    </div>
+    <div class="compare">
+      <div>
+        <div class="compare-label">Light</div>
+        <div class="type-card light">
+          <div class="type-row"><span class="type-label">h1 · display</span><span class="t-h1">The American Revolution</span><span class="type-spec">44 / -0.02em</span></div>
+          <div class="type-row"><span class="type-label">h2 · display</span><span class="t-h2">Level 2 · Intermediate</span><span class="type-spec">28 / -0.015em</span></div>
+          <div class="type-row"><span class="type-label">h3 · display</span><span class="t-h3">Current topic</span><span class="type-spec">20</span></div>
+          <div class="type-row"><span class="type-label">body</span><span class="t-body">A short read on the political and economic causes of the war.</span><span class="type-spec">16 / 1.55</span></div>
+          <div class="type-row"><span class="type-label">caption</span><span class="t-caption">topic 8 of 23</span><span class="type-spec">13 · muted</span></div>
+          <div class="type-row"><span class="type-label">mono</span><span class="t-mono">+80 pts · 12h 32m</span><span class="type-spec">14 · mono</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="compare-label">Dark</div>
+        <div class="type-card dark">
+          <div class="type-row"><span class="type-label">h1 · display</span><span class="t-h1">The American Revolution</span><span class="type-spec">44 / -0.02em</span></div>
+          <div class="type-row"><span class="type-label">h2 · display</span><span class="t-h2">Level 2 · Intermediate</span><span class="type-spec">28 / -0.015em</span></div>
+          <div class="type-row"><span class="type-label">h3 · display</span><span class="t-h3">Current topic</span><span class="type-spec">20</span></div>
+          <div class="type-row"><span class="type-label">body</span><span class="t-body">A short read on the political and economic causes of the war.</span><span class="type-spec">16 / 1.55</span></div>
+          <div class="type-row"><span class="type-label">caption</span><span class="t-caption">topic 8 of 23</span><span class="type-spec">13 · muted</span></div>
+          <div class="type-row"><span class="type-label">mono</span><span class="t-mono">+80 pts · 12h 32m</span><span class="type-spec">14 · mono</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Sample card</h2>
+      <span class="section-note">continuous roadmap line signature</span>
+    </div>
+    <div class="compare">
+      <div>
+        <div class="compare-label">Light</div>
+        <div class="card light">
+          <div class="card-head">
+            <span class="card-tag">US History · Level 2</span>
+            <span class="card-time">5 min read</span>
+          </div>
+          <h3 class="card-title">The American Revolution</h3>
+          <p class="card-desc">A short read on the political and economic causes of the war, the Continental Congress, and the path to independence.</p>
+          <div class="roadmap">
+            <div class="roadmap-item done"><span>Causes of Revolution</span><span class="meta">+30 pts</span></div>
+            <div class="roadmap-item done"><span>First Continental Congress</span><span class="meta">+30 pts</span></div>
+            <div class="roadmap-item done"><span>Declaration of Independence</span><span class="meta">+30 pts</span></div>
+            <div class="roadmap-item current"><span>Legacy of the Revolution</span><span class="meta">in progress</span></div>
+            <div class="roadmap-item"><span>The Constitution</span><span class="meta">locked</span></div>
+          </div>
+          <div class="card-foot">
+            <div class="progress"><div class="progress-fill" style="width:60%"></div></div>
+            <span class="pct">60% · topic 8/23</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="compare-label">Dark</div>
+        <div class="card dark">
+          <div class="card-head">
+            <span class="card-tag">US History · Level 2</span>
+            <span class="card-time">5 min read</span>
+          </div>
+          <h3 class="card-title">The American Revolution</h3>
+          <p class="card-desc">A short read on the political and economic causes of the war, the Continental Congress, and the path to independence.</p>
+          <div class="roadmap">
+            <div class="roadmap-item done"><span>Causes of Revolution</span><span class="meta">+30 pts</span></div>
+            <div class="roadmap-item done"><span>First Continental Congress</span><span class="meta">+30 pts</span></div>
+            <div class="roadmap-item done"><span>Declaration of Independence</span><span class="meta">+30 pts</span></div>
+            <div class="roadmap-item current"><span>Legacy of the Revolution</span><span class="meta">in progress</span></div>
+            <div class="roadmap-item"><span>The Constitution</span><span class="meta">locked</span></div>
+          </div>
+          <div class="card-foot">
+            <div class="progress"><div class="progress-fill" style="width:60%"></div></div>
+            <span class="pct">60% · topic 8/23</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Buttons</h2>
+      <span class="section-note">primary · secondary · ghost</span>
+    </div>
+    <div class="compare">
+      <div>
+        <div class="compare-label">Light</div>
+        <div class="btn-row light">
+          <button class="btn btn-primary">Start 5 min read →</button>
+          <button class="btn btn-secondary">Review answers</button>
+          <button class="btn btn-ghost">See all learners →</button>
+        </div>
+      </div>
+      <div>
+        <div class="compare-label">Dark</div>
+        <div class="btn-row dark">
+          <button class="btn btn-primary">Start 5 min read →</button>
+          <button class="btn btn-secondary">Review answers</button>
+          <button class="btn btn-ghost">See all learners →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer-note">
+    <span>Direction C — Atelier</span>
+    <span>Stop here. Tell me to keep, change, or pick another direction.</span>
+  </div>
+</body>
+</html>

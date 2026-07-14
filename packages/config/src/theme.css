@@ -1,0 +1,112 @@
+/* =====================================================================
+   Wicky — Almanac theme tokens
+   Direction F: light-first, data-led, with personality.
+   The almanac is the form factor for Wicky — a reference work for learning.
+   Every token is named after what it IS, not how it's used.
+   ===================================================================== */
+
+:root {
+  /* Surface colors — paper, ink, and the almanac's working colors */
+  --color-paper: #F0EDDF;            /* almanac cream — chroma toward green-yellow */
+  --color-surface: #F5F2E5;          /* one step lighter, for layered content */
+  --color-ink: #1A1814;              /* deep ink, near-black */
+  --color-ink-muted: #847C72;        /* warm gray for secondary text */
+  --color-border: #1A1814;           /* hairline color, full opacity (the almanac doesn't do low-opacity hairlines) */
+
+  /* Oxblood — the year color. Structural: dividers, current state, "you" indicators. */
+  --color-oxblood: #7A2E2E;
+  --color-oxblood-soft: rgba(122, 46, 46, 0.08);
+
+  /* Forest — the table color. Verified / passed / table headers. */
+  --color-forest: #2C4A3E;
+  --color-forest-soft: rgba(44, 74, 62, 0.08);
+
+  /* Verified (success) — used for "passed" quiz states, completed topic states. */
+  --color-verified: #3F6B3A;
+  --color-verified-soft: rgba(63, 107, 58, 0.08);
+
+  /* Foreground inversion — for text on dark surfaces (table headers, button bg) */
+  --color-on-ink: #F0EDDF;
+  --color-on-oxblood: #F0EDDF;
+  --color-on-forest: #F0EDDF;
+
+  /* Typography */
+  --font-display: 'Lora', Georgia, serif;
+  --font-body: 'Source Sans 3', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Type scale */
+  --text-h1: 2.75rem;       /* 44px */
+  --text-h1-leading: 1.05;
+  --text-h1-tracking: -0.02em;
+  --text-h2: 1.625rem;      /* 26px */
+  --text-h2-leading: 1.15;
+  --text-h2-tracking: -0.015em;
+  --text-h3: 1.25rem;       /* 20px */
+  --text-h3-leading: 1.2;
+  --text-h3-tracking: -0.01em;
+  --text-body: 0.9375rem;   /* 15px */
+  --text-body-leading: 1.6;
+  --text-caption: 0.75rem;  /* 12px */
+  --text-caption-leading: 1.4;
+  --text-mono: 0.8125rem;   /* 13px */
+
+  /* Spacing — 4px base */
+  --space-1: 0.25rem;   /* 4 */
+  --space-2: 0.5rem;    /* 8 */
+  --space-3: 0.75rem;   /* 12 */
+  --space-4: 1rem;      /* 16 */
+  --space-6: 1.5rem;    /* 24 */
+  --space-8: 2rem;      /* 32 */
+  --space-12: 3rem;     /* 48 */
+  --space-16: 4rem;     /* 64 */
+  --space-24: 6rem;     /* 96 */
+
+  /* Radii — the almanac is mostly square */
+  --radius-none: 0;
+  --radius-sm: 4px;     /* buttons and pills only */
+  --radius-md: 0;       /* surfaces — flat, demarcated by rules */
+  --radius-lg: 0;
+
+  /* Borders */
+  --border-hairline: 1px solid var(--color-border);
+  --border-double: 3px double var(--color-border);
+  --border-row: 1px solid var(--color-border);
+
+  /* Motion */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+}
+
+/* Dark theme — toggled via [data-theme="dark"] on <html> */
+[data-theme="dark"] {
+  --color-paper: #14110D;
+  --color-surface: #1E1A15;
+  --color-ink: #F2EDE4;
+  --color-ink-muted: #847C72;
+  --color-border: #F2EDE4;
+
+  --color-oxblood: #C26A6A;
+  --color-oxblood-soft: rgba(194, 106, 106, 0.12);
+
+  --color-forest: #6B8C7A;
+  --color-forest-soft: rgba(107, 140, 122, 0.12);
+
+  --color-verified: #7AA674;
+  --color-verified-soft: rgba(122, 166, 116, 0.12);
+
+  --color-on-ink: #14110D;
+  --color-on-oxblood: #14110D;
+  --color-on-forest: #14110D;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+  }
+}

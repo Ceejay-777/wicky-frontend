@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Direction D — Field Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       Direction D — "Field Guide"
+       Reference: Roger Tory Peterson, Audubon, National Geographic.
+       Committed palette: deep library green as binding, sienna as highlighter.
+       Topic reading page is the hero.
+       ============================================================ */
+
+    :root {
+      /* Light */
+      --bg: #EFEDE3;          /* paper with chroma toward green */
+      --surface: #F5F2E8;
+      --ink: #1A1F1A;         /* ink with the faintest green tint */
+      --binding: #2C4A3E;     /* deep library green — committed */
+      --highlight: #8B5A2B;   /* sienna — highlighter mark, "passed" */
+      --muted: #7A7568;
+
+      /* Dark */
+      --bg-d: #14130E;
+      --surface-d: #1F1E18;
+      --ink-d: #F0EDDF;
+      --binding-d: #6B8C7A;
+      --highlight-d: #C99A4D;
+      --muted-d: #847C72;
+
+      --display: 'Spectral', Georgia, serif;
+      --body: 'IBM Plex Sans', system-ui, sans-serif;
+      --mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+      --r: 4px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #E0DDD0; color: var(--ink); font-family: var(--body); -webkit-font-smoothing: antialiased; font-feature-settings: "kern" 1, "liga" 1, "onum" 1; }
+    body { padding: 40px 56px 80px; max-width: 1440px; margin: 0 auto; }
+
+    /* Header */
+    .head { padding: 32px 0 48px; border-bottom: 2px solid var(--ink); margin-bottom: 48px; position: relative; }
+    .head::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 8px; background: var(--binding); }
+    .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--binding); margin-bottom: 10px; font-weight: 500; }
+    .head h1 { font-family: var(--display); font-weight: 600; font-size: 60px; letter-spacing: -0.02em; line-height: 1; color: var(--ink); margin-bottom: 14px; }
+    .head h1 .it { font-style: italic; font-weight: 400; }
+    .sub { font-size: 15px; color: var(--muted); max-width: 64ch; line-height: 1.55; font-style: italic; }
+    .meta { display: flex; gap: 32px; margin-top: 24px; font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .meta b { font-weight: 500; color: var(--ink); }
+
+    /* Section */
+    .sec { margin-bottom: 64px; }
+    .sec-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 28px; padding-bottom: 10px; border-bottom: 1px solid var(--ink); }
+    .sec-num { font-family: var(--mono); font-size: 11px; color: var(--binding); font-weight: 500; }
+    .sec-title { font-family: var(--display); font-size: 26px; font-weight: 500; letter-spacing: -0.01em; font-style: italic; }
+    .sec-note { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    .label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+
+    /* ===== 01 — Palette ===== */
+    .swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+    .sw { display: flex; flex-direction: column; }
+    .sw .a, .sw .b { padding: 28px 12px 12px; min-height: 92px; display: flex; flex-direction: column; justify-content: space-between; }
+    .sw .a { background: var(--sw-light); color: var(--sw-light-ink); }
+    .sw .b { background: var(--sw-dark); color: var(--sw-dark-ink); }
+    .sw .name { font-family: var(--mono); font-size: 10px; text-transform: lowercase; letter-spacing: 0.04em; font-weight: 500; }
+    .sw .hex { font-family: var(--mono); font-size: 9px; opacity: 0.6; }
+
+    /* ===== 02 — Type scale ===== */
+    .type-card { padding: 36px 40px; background: var(--bg); border: 1px solid rgba(26,31,26,0.1); }
+    .type-card.dark { background: var(--bg-d); color: var(--ink-d); border-color: rgba(240,237,223,0.08); }
+    .type-row { display: grid; grid-template-columns: 120px 1fr 100px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid rgba(26,31,26,0.08); gap: 16px; }
+    .type-card.dark .type-row { border-color: rgba(240,237,223,0.08); }
+    .type-row:last-child { border-bottom: 0; }
+    .type-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .type-card.dark .type-label { color: var(--muted-d); }
+    .type-spec { font-family: var(--mono); font-size: 10px; color: var(--muted); text-align: right; }
+    .type-card.dark .type-spec { color: var(--muted-d); }
+    .t-h1 { font-family: var(--display); font-size: 44px; font-weight: 600; line-height: 1.05; letter-spacing: -0.02em; }
+    .t-h2 { font-family: var(--display); font-size: 28px; font-weight: 500; line-height: 1.15; letter-spacing: -0.015em; font-style: italic; }
+    .t-h3 { font-family: var(--display); font-size: 20px; font-weight: 500; line-height: 1.2; }
+    .t-body { font-family: var(--body); font-size: 15px; line-height: 1.6; }
+    .t-cap { font-family: var(--body); font-size: 12px; color: var(--muted); font-style: italic; }
+    .type-card.dark .t-cap { color: var(--muted-d); }
+    .t-mono { font-family: var(--mono); font-size: 13px; }
+
+    /* ===== 03 — THE TOPIC READING PAGE (the hero) ===== */
+    .page { background: var(--bg); border: 1px solid rgba(26,31,26,0.1); padding: 0; }
+    .page.dark { background: var(--bg-d); color: var(--ink-d); border-color: rgba(240,237,223,0.08); }
+
+    /* Running head — the signature */
+    .running-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 56px; border-bottom: 1px solid var(--ink); font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink); }
+    .page.dark .running-head { border-color: var(--ink-d); color: var(--ink-d); }
+    .running-head .left { color: var(--binding); font-weight: 500; }
+    .page.dark .running-head .left { color: var(--binding-d); }
+    .running-head .right { display: flex; align-items: center; gap: 12px; }
+    .pg-no { background: var(--binding); color: var(--bg); padding: 3px 8px; font-weight: 500; letter-spacing: 0.08em; }
+    .page.dark .pg-no { background: var(--binding-d); color: var(--bg-d); }
+
+    .topic { padding: 64px 56px 48px; }
+    .chapter { font-family: var(--display); font-size: 13px; text-transform: uppercase; letter-spacing: 0.16em; color: var(--binding); margin-bottom: 24px; font-weight: 500; }
+    .page.dark .chapter { color: var(--binding-d); }
+    .topic h2 { font-family: var(--display); font-size: 56px; font-weight: 600; line-height: 1.0; letter-spacing: -0.025em; margin-bottom: 16px; color: var(--ink); }
+    .page.dark .topic h2 { color: var(--ink-d); }
+    .topic .it-sub { font-family: var(--display); font-size: 22px; font-style: italic; font-weight: 300; color: var(--muted); line-height: 1.3; margin-bottom: 48px; max-width: 36ch; }
+    .page.dark .topic .it-sub { color: var(--muted-d); }
+
+    /* Body + marginalia — the field-guide layout */
+    .body-and-margin { display: grid; grid-template-columns: 1fr 200px; gap: 56px; padding: 0 56px 64px; }
+    .prose { font-family: var(--body); font-size: 17px; line-height: 1.7; color: var(--ink); }
+    .page.dark .prose { color: var(--ink-d); }
+    .prose p { margin-bottom: 22px; }
+    .prose .hl { background: linear-gradient(transparent 55%, rgba(139,90,43,0.22) 55%, rgba(139,90,43,0.22) 90%, transparent 90%); padding: 0 2px; }
+    .page.dark .prose .hl { background: linear-gradient(transparent 55%, rgba(201,154,77,0.25) 55%, rgba(201,154,77,0.25) 90%, transparent 90%); }
+    .prose .lead { font-family: var(--display); font-size: 19px; font-style: italic; line-height: 1.5; color: var(--ink); margin-bottom: 32px; padding-left: 18px; border-left: 2px solid var(--binding); }
+    .page.dark .prose .lead { color: var(--ink-d); border-color: var(--binding-d); }
+    .prose .small-caps { font-variant: small-caps; font-weight: 500; letter-spacing: 0.04em; }
+
+    /* Marginalia */
+    .margin { display: flex; flex-direction: column; gap: 28px; padding-top: 4px; }
+    .margin-item { font-family: var(--body); font-size: 12px; line-height: 1.45; color: var(--muted); }
+    .page.dark .margin-item { color: var(--muted-d); }
+    .margin-item .lbl { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--binding); display: block; margin-bottom: 4px; font-weight: 500; }
+    .page.dark .margin-item .lbl { color: var(--binding-d); }
+    .margin-item .v { color: var(--ink); font-family: var(--display); font-size: 14px; line-height: 1.3; font-style: italic; }
+    .page.dark .margin-item .v { color: var(--ink-d); }
+    .margin-item .v.figure { font-family: var(--mono); font-size: 16px; font-weight: 500; font-style: normal; font-variant-numeric: oldstyle-nums; }
+
+    /* Footer with CTA */
+    .foot { padding: 24px 56px; border-top: 1px solid var(--ink); display: flex; align-items: center; justify-content: space-between; }
+    .page.dark .foot { border-color: var(--ink-d); }
+    .foot .left { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .btn { font-family: var(--body); font-size: 14px; font-weight: 500; padding: 12px 22px; border: 1px solid transparent; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; letter-spacing: 0.01em; }
+    .btn-primary { background: var(--binding); color: #F0EDDF; }
+    .page.dark .btn-primary { background: var(--binding-d); color: #14130E; }
+    .btn-secondary { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+    .page.dark .btn-secondary { color: var(--ink-d); border-color: var(--ink-d); }
+    .btn-ghost { background: transparent; color: var(--binding); }
+    .page.dark .btn-ghost { color: var(--binding-d); }
+
+    /* ===== 04 — Secondary: subject card ===== */
+    .subj { background: var(--bg); border: 1px solid rgba(26,31,26,0.1); padding: 28px 32px; }
+    .subj.dark { background: var(--bg-d); color: var(--ink-d); border-color: rgba(240,237,223,0.08); }
+    .subj-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+    .subj-name { font-family: var(--display); font-size: 22px; font-weight: 600; }
+    .subj-pts { font-family: var(--mono); font-size: 12px; color: var(--highlight); font-weight: 500; }
+    .subj.dark .subj-pts { color: var(--highlight-d); }
+    .subj-meta { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 18px; }
+    .subj.dark .subj-meta { color: var(--muted-d); }
+    .subj-topic { font-family: var(--display); font-size: 17px; font-style: italic; margin-bottom: 16px; }
+    .progress-line { display: flex; align-items: center; gap: 12px; }
+    .progress-line .bar { flex: 1; height: 3px; background: rgba(26,31,26,0.12); }
+    .subj.dark .progress-line .bar { background: rgba(240,237,223,0.12); }
+    .progress-line .fill { height: 100%; background: var(--binding); }
+    .subj.dark .progress-line .fill { background: var(--binding-d); }
+    .progress-line .pct { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .subj.dark .progress-line .pct { color: var(--muted-d); }
+
+    .foot-end { margin-top: 56px; padding-top: 24px; border-top: 2px solid var(--ink); font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; display: flex; justify-content: space-between; }
+  </style>
+</head>
+<body>
+  <header class="head">
+    <div class="eyebrow">Direction D · Pass 2</div>
+    <h1>Field Guide <span class="it">of</span> learning</h1>
+    <p class="sub">A reference book you carry outside. Running heads, chapter labels, marginalia, highlighter marks. The reading page is the spine of the whole product — the same way a real field guide is built around its species accounts.</p>
+    <div class="meta">
+      <span><b>Display</b> · Spectral</span>
+      <span><b>Body</b> · IBM Plex Sans</span>
+      <span><b>Mono</b> · IBM Plex Mono</span>
+      <span><b>Palette</b> · committed (green is binding, not accent)</span>
+    </div>
+  </header>
+
+  <section class="sec">
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <h2 class="sec-title">Palette</h2>
+      <span class="sec-note">binding · ink · highlight — three working colors</span>
+    </div>
+    <div class="swatches">
+      <div class="sw" style="--sw-light:#EFEDE3;--sw-light-ink:#1A1F1A;--sw-dark:#14130E;--sw-dark-ink:#F0EDDF">
+        <div class="a"><span class="name">paper</span><span class="hex">#EFEDE3</span></div>
+        <div class="b"><span class="name">paper · dark</span><span class="hex">#14130E</span></div>
+      </div>
+      <div class="sw" style="--sw-light:#1A1F1A;--sw-light-ink:#EFEDE3;--sw-dark:#F0EDDF;--sw-dark-ink:#14130E">
+        <div class="a"><span class="name">ink</span><span class="hex">#1A1F1A</span></div>
+        <div class="b"><span class="name">ink · dark</span><span class="hex">#F0EDDF</span></div>
+      </div>
+      <div class="sw" style="--sw-light:#2C4A3E;--sw-light-ink:#EFEDE3;--sw-dark:#6B8C7A;--sw-dark-ink:#14130E">
+        <div class="a"><span class="name">binding</span><span class="hex">#2C4A3E</span></div>
+        <div class="b"><span class="name">binding · dark</span><span class="hex">#6B8C7A</span></div>
+      </div>
+      <div class="sw" style="--sw-light:#8B5A2B;--sw-light-ink:#EFEDE3;--sw-dark:#C99A4D;--sw-dark-ink:#14130E">
+        <div class="a"><span class="name">highlight</span><span class="hex">#8B5A2B</span></div>
+        <div class="b"><span class="name">highlight · dark</span><span class="hex">#C99A4D</span></div>
+      </div>
+      <div class="sw" style="--sw-light:#7A7568;--sw-light-ink:#EFEDE3;--sw-dark:#847C72;--sw-dark-ink:#14130E">
+        <div class="a"><span class="name">muted</span><span class="hex">#7A7568</span></div>
+        <div class="b"><span class="name">muted · dark</span><span class="hex">#847C72</span></div>
+      </div>
+      <div class="sw" style="--sw-light:#3F6B3A;--sw-light-ink:#EFEDE3;--sw-dark:#7AA674;--sw-dark-ink:#14130E">
+        <div class="a"><span class="name">passed</span><span class="hex">#3F6B3A</span></div>
+        <div class="b"><span class="name">passed · dark</span><span class="hex">#7AA674</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <h2 class="sec-title">Type scale</h2>
+      <span class="sec-note">old-style figures · small caps · italic for emphasis</span>
+    </div>
+    <div class="compare">
+      <div>
+        <div class="label">Light</div>
+        <div class="type-card">
+          <div class="type-row"><span class="type-label">h1 · display</span><span class="t-h1">The American Revolution</span><span class="type-spec">44 · -0.02em</span></div>
+          <div class="type-row"><span class="type-label">h2 · display</span><span class="t-h2">Causes and course of the war</span><span class="type-spec">28 · italic</span></div>
+          <div class="type-row"><span class="type-label">h3 · display</span><span class="t-h3">Current topic</span><span class="type-spec">20</span></div>
+          <div class="type-row"><span class="type-label">body</span><span class="t-body">By the spring of <span class="small-caps">1776</span>, the political break had become irreconcilable.</span><span class="type-spec">15 · 1.6</span></div>
+          <div class="type-row"><span class="type-label">caption</span><span class="t-cap">topic 8 of 23 · 5 min read</span><span class="type-spec">12 · italic</span></div>
+          <div class="type-row"><span class="type-label">mono</span><span class="t-mono">+80 pts · 12h 32m</span><span class="type-spec">13</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="label">Dark</div>
+        <div class="type-card dark">
+          <div class="type-row"><span class="type-label">h1 · display</span><span class="t-h1">The American Revolution</span><span class="type-spec">44 · -0.02em</span></div>
+          <div class="type-row"><span class="type-label">h2 · display</span><span class="t-h2">Causes and course of the war</span><span class="type-spec">28 · italic</span></div>
+          <div class="type-row"><span class="type-label">h3 · display</span><span class="t-h3">Current topic</span><span class="type-spec">20</span></div>
+          <div class="type-row"><span class="type-label">body</span><span class="t-body">By the spring of <span class="small-caps">1776</span>, the political break had become irreconcilable.</span><span class="type-spec">15 · 1.6</span></div>
+          <div class="type-row"><span class="type-label">caption</span><span class="t-cap">topic 8 of 23 · 5 min read</span><span class="type-spec">12 · italic</span></div>
+          <div class="type-row"><span class="type-label">mono</span><span class="t-mono">+80 pts · 12h 32m</span><span class="type-spec">13</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <span class="sec-num">03 · the hero</span>
+      <h2 class="sec-title">Topic reading page</h2>
+      <span class="sec-note">where the signature lives · running head, chapter, marginalia</span>
+    </div>
+    <div class="compare">
+      <div>
+        <div class="label">Light</div>
+        <article class="page">
+          <div class="running-head">
+            <span class="left">US History</span>
+            <span class="right"><span>5 min read</span><span class="pg-no">008</span><span>/ 023</span></span>
+          </div>
+          <div class="topic">
+            <div class="chapter">Chapter VIII</div>
+            <h2>The American Revolution</h2>
+            <p class="it-sub">Causes, course, and consequences of the war, 1775–1783.</p>
+          </div>
+          <div class="body-and-margin">
+            <div class="prose">
+              <p class="lead">By the spring of 1776, the political break between the thirteen American colonies and Great Britain had become irreconcilable.</p>
+              <p>The dispute, which had begun over the right to tax, had expanded within a decade to questions of <span class="hl">sovereignty, representation, and the meaning of subjecthood itself</span>. The First Continental Congress, meeting in Philadelphia in September 1774, had attempted a petition to the Crown. The petition went unanswered.</p>
+              <p>The Second Continental Congress, which would become both a governing body and a wartime assembly, was already meeting when, on the night of <span class="small-caps">April 18</span>, militia riders set out from Boston to warn the countryside that British regulars were marching to seize a cache of arms at Concord.</p>
+              <p>The war that followed would last eight years, span a continent, and end in a victory so improbable that the most serious contemporary observers had given the colonial cause no chance of surviving the first campaign.</p>
+            </div>
+            <aside class="margin">
+              <div class="margin-item">
+                <span class="lbl">Date</span>
+                <span class="v figure">1775–1783</span>
+              </div>
+              <div class="margin-item">
+                <span class="lbl">Colonies</span>
+                <span class="v">Thirteen, of which all but one sent delegates.</span>
+              </div>
+              <div class="margin-item">
+                <span class="lbl">Also</span>
+                <span class="v">Continental Congress, Lexington, Yorktown, Treaty of Paris.</span>
+              </div>
+              <div class="margin-item">
+                <span class="lbl">Reading time</span>
+                <span class="v figure">5 min</span>
+              </div>
+            </aside>
+          </div>
+          <div class="foot">
+            <span class="left">Continue at your own pace</span>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-secondary">Save for later</button>
+              <button class="btn btn-primary">Take the quiz →</button>
+            </div>
+          </div>
+        </article>
+      </div>
+      <div>
+        <div class="label">Dark</div>
+        <article class="page dark">
+          <div class="running-head">
+            <span class="left">US History</span>
+            <span class="right"><span>5 min read</span><span class="pg-no">008</span><span>/ 023</span></span>
+          </div>
+          <div class="topic">
+            <div class="chapter">Chapter VIII</div>
+            <h2>The American Revolution</h2>
+            <p class="it-sub">Causes, course, and consequences of the war, 1775–1783.</p>
+          </div>
+          <div class="body-and-margin">
+            <div class="prose">
+              <p class="lead">By the spring of 1776, the political break between the thirteen American colonies and Great Britain had become irreconcilable.</p>
+              <p>The dispute, which had begun over the right to tax, had expanded within a decade to questions of <span class="hl">sovereignty, representation, and the meaning of subjecthood itself</span>. The First Continental Congress, meeting in Philadelphia in September 1774, had attempted a petition to the Crown. The petition went unanswered.</p>
+              <p>The Second Continental Congress, which would become both a governing body and a wartime assembly, was already meeting when, on the night of <span class="small-caps">April 18</span>, militia riders set out from Boston to warn the countryside that British regulars were marching to seize a cache of arms at Concord.</p>
+              <p>The war that followed would last eight years, span a continent, and end in a victory so improbable that the most serious contemporary observers had given the colonial cause no chance of surviving the first campaign.</p>
+            </div>
+            <aside class="margin">
+              <div class="margin-item">
+                <span class="lbl">Date</span>
+                <span class="v figure">1775–1783</span>
+              </div>
+              <div class="margin-item">
+                <span class="lbl">Colonies</span>
+                <span class="v">Thirteen, of which all but one sent delegates.</span>
+              </div>
+              <div class="margin-item">
+                <span class="lbl">Also</span>
+                <span class="v">Continental Congress, Lexington, Yorktown, Treaty of Paris.</span>
+              </div>
+              <div class="margin-item">
+                <span class="lbl">Reading time</span>
+                <span class="v figure">5 min</span>
+              </div>
+            </aside>
+          </div>
+          <div class="foot">
+            <span class="left">Continue at your own pace</span>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-secondary">Save for later</button>
+              <button class="btn btn-primary">Take the quiz →</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <h2 class="sec-title">Subject card (homepage)</h2>
+      <span class="sec-note">flat · no shadows · hairline rules</span>
+    </div>
+    <div class="compare">
+      <div>
+        <div class="label">Light</div>
+        <div class="subj">
+          <div class="subj-head">
+            <span class="subj-name">US History</span>
+            <span class="subj-pts">1,250 pts</span>
+          </div>
+          <div class="subj-meta">Level 2 · Topic 8 of 23 · 60% complete</div>
+          <div class="subj-topic">The American Revolution</div>
+          <div class="progress-line">
+            <div class="bar"><div class="fill" style="width:60%"></div></div>
+            <span class="pct">60%</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="label">Dark</div>
+        <div class="subj dark">
+          <div class="subj-head">
+            <span class="subj-name">US History</span>
+            <span class="subj-pts">1,250 pts</span>
+          </div>
+          <div class="subj-meta">Level 2 · Topic 8 of 23 · 60% complete</div>
+          <div class="subj-topic">The American Revolution</div>
+          <div class="progress-line">
+            <div class="bar"><div class="fill" style="width:60%"></div></div>
+            <span class="pct">60%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot-end">
+    <span>Direction D — Field Guide</span>
+    <span>Stop here. Tell me to keep, change, or pick another direction.</span>
+  </div>
+</body>
+</html>
