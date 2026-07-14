@@ -889,27 +889,67 @@ These are the shadcn skill's non-negotiable rules. They apply to the almanac pro
 
 ---
 
-## § 5 — Pass 3 Placeholders
-
-This section is empty. Pass 3 (the actual screens) will fill it in.
+## § 5 — Pass 3 Progress
 
 ### 5.1 Component inventory
 
-*(To be filled in as components are built. Each entry: name, file path, status, dependencies.)*
+#### Components added in Pass 3 — auth screens
+
+| Name | File | Status | Notes |
+|---|---|---|---|
+| `AuthField` | `apps/web/src/components/auth/auth-field.tsx` | shipped | Base UI `Field.Root` + `Field.Label` + `Field.Control` wrapper. Almanac styling: 1px ink border, 0 radius, 48px tall, mono uppercase 10px label tracking 0.08em in ink-muted, oxblood focus ring, `data-invalid` and `aria-invalid` on error. |
+| `AuthSubmitButton` | `apps/web/src/components/auth/auth-submit-button.tsx` | shipped | shadcn Button `variant="default" size="lg"` with `IconLoader2` + `animate-spin` loading state. Mono uppercase 11px. 0 radius, 48px tall. |
+| `OrDivider` | `apps/web/src/components/auth/or-divider.tsx` | shipped | Mono "or" hairline divider. Two `bg-ink` 1px lines with a mono uppercase 10px tracking 0.12em label in a paper gap. The almanac's signature detail on the auth surfaces. |
+| `AuthFooterLink` | `apps/web/src/components/auth/auth-footer-link.tsx` | shipped | "Already have an account? Sign in" pattern. Prompt in body 14px ink-muted, link in mono uppercase 11px forest with underline-offset-4, hover to oxblood. |
+| `BackLink` | `apps/web/src/components/auth/back-link.tsx` | shipped | 44×44px `size-11` touch target with `IconChevronLeft` 20px. Links back to `/signin` from recover pages. |
+| `AuthFormAlert` | `apps/web/src/components/auth/auth-form-alert.tsx` | shipped | Top-of-form error alert using shadcn `Alert`. 1px oxblood border, `bg-accent` (oxblood-soft) background, oxblood title in Lora display 15px, description in body 13px ink-muted. |
+| `OAuthButton` | `apps/web/src/components/auth/oauth-button.tsx` | shipped | Full-width shadcn Button `variant="outline" size="lg"` with brand icon. Used for "Continue with Google" on signup. |
+| `OAuthIconButton` | `apps/web/src/components/auth/oauth-icon-button.tsx` | shipped | 44×44px `size-11` raw `<button>` (not shadcn) with 20px brand icon. Used for the 3-provider row on signin. 1px ink border, paper fill. |
+| `Alert` (shadcn) | `apps/web/src/components/ui/alert.tsx` | shipped | Added via `pnpm dlx shadcn@latest add alert`. Used by `AuthFormAlert`. |
+| `Toaster` (sonner) | `apps/web/src/components/ui/sonner.tsx` | shipped | Added via `pnpm dlx shadcn@latest add sonner`. **Modified** to read `data-theme` from `<html>` directly (instead of `next-themes`) so it stays in sync with the almanac's custom theme system. Uses `MutationObserver` to react to theme changes. |
+| `typeClass` / `typeClassMobile` | `apps/web/src/lib/typography.ts` | extracted | Was in `showcase/page.tsx`, extracted to lib for reuse. Used by all 5 auth pages and the future homepage. |
+| `initApiClient` | `apps/web/src/lib/api.ts` | shipped | Configures `@wicky/api-client` with the fetch wrapper. Default `API_BASE` is empty string (relative `/api` paths); overridable via `NEXT_PUBLIC_API_BASE` for cross-origin. Defines `ApiRequestError` class. |
+| `signupSchema` etc. | `apps/web/src/lib/auth/schemas.ts` | shipped | zod schemas for all 4 forms (signup, signin, requestReset, confirmReset). `confirmResetSchema` uses `.refine()` for password match. |
+| `signup` / `signin` / etc. | `apps/web/src/lib/auth/service.ts` | shipped | API service wrappers. Re-exports `ApiRequestError` from `@/lib/api`. |
+| `authMessages` | `apps/web/src/lib/auth/messages.ts` | shipped | All error and success copy in the almanac voice. `as const` for literal types. |
 
 ### 5.2 Screen-by-screen log
 
-*(To be filled in as screens are built. Each entry: screen name, file path, status, design notes, deviations from the per-screen rules above.)*
+#### Auth — Sign Up
 
-### 5.3 Decisions log
+- **Route:** `/signup` (in `(auth)` route group)
+- **Files:** `apps/web/src/app/(auth)/signup/page.tsx`, `signup-form.tsx`
+- **Status:** shipped
+- **Design notes:** Wordmark "Wicky" h1 (28px mobile / 36px tablet / 44px desktop, Lora 600), tagline "An almanac of learning." in Lora italic 18px, 3 fields (display name, email, password) each with mono label and 1px ink border 48px tall, oxblood primary CTA full-width, "or" mono divider, "Continue with Google" outline, footer link in forest. Validation via zod. `POST /api/auth/signup`. On success: toast "Account created.", redirect to `/`.
+- **Deviations from spec:** None. Tagline matches almanac version, "Continue with" verb per §3.4.1, no mascot/illustration.
 
-*(To be filled in as decisions are made during Pass 3. Each entry: date, decision, context, alternatives considered.)*
+#### Auth — Sign In
+
+- **Route:** `/signin`
+- **Files:** `apps/web/src/app/(auth)/signin/page.tsx`, `signin-form.tsx`
+- **Status:** shipped
+- **Design notes:** Wordmark + tagline "Welcome back." (Lora italic, no emoji, no exclamation per §1.5 / §3.1.10), 2 fields (email, password), "Forgot?" link right of label in forest, "Sign in" CTA, "or continue with" divider, 3 circular icon buttons (Google/Apple/Facebook) 44×44 centered, footer link. `POST /api/auth/signin`. Error ladder: 401 → "Invalid email or password.", 429 → "Too many attempts.", other → server message or unknown, else → network.
+- **Deviations from spec:** Dropped the 👋 emoji and "Welcome back!" exclamation per almanac voice.
+
+#### Auth — Account Recovery
+
+- **Routes:** `/recover`, `/recover/sent`, `/recover/confirm?token=...&email=...`
+- **Files:** `apps/web/src/app/(auth)/recover/{page,recover-form}.tsx`, `recover/sent/page.tsx`, `recover/confirm/{page,confirm-form}.tsx`
+- **Status:** shipped
+- **Design notes:** All 3 sub-states share the shell (back chevron 44×44, h1, italic helper, max-w-sm centered, `text-center sm:text-left` on heading). `/recover`: email + "Send recovery link" CTA, footer "Sign in" link. `/recover/sent`: 48px `IconMail` line icon stroke 1.25 in ink-muted centered above h1, "Back to sign in" link. `/recover/confirm`: reads `?token` and `?email` from URL into hidden inputs, shows 2 password fields, "Save password" CTA. `POST /api/auth/password-reset/{request,confirm}`. Always redirects to `/recover/sent` after request to avoid email enumeration.
+- **Deviations from spec:** Dropped the envelope/paper-airplane illustration in `/recover/sent` per §3.4.1's "no mascot, no illustration, no decorative shapes". Replaced with a 48px `IconMail` Tabler line icon stroke 1.25 — a restrained line icon, not a graphic.
+
+#### Decisions during this pass
+
+- **`Controller` over `register()` for wrapped inputs**: react-hook-form's `register()` returns an event-callback `onChange` (takes `ChangeEvent<HTMLInputElement>`), but our wrapped `AuthField` accepts a string-callback `onChange: (value: string) => void`. The `Controller` component is the standard react-hook-form idiom for integrating with custom wrapped inputs — it provides the string-callback `field.onChange` that matches `AuthField`'s API. Hidden native inputs (in `/recover/confirm`) use `register` directly because native `<input>` accepts the event-callback shape. Mixed approach is correct and idiomatic.
+- **`next-themes` removed**: The shadcn-generated `sonner.tsx` used `next-themes`' `useTheme` hook, but the almanac's theme system uses a custom inline script that sets `data-theme` on `<html>` (set up in `layout.tsx`). Without a `ThemeProvider` in the layout, `useTheme()` returns `undefined` and the Toaster falls back to `system` mode, which conflicts with the showcase's theme toggle. We rewrote the Toaster to read `data-theme` directly via `MutationObserver`, then removed the unused `next-themes` dep. Smaller dep tree, fewer moving parts.
+- **`API_BASE` defaults to empty string** (relative paths): Per `api-reference.md` line 3 the base URL is `/api` (relative). Same-origin in dev. Cross-origin setups set `NEXT_PUBLIC_API_BASE`.
 
 ---
 
 ## § 6 — Implementation Roadmap
 
-### Pass 2 (this pass) — done
+### Pass 2 — done
 
 - ✅ Token system in `packages/config/src/theme.css` and `theme.ts`.
 - ✅ Tailwind v4 setup with `@theme inline` in `apps/web/src/app/globals.css`.
@@ -918,20 +958,19 @@ This section is empty. Pass 3 (the actual screens) will fill it in.
 - ✅ `refs/design_system.md` (this file).
 - ✅ Monorepo builds end to end (`pnpm turbo typecheck` + `pnpm turbo build`).
 
-### Pass 3 — the actual screens
+### Pass 3 — in progress
 
-- Build each screen per the per-screen rules above, in this order:
-  1. Auth (Sign Up, Sign In, Password Recovery)
-  2. Homepage
-  3. Subject detail (Overview, Roadmap, Leaderboard)
-  4. Topic reading page (the entry)
-  5. Quiz page
-  6. Quiz Result page
-  7. Metrics page
-  8. Leaderboard page
-  9. Profile / Settings page
-  10. Bottom nav / sidebar
-- Add components as needed: Input, Textarea, Select, Switch, Checkbox, RadioGroup, Tabs, Dialog, AlertDialog, Tooltip, Avatar, Badge, Skeleton, Spinner, Alert, Empty, sonner toast, Separator.
+- ✅ 1. Auth (Sign Up, Sign In, Password Recovery) — see §5.2 for screen log
+- 2. Homepage
+- 3. Subject detail (Overview, Roadmap, Leaderboard)
+- 4. Topic reading page (the entry)
+- 5. Quiz page
+- 6. Quiz Result page
+- 7. Metrics page
+- 8. Leaderboard page
+- 9. Profile / Settings page
+- 10. Bottom nav / sidebar
+- Add components as needed: Textarea, Select, Combobox, Switch, Checkbox, RadioGroup, ToggleGroup, Tabs, Dialog, AlertDialog, Tooltip, Avatar, Badge, Skeleton, Spinner, Empty, sonner toast (already added), Separator.
 - Each screen goes through the per-screen rules above and the shadcn critical rules.
 - Fill in the § 5.1 Component inventory and § 5.2 Screen-by-screen log as screens are built.
 
