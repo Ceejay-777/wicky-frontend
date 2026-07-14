@@ -104,7 +104,7 @@ export function SigninForm() {
         )}
       />
 
-      <AuthSubmitButton loading={isSubmitting || isPending}>
+      <AuthSubmitButton loading={isPending}>
         Sign in
       </AuthSubmitButton>
 

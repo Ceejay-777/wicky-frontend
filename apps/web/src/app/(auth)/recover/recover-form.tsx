@@ -66,7 +66,7 @@ export function RecoverForm() {
         )}
       />
 
-      <AuthSubmitButton loading={isSubmitting || isPending}>
+      <AuthSubmitButton loading={isPending}>
         Send recovery link
       </AuthSubmitButton>
 

@@ -105,7 +105,7 @@ export function ConfirmResetForm() {
         )}
       />
 
-      <AuthSubmitButton loading={isSubmitting || isPending}>
+      <AuthSubmitButton loading={isPending}>
         Save password
       </AuthSubmitButton>
     </form>
