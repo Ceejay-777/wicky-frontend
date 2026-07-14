@@ -1,6 +1,6 @@
 # Wicky API Reference
 
-Base URL: `/api`
+Base URL: `https://learnerhq-production.up.railway.app/`
 
 **Auth:** JWT in HTTP-only cookies (`access_token` = 15min, `refresh_token` = 7 days).
 All endpoints marked "Auth required" will return `401` if the access token is missing or expired.

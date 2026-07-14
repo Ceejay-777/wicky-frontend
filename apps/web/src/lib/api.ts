@@ -1,7 +1,7 @@
 import { configureApiClient } from "@wicky/api-client";
 import type { ApiSuccess, ApiError } from "@wicky/types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "";
+const API_BASE = (process.env.NEXT_PUBLIC_API_BASE ?? "").replace(/\/$/, "");
 
 let initialized = false;
 
