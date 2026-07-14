@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { Lora, Source_Sans_3, JetBrains_Mono, Geist } from "next/font/google";
+import { Lora, Source_Sans_3, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+import { Providers } from "@/components/providers";
 
 const lora = Lora({
   subsets: ["latin"],
@@ -33,7 +32,6 @@ export const metadata: Metadata = {
   description: "An almanac of learning. Learn more. Every day.",
 };
 
-// Inline script — sets data-theme on <html> before React hydrates to prevent flash.
 const themeScript = `
 (function() {
   try {
@@ -58,12 +56,14 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn(lora.variable, sourceSans.variable, jetbrainsMono.variable, "font-sans", geist.variable)}
+      className={cn(lora.variable, sourceSans.variable, jetbrainsMono.variable, "font-sans")}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
