@@ -2,7 +2,13 @@ import "server-only";
 
 import { cache } from "react";
 import { ApiRequestError } from "@wicky/api-client";
-import type { ApiSuccess, EnrolledSubject, Subject, UserProfile } from "@wicky/types";
+import type {
+  ApiSuccess,
+  EnrolledSubject,
+  Subject,
+  SubjectDetail,
+  UserProfile,
+} from "@wicky/types";
 import { cookies } from "next/headers";
 
 const API_BASE = (process.env.API_BASE ?? "").replace(/\/$/, "");
@@ -64,5 +70,11 @@ export const getEnrolledSubjects = cache(
 export const getExploreSubjects = cache(
   async (): Promise<Subject[]> => {
     return serverFetch<Subject[]>("/api/learning/explore");
+  },
+);
+
+export const getSubjectDetail = cache(
+  async (id: number): Promise<SubjectDetail> => {
+    return serverFetch<SubjectDetail>(`/api/learning/subjects/${id}`);
   },
 );
