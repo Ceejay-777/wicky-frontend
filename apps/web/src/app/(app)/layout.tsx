@@ -1,11 +1,21 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { preconnect } from "react-dom";
 import { BottomNav } from "@/components/nav/bottom-nav";
 import { cn } from "@/lib/utils";
 
-export default function AppLayout({
+export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  preconnect("https://learnerhq-production.up.railway.app");
+
+  const cookieStore = await cookies();
+  if (!cookieStore.get("access_token")) {
+    redirect("/signin");
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <main
