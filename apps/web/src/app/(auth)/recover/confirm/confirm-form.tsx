@@ -25,7 +25,7 @@ export function ConfirmResetForm() {
     handleSubmit,
     control,
     register,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm<ConfirmResetValues>({
     resolver: zodResolver(confirmResetSchema),
     mode: "onBlur",
