@@ -86,7 +86,7 @@ handed directly to a coding agent as a build reference.
 - Footer link: **"Back to sign in"**.
 
 ### 2.4 Homepage
-- Header: **"Good morning, Alex! 👋"** (dynamic greeting by time of day + first name)
+- Header: **"Good morning, Alex!"** (dynamic greeting by time of day + display name)
   + subtitle **"Keep learning. Keep growing."** + a notification bell icon (top-right,
   with unread-dot support).
 - **"Currently Learning"** section, with a **"View all"** link on the same row.
@@ -211,7 +211,7 @@ Tabs:
 - Header: back chevron, **"Quiz Result"** title.
 - Large celebratory trophy icon inside a circular badge, with a confetti/particle
   burst graphic behind it.
-- **"Great job! 🎉"** headline.
+- **"Great job!"** headline.
 - "You scored" caption + large score readout **"4 / 5"**.
 - Points-earned pill: **"+80 pts"** (success-green).
 - Secondary button: **"Review Answers"** (outlined).

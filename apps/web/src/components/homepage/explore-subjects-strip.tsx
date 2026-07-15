@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useCallback, useEffect, useState } from "react";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { SubjectDiscoveryCard } from "./subject-discovery-card";
 import { AddSubjectCard } from "./add-subject-card";
@@ -19,12 +19,46 @@ export function ExploreSubjectsStrip({
   slotsTotal,
 }: ExploreSubjectsStripProps) {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const [scrollThumb, setScrollThumb] = useState<{
+    left: string;
+    width: string;
+  } | null>(null);
 
   const scrollBy = (dir: 1 | -1) => {
     const el = scrollerRef.current;
     if (!el) return;
     el.scrollBy({ left: dir * (el.clientWidth * 0.8), behavior: "smooth" });
   };
+
+  const updateScrollThumb = useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    if (scrollWidth <= clientWidth) {
+      setScrollThumb(null);
+      return;
+    }
+    const thumbPct = (clientWidth / scrollWidth) * 100;
+    const trackPct = 100 - thumbPct;
+    const leftPct =
+      (scrollLeft / (scrollWidth - clientWidth)) * trackPct;
+    setScrollThumb({ left: `${leftPct}%`, width: `${thumbPct}%` });
+  }, []);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    updateScrollThumb();
+
+    const ro = new ResizeObserver(updateScrollThumb);
+    ro.observe(el);
+    el.addEventListener("scroll", updateScrollThumb, { passive: true });
+
+    return () => {
+      ro.disconnect();
+      el.removeEventListener("scroll", updateScrollThumb);
+    };
+  }, [updateScrollThumb]);
 
   return (
     <section aria-labelledby="explore-heading" className="mt-10 sm:mt-12">
@@ -44,20 +78,35 @@ export function ExploreSubjectsStrip({
         ref={scrollerRef}
         className={cn(
           "flex gap-4 overflow-x-auto pb-2",
+          "snap-x snap-mandatory",
           "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         )}
         role="list"
         aria-label="Subject discovery"
       >
         {subjects.map((s) => (
-          <div key={s.id} role="listitem" className="contents">
+          <div key={s.id} role="listitem" className="shrink-0 snap-start">
             <SubjectDiscoveryCard subject={s} />
           </div>
         ))}
-        <div role="listitem" className="contents">
+        <div role="listitem" className="shrink-0 snap-start">
           <AddSubjectCard slotsUsed={slotsUsed} slotsTotal={slotsTotal} />
         </div>
       </div>
+      {scrollThumb && (
+        <div
+          className="mt-2 h-[3px] bg-muted lg:hidden"
+          aria-hidden="true"
+        >
+          <div
+            className="h-full bg-foreground"
+            style={{
+              width: scrollThumb.width,
+              marginLeft: scrollThumb.left,
+            }}
+          />
+        </div>
+      )}
     </section>
   );
 }

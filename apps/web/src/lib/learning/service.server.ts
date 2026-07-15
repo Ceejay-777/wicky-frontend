@@ -12,7 +12,6 @@ import type {
 import { cookies } from "next/headers";
 
 const API_BASE = (process.env.API_BASE ?? "").replace(/\/$/, "");
-console.log("API_BASE", API_BASE);
 
 async function serverFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const cookieStore = await cookies();

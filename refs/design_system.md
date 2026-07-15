@@ -480,16 +480,25 @@ Specific rules for each screen in the product. These are derived from the ui-spe
 - **Primary CTA:** full-width, oxblood fill, paper text, mono uppercase 11px, 0 radius, 48px tall. "Sign up" / "Sign in" / "Send recovery link".
 - **Secondary CTA (sign up with Google etc.):** full-width, paper fill, ink text, mono uppercase 11px, 0 radius, 48px tall, with a Google/Apple/Facebook icon on the left. The almanac voice on these buttons: "Continue with Google" rather than "Sign up with Google" (the action is "continue", not "sign up" — the user is starting a session, not creating an account).
 - **No mascot, no illustration, no decorative shapes.** Just type, a form, and a button. The almanac's restraint is the design.
+- 
+#### 3.4.2.0 Bottom nav bar (mobile) / sidebar (desktop)
+
+- **Posture:** airy. Persistent chrome.
+- **Five items:** Home, Subjects, Quiz, Metrics, Profile. Each with a Tabler icon (line variant for inactive, fill variant for active).
+- **Labels:** mono uppercase 10px, tracking 0.04em. Below the icon.
+- **Active state:** small 4x4 oxblood dot above the icon. Icon in oxblood color. Label in ink color.
+- **Inactive state:** icon in ink-muted color, label in ink-muted.
+- **No background fill.** The nav is transparent on top of the page background. A 1px solid ink border on the top edge of the nav (mobile) or the right edge (desktop sidebar) demarcates it.
+- **Desktop transformation:** at 1024px+, the bottom nav becomes a left sidebar. Same items, vertical layout, 240px wide, 0 radius, 1px solid ink right border.
 
 #### 3.4.2 Homepage
 
 - **Posture:** airy + a single data surface ("Currently Learning" as a flat list of subject rows).
-- **Greeting:** "Good morning, Alex." in Lora display 36-44px. Time-of-day greeting, italic for the time-of-day word. Below it: "An almanac of learning, kept up to date." in Lora italic 18px, ink-muted. *The almanac version of the spec's "Keep learning. Keep growing." — more confident, more "this is what it is".*
-- **Notification bell:** top-right, with a small oxblood dot for unread state. No notification panel in Pass 2; comes in Pass 3.
+- **Greeting:** "Good morning, {displayname}." in Lora display 36-44px. Time-of-day greeting, italic for the time-of-day word. Below it: "An almanac of learning, kept up to date." in Lora italic 18px, ink-muted. *The almanac version of the spec's "Keep learning. Keep growing." — more confident, more "this is what it is".*
+- **Notification bell:** top-right, with a small oxblood dot for unread state. 
 - **"Currently Learning" section:** header in mono uppercase 10px, ink-muted. Below: a **flat list** of subject rows (not cards). Each row: subject name in Lora display 18px on the left, current topic in Lora italic 14px below, points in JetBrains Mono 12px on the right. Hairline rule between rows. Hover state: oxblood-soft background.
 - **"Explore Other Subjects" section:** header in mono uppercase 10px. Below: a horizontally-scrolling strip of subject cards. The cards use the *flat* treatment (not table-styled) — they are discovery surfaces, not active content. Card body: 1px solid ink border, 0 radius, surface-color background. Subject name in Lora display 18px, learner count in JetBrains Mono 11px ink-muted. Width: 200px. Spacing: 16px between cards.
 - **"+ Add Subject" card:** a special last card in the strip with a dashed ink border. "0/5 slots used" in JetBrains Mono 11px ink-muted.
-- **No bottom nav bar visible in the Pass 2 design.** Pass 3 implements the bottom nav. The homepage stands alone for now.
 
 #### 3.4.3 Subject detail: Overview tab
 
@@ -589,16 +598,6 @@ This is the almanac's hero. Every almanac-strong rule applies.
 - **"Visibility" section:** "Show me on Leaderboard" toggle (on) and "Show my progress to others" toggle (on). Toggles: 1px solid ink border, 0 radius, 24x40px. On state: oxblood fill. Off state: surface-color fill. Mono labels above.
 - **Menu list:** chevron-right rows. "Account Settings", "Notification Settings", "Learning Preferences", "Help & Support". Each row: ink-color text in body 15px, Tabler `IconChevronRight` on the right, hairline rule between rows.
 - **"Log Out"** at the bottom: oxblood color (the only "destructive" color), body 15px, no chevron, separated by 32px of space above.
-
-#### 3.4.12 Bottom nav bar (mobile) / sidebar (desktop)
-
-- **Posture:** airy. Persistent chrome.
-- **Five items:** Home, Subjects, Quiz, Metrics, Profile. Each with a Tabler icon (line variant for inactive, fill variant for active).
-- **Labels:** mono uppercase 10px, tracking 0.04em. Below the icon.
-- **Active state:** small 4x4 oxblood dot above the icon. Icon in oxblood color. Label in ink color.
-- **Inactive state:** icon in ink-muted color, label in ink-muted.
-- **No background fill.** The nav is transparent on top of the page background. A 1px solid ink border on the top edge of the nav (mobile) or the right edge (desktop sidebar) demarcates it.
-- **Desktop transformation:** at 1024px+, the bottom nav becomes a left sidebar. Same items, vertical layout, 240px wide, 0 radius, 1px solid ink right border.
 
 ### 3.5 Mobile-first responsive rules
 
@@ -887,103 +886,7 @@ These are the shadcn skill's non-negotiable rules. They apply to the almanac pro
 - **`TabsTrigger` must be inside `TabsList`.** Never render triggers directly in `Tabs`.
 - **`Avatar` always needs `AvatarFallback`.** For when the image fails to load.
 
----
-
-## § 5 — Pass 3 Progress
-
-### 5.1 Component inventory
-
-#### Components added in Pass 3 — auth screens
-
-| Name | File | Status | Notes |
-|---|---|---|---|
-| `AuthField` | `apps/web/src/components/auth/auth-field.tsx` | shipped | Base UI `Field.Root` + `Field.Label` + `Field.Control` wrapper. Almanac styling: 1px ink border, 0 radius, 48px tall, mono uppercase 10px label tracking 0.08em in ink-muted, oxblood focus ring, `data-invalid` and `aria-invalid` on error. |
-| `AuthSubmitButton` | `apps/web/src/components/auth/auth-submit-button.tsx` | shipped | shadcn Button `variant="default" size="lg"` with `IconLoader2` + `animate-spin` loading state. Mono uppercase 11px. 0 radius, 48px tall. |
-| `OrDivider` | `apps/web/src/components/auth/or-divider.tsx` | shipped | Mono "or" hairline divider. Two `bg-ink` 1px lines with a mono uppercase 10px tracking 0.12em label in a paper gap. The almanac's signature detail on the auth surfaces. |
-| `AuthFooterLink` | `apps/web/src/components/auth/auth-footer-link.tsx` | shipped | "Already have an account? Sign in" pattern. Prompt in body 14px ink-muted, link in mono uppercase 11px forest with underline-offset-4, hover to oxblood. |
-| `BackLink` | `apps/web/src/components/auth/back-link.tsx` | shipped | 44×44px `size-11` touch target with `IconChevronLeft` 20px. Links back to `/signin` from recover pages. |
-| `AuthFormAlert` | `apps/web/src/components/auth/auth-form-alert.tsx` | shipped | Top-of-form error alert using shadcn `Alert`. 1px oxblood border, `bg-accent` (oxblood-soft) background, oxblood title in Lora display 15px, description in body 13px ink-muted. |
-| `OAuthButton` | `apps/web/src/components/auth/oauth-button.tsx` | shipped | Full-width shadcn Button `variant="outline" size="lg"` with brand icon. Used for "Continue with Google" on signup. |
-| `OAuthIconButton` | `apps/web/src/components/auth/oauth-icon-button.tsx` | shipped | 44×44px `size-11` raw `<button>` (not shadcn) with 20px brand icon. Used for the 3-provider row on signin. 1px ink border, paper fill. |
-| `Alert` (shadcn) | `apps/web/src/components/ui/alert.tsx` | shipped | Added via `pnpm dlx shadcn@latest add alert`. Used by `AuthFormAlert`. |
-| `Toaster` (sonner) | `apps/web/src/components/ui/sonner.tsx` | shipped | Added via `pnpm dlx shadcn@latest add sonner`. **Modified** to read `data-theme` from `<html>` directly (instead of `next-themes`) so it stays in sync with the almanac's custom theme system. Uses `MutationObserver` to react to theme changes. |
-| `typeClass` / `typeClassMobile` | `apps/web/src/lib/typography.ts` | extracted | Was in `showcase/page.tsx`, extracted to lib for reuse. Used by all 5 auth pages and the future homepage. |
-| `initApiClient` | `apps/web/src/lib/api.ts` | shipped | Configures `@wicky/api-client` with the fetch wrapper. Default `API_BASE` is empty string (relative `/api` paths); overridable via `NEXT_PUBLIC_API_BASE` for cross-origin. Defines `ApiRequestError` class. |
-| `signupSchema` etc. | `apps/web/src/lib/auth/schemas.ts` | shipped | zod schemas for all 4 forms (signup, signin, requestReset, confirmReset). `confirmResetSchema` uses `.refine()` for password match. |
-| `signup` / `signin` / etc. | `apps/web/src/lib/auth/service.ts` | shipped | API service wrappers. Re-exports `ApiRequestError` from `@/lib/api`. |
-| `authMessages` | `apps/web/src/lib/auth/messages.ts` | shipped | All error and success copy in the almanac voice. `as const` for literal types. |
-
-### 5.2 Screen-by-screen log
-
-#### Auth — Sign Up
-
-- **Route:** `/signup` (in `(auth)` route group)
-- **Files:** `apps/web/src/app/(auth)/signup/page.tsx`, `signup-form.tsx`
-- **Status:** shipped
-- **Design notes:** Wordmark "Wicky" h1 (28px mobile / 36px tablet / 44px desktop, Lora 600), tagline "An almanac of learning." in Lora italic 18px, 3 fields (display name, email, password) each with mono label and 1px ink border 48px tall, oxblood primary CTA full-width, "or" mono divider, "Continue with Google" outline, footer link in forest. Validation via zod. `POST /api/auth/signup`. On success: toast "Account created.", redirect to `/`.
-- **Deviations from spec:** None. Tagline matches almanac version, "Continue with" verb per §3.4.1, no mascot/illustration.
-
-#### Auth — Sign In
-
-- **Route:** `/signin`
-- **Files:** `apps/web/src/app/(auth)/signin/page.tsx`, `signin-form.tsx`
-- **Status:** shipped
-- **Design notes:** Wordmark + tagline "Welcome back." (Lora italic, no emoji, no exclamation per §1.5 / §3.1.10), 2 fields (email, password), "Forgot?" link right of label in forest, "Sign in" CTA, "or continue with" divider, 3 circular icon buttons (Google/Apple/Facebook) 44×44 centered, footer link. `POST /api/auth/signin`. Error ladder: 401 → "Invalid email or password.", 429 → "Too many attempts.", other → server message or unknown, else → network.
-- **Deviations from spec:** Dropped the 👋 emoji and "Welcome back!" exclamation per almanac voice.
-
-#### Auth — Account Recovery
-
-- **Routes:** `/recover`, `/recover/sent`, `/recover/confirm?token=...&email=...`
-- **Files:** `apps/web/src/app/(auth)/recover/{page,recover-form}.tsx`, `recover/sent/page.tsx`, `recover/confirm/{page,confirm-form}.tsx`
-- **Status:** shipped
-- **Design notes:** All 3 sub-states share the shell (back chevron 44×44, h1, italic helper, max-w-sm centered, `text-center sm:text-left` on heading). `/recover`: email + "Send recovery link" CTA, footer "Sign in" link. `/recover/sent`: 48px `IconMail` line icon stroke 1.25 in ink-muted centered above h1, "Back to sign in" link. `/recover/confirm`: reads `?token` and `?email` from URL into hidden inputs, shows 2 password fields, "Save password" CTA. `POST /api/auth/password-reset/{request,confirm}`. Always redirects to `/recover/sent` after request to avoid email enumeration.
-- **Deviations from spec:** Dropped the envelope/paper-airplane illustration in `/recover/sent` per §3.4.1's "no mascot, no illustration, no decorative shapes". Replaced with a 48px `IconMail` Tabler line icon stroke 1.25 — a restrained line icon, not a graphic.
-
-#### Decisions during this pass
-
-- **`Controller` over `register()` for wrapped inputs**: react-hook-form's `register()` returns an event-callback `onChange` (takes `ChangeEvent<HTMLInputElement>`), but our wrapped `AuthField` accepts a string-callback `onChange: (value: string) => void`. The `Controller` component is the standard react-hook-form idiom for integrating with custom wrapped inputs — it provides the string-callback `field.onChange` that matches `AuthField`'s API. Hidden native inputs (in `/recover/confirm`) use `register` directly because native `<input>` accepts the event-callback shape. Mixed approach is correct and idiomatic.
-- **`next-themes` removed**: The shadcn-generated `sonner.tsx` used `next-themes`' `useTheme` hook, but the almanac's theme system uses a custom inline script that sets `data-theme` on `<html>` (set up in `layout.tsx`). Without a `ThemeProvider` in the layout, `useTheme()` returns `undefined` and the Toaster falls back to `system` mode, which conflicts with the showcase's theme toggle. We rewrote the Toaster to read `data-theme` directly via `MutationObserver`, then removed the unused `next-themes` dep. Smaller dep tree, fewer moving parts.
-- **`API_BASE` defaults to empty string** (relative paths): Per `api-reference.md` line 3 the base URL is `/api` (relative). Same-origin in dev. Cross-origin setups set `NEXT_PUBLIC_API_BASE`.
-- **Railway backend wired** (2026-07-14): The Django backend is deployed at `https://learnerhq-production.up.railway.app/`. The frontend is wired via `NEXT_PUBLIC_API_BASE` in `.env.local` (gitignored) and `.env.production` (committed). `.env.example` documents the variable for future contributors. `api.ts` strips trailing slashes from `API_BASE` to prevent double-slash URLs. Dev requires HTTPS (`pnpm dev:https` via `--experimental-https` CLI flag) because the Railway backend sets `Secure; SameSite=None` cookies; the one-time mkcert UAC prompt on first run must be accepted. Regular `pnpm dev` serves HTTP only and will work for page rendering but not for auth cookie persistence.
-
----
-
-## § 6 — Implementation Roadmap
-
-### Pass 2 — done
-
-- ✅ Token system in `packages/config/src/theme.css` and `theme.ts`.
-- ✅ Tailwind v4 setup with `@theme inline` in `apps/web/src/app/globals.css`.
-- ✅ shadcn/ui init with `iconLibrary: "tabler"`, Button + Card generated.
-- ✅ Showcase page at `/showcase` with 6 sections, light/dark toggle.
-- ✅ `refs/design_system.md` (this file).
-- ✅ Monorepo builds end to end (`pnpm turbo typecheck` + `pnpm turbo build`).
-
-### Pass 3 — in progress
-
-- ✅ 1. Auth (Sign Up, Sign In, Password Recovery) — see §5.2 for screen log
-- 2. Homepage
-- 3. Subject detail (Overview, Roadmap, Leaderboard)
-- 4. Topic reading page (the entry)
-- 5. Quiz page
-- 6. Quiz Result page
-- 7. Metrics page
-- 8. Leaderboard page
-- 9. Profile / Settings page
-- 10. Bottom nav / sidebar
-- Add components as needed: Textarea, Select, Combobox, Switch, Checkbox, RadioGroup, ToggleGroup, Tabs, Dialog, AlertDialog, Tooltip, Avatar, Badge, Skeleton, Spinner, Empty, sonner toast (already added), Separator.
-- Each screen goes through the per-screen rules above and the shadcn critical rules.
-- Fill in the § 5.1 Component inventory and § 5.2 Screen-by-screen log as screens are built.
-
-### Pass 4+ — PWA, native, polish
-
-- PWA support (manifest, service worker, icons, offline/caching).
-- Expo/React Native app in `apps/mobile`, consuming `@wicky/config` and `@wicky/types`.
-- Polish, accessibility audit, performance audit.
-
----
-
-## § 7 — Verification
+## § 5 — Verification
 
 To verify the almanac system is real:
 
@@ -1046,7 +949,7 @@ If any of the above checks fail, the design has drifted. Re-read this document, 
 
 ---
 
-## § 8 — Quick Reference
+## § 6 — Quick Reference
 
 ### File map
 

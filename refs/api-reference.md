@@ -18,7 +18,22 @@ No auth required. Returns a simple liveness check.
 ```
 Response 200:
 {
-  "status": "ok"
+  "status": "ok",
+  "checks": {
+    "database": true,
+    "redis": true,
+    "celery": true
+  }
+}
+
+Response 503 (degraded):
+{
+  "status": "degraded",
+  "checks": {
+    "database": false,
+    "redis": true,
+    "celery": true
+  }
 }
 ```
 
@@ -33,7 +48,7 @@ Create a new account. Sets `access_token` and `refresh_token` cookies on success
 ```
 Request body:
 {
-  "email":        string,   // required, unique
+  "email":        string,   // required, unique (read-only after creation)
   "password":     string,   // required, Django password validators enforced
   "display_name": string,   // max 100 chars
   "avatar":       string,   // optional, URL
@@ -43,13 +58,16 @@ Request body:
 Response 201:
 {
   "data": {
-    "email":                    string,   // read-only on updates
+    "email":                    string,
     "display_name":             string,
     "avatar":                   string,
     "bio":                      string,
-    "leaderboard_visible":      boolean,  // default true
-    "others_learning_visible":  boolean,  // default true
-    "date_joined":              string    // ISO 8601, read-only
+    "preferences": {
+      "leaderboard_visible":           boolean,  // default true
+      "others_learning_visible":       boolean,  // default true
+      "auto_select_subjects_enabled":  boolean   // default false
+    },
+    "date_joined":              string    // ISO 8601
   },
   "status": "success"
 }
@@ -172,14 +190,25 @@ Response 400 (validation errors):
 
 Auth required (CookieJWTAuthentication — reads `access_token` cookie).
 
-### `GET /api/profile/`
+### `GET /api/auth/profile/`
 
 Get the current user's profile.
 
 ```
 Response 200:
 {
-  "data": { /* UserProfile object */ },
+  "data": {
+    "email":                    string,
+    "display_name":             string,
+    "avatar":                   string,
+    "bio":                      string,
+    "preferences": {
+      "leaderboard_visible":           boolean,
+      "others_learning_visible":       boolean,
+      "auto_select_subjects_enabled":  boolean
+    },
+    "date_joined":              string    // ISO 8601
+  },
   "status": "success"
 }
 ```
@@ -189,20 +218,25 @@ Response 200:
 ### `PATCH /api/auth/profile/`
 
 Update the current user's profile. Partial updates allowed — send only the fields you want to change.
+Privacy settings (`leaderboard_visible`, `others_learning_visible`) and `auto_select_subjects_enabled`
+must be sent as a nested `preferences` object.
 
 ```
 Request body:
 {
-  "display_name":             string,   // optional
-  "avatar":                   string,   // optional, URL
-  "bio":                      string,   // optional
-  "leaderboard_visible":      boolean,  // optional, hide from leaderboard (still counts points)
-  "others_learning_visible":  boolean   // optional, hide from "others learning" lists
+  "display_name": string,   // optional
+  "avatar":       string,   // optional, URL
+  "bio":          string,   // optional
+  "preferences": {          // optional, send the keys you want to change
+    "leaderboard_visible":           boolean,
+    "others_learning_visible":       boolean,
+    "auto_select_subjects_enabled":  boolean
+  }
 }
 
 Response 200:
 {
-  "data": { /* Updated UserProfile object */ },
+  "data": { /* Updated UserProfile object — same shape as GET */ },
   "status": "success"
 }
 ```
@@ -260,6 +294,50 @@ Response 204: (empty body)
 
 ---
 
+### `GET /api/learning/explore/<subject_id>`
+
+Preview a subject before enrolling. Returns the subject metadata, enrollment stats,
+and the full topic roadmap so users can see what they'll learn before committing.
+No user progress data is included — this works for any authenticated user
+(enrolled or not).
+
+```
+Response 200:
+{
+  "data": {
+    "id":                int,
+    "name":              string,
+    "enrollment_count":  int,
+    "is_enrolled":       boolean,
+    "is_completed":      boolean,
+    "is_interested":     boolean,
+    "levels": [
+      {
+        "level":       int,   // 1, 2, or 3
+        "topic_count": int    // number of topics in this level
+      }
+    ],
+    "topics": [
+      {
+        "id":     int,
+        "title":  string,
+        "level":  int,
+        "order":  int
+      }
+    ]
+  },
+  "status": "success"
+}
+
+Response 404:
+{
+  "detail": "Not found.",
+  "status": "error"
+}
+```
+
+---
+
 ### `GET /api/learning/subjects/suggestions`
 
 Get personalized subject suggestions. Prioritizes subjects the user has marked interest in,
@@ -290,7 +368,7 @@ Response 201: (empty body)
 
 Response 400:
 {
-  "detail": "User is at capacity (5 active subjects)"
+  "detail": "You've reached the limit of 5 active subjects. Remove one or complete a subject to add a new one."
 }
 ```
 
@@ -381,6 +459,48 @@ Response 404:
 
 ---
 
+### `POST /api/learning/subjects/create`
+
+Create a new subject or resolve an existing one by name. If the name exactly matches
+an existing subject, that subject is returned. If it's close (semantic similarity),
+the existing subject is resolved. If it's too broad (e.g. "Science"), a suggestion
+for a narrower term is returned (HTTP 300). The user is automatically enrolled on success.
+
+```
+Request body:
+{
+  "name": string   // required, max 200 chars
+}
+
+Response 200 — resolved (matched or created):
+{
+  "data": {
+    "action": "resolved",
+    "subject": {
+      "id":   int,
+      "name": string
+    }
+  },
+  "status": "success"
+}
+
+Response 300 — name too broad, needs narrowing:
+{
+  "data": {
+    "action": "narrow",
+    "suggestion": string   // e.g. "Try: Physics, Chemistry, Biology"
+  },
+  "status": "success"
+}
+
+Response 400:
+{
+  "detail": "Name is required." | "You've reached the limit of 5 active subjects. Remove one or complete a subject to add a new one."
+}
+```
+
+---
+
 ### `GET /api/learning/subjects`
 
 List all subjects the current user is enrolled in, with progress aggregations.
@@ -422,36 +542,39 @@ Returns 404 if the user is not enrolled in this subject or the subject does not 
 ```
 Response 200:
 {
-  "id":                          int,
-  "name":                        string,
-  "status":                      string,   // "ACTIVE" | "COMPLETED"
-  "points":                      int,
-  "level_unlocked":              int,      // 1-3
-  "created_at":                  string,   // ISO 8601
-  "notification_frequency_hours": int,     // 1-24
-  "next_due_at":                 string | null,
-  "levels": [
-    {
-      "level":       int,        // 1, 2, or 3
-      "total":       int,        // topics in this level
-      "passed":      int,        // topics the user has passed in this level
-      "threshold":   int,        // 80% of total (or total-1 for small levels)
-      "is_unlocked": boolean     // true if user's level_unlocked >= this level
-    }
-  ],
-  "topics": [
-    {
-      "id":                  int,
-      "title":               string,
-      "level":               int,
-      "order":               int,
-      "content_status":      string,        // "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
-      "review_status":       string,        // "PENDING" | "PASSED" | "FAILED" | "FLAGGED"
-      "user_progress_status": string | null, // null if user hasn't started this topic
-      "is_passed":           boolean,
-      "completed_at":        string | null
-    }
-  ]
+  "data": {
+    "id":                          int,
+    "name":                        string,
+    "status":                      string,   // "ACTIVE" | "COMPLETED"
+    "points":                      int,
+    "level_unlocked":              int,      // 1-3
+    "created_at":                  string,   // ISO 8601
+    "notification_frequency_hours": int,     // 1-24
+    "next_due_at":                 string | null,
+    "levels": [
+      {
+        "level":       int,        // 1, 2, or 3
+        "total":       int,        // topics in this level
+        "passed":      int,        // topics the user has passed in this level
+        "threshold":   int,        // 80% of total (or total-1 for small levels)
+        "is_unlocked": boolean     // true if user's level_unlocked >= this level
+      }
+    ],
+    "topics": [
+      {
+        "id":                  int,
+        "title":               string,
+        "level":               int,
+        "order":               int,
+        "content_status":      string,        // "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
+        "review_status":       string,        // "PENDING" | "PASSED" | "FAILED" | "FLAGGED"
+        "user_progress_status": string | null, // null if user hasn't started this topic
+        "is_passed":           boolean,
+        "completed_at":        string | null
+      }
+    ]
+  },
+  "status": "success"
 }
 
 Response 404:

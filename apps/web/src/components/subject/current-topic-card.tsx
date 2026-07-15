@@ -27,7 +27,8 @@ export function CurrentTopicCard({ subject, topic }: CurrentTopicCardProps) {
       </h2>
       <div className="flex items-center justify-between gap-3 border-b border-ink bg-ink px-3 py-2 text-paper sm:px-4 sm:py-2.5">
         <span className="truncate font-display text-[16px] font-semibold sm:text-[18px]">
-          {subject.name}
+        {/*If this is the latest unlocked topic, show "Latest topic" else show "Topic {number in roman numerals}"*/}
+          {topic?.order === total ? "Latest topic" : `Topic ${topic?.order}`}
         </span>
         <span className="shrink-0 rounded-sm bg-accent px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-accent-foreground">
           5 min read

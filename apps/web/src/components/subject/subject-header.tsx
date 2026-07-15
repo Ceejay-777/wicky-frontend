@@ -8,7 +8,6 @@ type SubjectHeaderProps = {
 };
 
 export function SubjectHeader({ name }: SubjectHeaderProps) {
-  const eyebrow = name.toUpperCase();
   return (
     <header>
       <div className="flex items-center justify-between gap-3 px-4 pt-4 sm:px-6 sm:pt-6 lg:px-8">
@@ -26,9 +25,6 @@ export function SubjectHeader({ name }: SubjectHeaderProps) {
         <ShareButton />
       </div>
       <div className="px-4 pb-4 pt-2 sm:px-6 sm:pb-5 sm:pt-3 lg:px-8 lg:pb-6 lg:pt-4">
-        <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
-          {eyebrow}
-        </p>
         <h1
           className={cn(
             "mt-1 font-display font-semibold tracking-[-0.015em]",
