@@ -18,10 +18,6 @@ function tierName(level: number): string {
   return TIER_NAMES[level] ?? "Beginner";
 }
 
-function tierLabel(level: number): string {
-  return `L${level}`;
-}
-
 export function YourProgressCard({
   subject,
   percentComplete,
@@ -35,52 +31,52 @@ export function YourProgressCard({
   return (
     <section
       aria-labelledby="your-progress-heading"
-      className="border border-ink bg-card p-4 sm:p-6"
+      className="border border-ink"
     >
       <h2 id="your-progress-heading" className="sr-only">
         Your progress
       </h2>
-      <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground">
-        Level {tierLabel(subject.level_unlocked)} · {tier}
-      </p>
-      <p
-        className={cn(
-          "mt-1 font-display italic text-muted-foreground",
-          "text-[16px] sm:text-[18px]",
-        )}
-      >
-        {tier}
-      </p>
-      <p
-        className={cn(
-          "mt-2 font-display font-semibold leading-none text-foreground",
-          "text-[36px] tracking-[-0.015em]",
-          "sm:text-[40px] sm:tracking-[-0.018em]",
-          "lg:text-[44px] lg:tracking-[-0.02em]",
-        )}
-      >
-        {formatPercent(percentComplete)}
-      </p>
-      <div
-        role="progressbar"
-        aria-valuenow={percentComplete}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label="Subject completion"
-        className="mt-4 h-1 w-full bg-muted"
-      >
-        <div
-          className="h-full bg-foreground"
-          style={{ width: `${percentComplete}%` }}
-        />
+      <div className="flex items-center justify-between gap-2 border-b border-ink bg-ink px-3 py-2 text-paper sm:px-4 sm:py-2.5">
+        <span className="font-display text-base font-semibold sm:text-lg">
+          {subject.name}
+        </span>
       </div>
-      <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
-        Topic {passed} of {total}
-      </p>
-      <div className="mt-4 grid grid-cols-3 border-t border-b border-ink -mx-4 sm:-mx-6">
-        <StatCell label="Points" value={formatPoints(subject.points)} />
+      <div className="flex items-start justify-between gap-4 bg-card px-4 py-6 sm:px-6 sm:py-8">
+        <div>
+          <p
+            className={cn(
+              "font-display font-semibold leading-none text-foreground",
+              "text-[28px] tracking-[-0.015em]",
+              "sm:text-[32px] sm:tracking-[-0.018em]",
+              "lg:text-[36px] lg:tracking-[-0.02em]",
+            )}
+          >
+            Level {subject.level_unlocked}
+          </p>
+          <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground">
+            {tier}
+          </p>
+        </div>
+        <div className="text-right">
+          <p
+            className={cn(
+              "font-display font-semibold leading-none text-foreground",
+              "text-[28px] tracking-[-0.015em]",
+              "sm:text-[32px] sm:tracking-[-0.018em]",
+              "lg:text-[36px] lg:tracking-[-0.02em]",
+            )}
+          >
+            {formatPercent(percentComplete)}
+          </p>
+          <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground">
+            Topic {passed} of {total}
+          </p>
+        </div>
+      </div>
+      <div className="grid grid-cols-3 border-y border-ink -mx-0 bg-card">
         <StatCell label="Streak" value="--" />
         <StatCell label="Time" value="--" />
+        <StatCell label="Points" value={formatPoints(subject.points)} />
       </div>
     </section>
   );
