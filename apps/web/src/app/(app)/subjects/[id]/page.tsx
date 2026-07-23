@@ -2,8 +2,9 @@ import { notFound } from "next/navigation";
 import { ApiRequestError } from "@wicky/api-client";
 import { getSubjectDetail } from "@/lib/learning/service.server";
 import { SubjectOverviewContent } from "@/components/subject/subject-overview-content";
+import { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Subject · Wicky",
   description: "An entry in your almanac of learning.",
 };

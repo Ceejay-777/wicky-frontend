@@ -35,7 +35,7 @@ export default function AppLoading() {
         <div
           className={cn(
             "mt-3 flex gap-4 overflow-x-auto pb-2",
-            "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            "[-ms-overflow-style:none] scrollbar-none [&::-webkit-scrollbar]:hidden"
           )}
         >
           <DiscoveryCardSkeleton nameMaxWidth={140} />
@@ -62,14 +62,14 @@ function CurrentlyLearningRow({
     <div className="flex items-center justify-between gap-4 border-b border-ink px-2 py-4 sm:px-4 sm:py-5">
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <Skeleton
-          className="h-[18px] w-full"
+          className="h-4.5 w-full"
           style={{ maxWidth: maxNameWidth }}
         />
         <Skeleton className="h-3 w-24" />
       </div>
       <div className="flex shrink-0 items-center gap-3">
         <Skeleton className="h-3.5" style={{ width: pointsWidth * 4 }} />
-        <Skeleton className="size-[18px]" />
+        <Skeleton className="size-4.5" />
       </div>
     </div>
   );
@@ -77,8 +77,8 @@ function CurrentlyLearningRow({
 
 function DiscoveryCardSkeleton({ nameMaxWidth }: { nameMaxWidth: number }) {
   return (
-    <div className="flex h-[110px] w-[200px] shrink-0 flex-col justify-between border border-ink bg-background p-4">
-      <Skeleton className="h-[18px] w-full" style={{ maxWidth: nameMaxWidth }} />
+    <div className="flex h-26.5 w-50 shrink-0 flex-col justify-between border border-ink bg-background p-4">
+      <Skeleton className="h-4.5 w-full" style={{ maxWidth: nameMaxWidth }} />
       <Skeleton className="h-3 w-20" />
     </div>
   );
@@ -86,7 +86,7 @@ function DiscoveryCardSkeleton({ nameMaxWidth }: { nameMaxWidth: number }) {
 
 function AddSubjectCardSkeleton() {
   return (
-    <div className="flex h-[110px] w-[200px] shrink-0 flex-col items-center justify-center border border-dashed border-ink bg-background p-4">
+    <div className="flex h-26.5 w-50 shrink-0 flex-col items-center justify-center border border-dashed border-ink bg-background p-4">
       <Skeleton className="size-7" />
       <Skeleton className="mt-3 h-4 w-24" />
       <Skeleton className="mt-1 h-3 w-24" />

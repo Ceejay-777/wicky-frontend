@@ -73,7 +73,7 @@ export function YourProgressCard({
           </p>
         </div>
       </div>
-      <div className="grid grid-cols-3 border-y border-ink -mx-0 bg-card">
+      <div className="grid grid-cols-3 border-y border-ink mx-0 bg-card">
         <StatCell label="Streak" value="--" />
         <StatCell label="Time" value="--" />
         <StatCell label="Points" value={formatPoints(subject.points)} />

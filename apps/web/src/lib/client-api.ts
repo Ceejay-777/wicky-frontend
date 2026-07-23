@@ -1,9 +1,10 @@
 import {
   configureApiClient,
-  type ApiCaller,
   ApiRequestError,
+  parseErrorDetail,
+  type ApiCaller,
 } from "@wicky/api-client";
-import type { ApiSuccess, ApiError } from "@wicky/types";
+import type { ApiSuccess } from "@wicky/types";
 
 const caller: ApiCaller = (async ({ method, path, body }) => {
   const res = await fetch(path, {
@@ -14,14 +15,7 @@ const caller: ApiCaller = (async ({ method, path, body }) => {
   });
 
   if (!res.ok) {
-    let detail: string;
-    try {
-      const errBody = (await res.json()) as Partial<ApiError> & { detail?: string };
-      detail = errBody.detail ?? `Request failed with status ${res.status}`;
-    } catch {
-      detail = `Request failed with status ${res.status}`;
-    }
-    throw new ApiRequestError(detail, res.status);
+    throw new ApiRequestError(await parseErrorDetail(res), res.status);
   }
 
   if (res.status === 204) return undefined as never;
@@ -29,5 +23,3 @@ const caller: ApiCaller = (async ({ method, path, body }) => {
 }) as ApiCaller;
 
 configureApiClient(caller);
-
-export { ApiRequestError };

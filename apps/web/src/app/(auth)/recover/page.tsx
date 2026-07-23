@@ -1,8 +1,9 @@
 import { BackLink } from "@/components/auth/back-link";
 import { RecoverForm } from "./recover-form";
 import { typeClassMobile } from "@/lib/typography";
+import { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Recover your account · Wicky",
   description: "Send a password reset link to your email.",
 };

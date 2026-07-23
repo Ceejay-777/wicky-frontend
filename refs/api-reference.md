@@ -255,17 +255,20 @@ Browse all available subjects, ordered by popularity (enrollment count descendin
 
 ```
 Response 200:
-[
-  {
-    "id":                int,      // subject ID
-    "name":              string,   // subject name
-    "enrollment_count":  int,      // active learners
-    "is_enrolled":       boolean,  // current user is enrolled
-    "is_completed":      boolean,  // current user completed this subject
-    "is_interested":     boolean   // current user marked interest
-  },
-  ...
-]
+{
+  "data": [
+    {
+      "id":                int,      // subject ID
+      "name":              string,   // subject name
+      "enrollment_count":  int,      // active learners
+      "is_enrolled":       boolean,  // current user is enrolled
+      "is_completed":      boolean,  // current user completed this subject
+      "is_interested":     boolean   // current user marked interest
+    },
+    ...
+  ],
+  "status": "success"
+}
 ```
 
 ---
@@ -277,7 +280,11 @@ Mark interest in a subject (does not enroll, just signals interest for suggestio
 No request body.
 
 ```
-Response 201: (empty body)
+Response 201:
+{
+  "data": {},
+  "status": "success"
+}
 ```
 
 ---
@@ -345,14 +352,17 @@ then popular subjects.
 
 ```
 Response 200:
-[
-  {
-    "id":     int,    // subject ID
-    "name":   string, // subject name
-    "reason": string  // e.g. "You marked interest in this subject" | "Popular subject (N learners)"
-  },
-  ...
-]
+{
+  "data": [
+    {
+      "id":     int,    // subject ID
+      "name":   string, // subject name
+      "reason": string  // e.g. "You marked interest in this subject" | "Popular subject (N learners)"
+    },
+    ...
+  ],
+  "status": "success"
+}
 ```
 
 ---
@@ -364,11 +374,16 @@ Enroll in a subject. If the subject has no roadmap yet, one is generated (LLM ca
 No request body.
 
 ```
-Response 201: (empty body)
+Response 201:
+{
+  "data": {},
+  "status": "success"
+}
 
 Response 400:
 {
-  "detail": "You've reached the limit of 5 active subjects. Remove one or complete a subject to add a new one."
+  "detail": "You've reached the limit of 5 active subjects. Remove one or complete a subject to add a new one.",
+  "status": "error"
 }
 ```
 
@@ -385,7 +400,8 @@ Response 204: (empty body)
 
 Response 404:
 {
-  "detail": "Not found."
+  "detail": "Not found.",
+  "status": "error"
 }
 ```
 
@@ -400,21 +416,24 @@ No request body.
 ```
 Response 200:
 {
-  "action":                 "none" | "level_up" | "subject_completed",
-  // Only present when action == "level_up":
-  "new_level_unlocked":     int,        // the new level number (2 or 3)
-  "slots_available":        int,        // how many more subjects user can add (max 5)
-  // Only present when action == "subject_completed":
-  "needs_subject_selection": boolean,   // true — user should pick a new subject
-  // Present for both level_up and subject_completed:
-  "suggestions": [
-    {
-      "id":     int,
-      "name":   string,
-      "reason": string
-    },
-    ...
-  ]
+  "data": {
+    "action":                 "none" | "level_up" | "subject_completed",
+    // Only present when action == "level_up":
+    "new_level_unlocked":     int,        // the new level number (2 or 3)
+    "slots_available":        int,        // how many more subjects user can add (max 5)
+    // Only present when action == "subject_completed":
+    "needs_subject_selection": boolean,   // true — user should pick a new subject
+    // Present for both level_up and subject_completed:
+    "suggestions": [
+      {
+        "id":     int,
+        "name":   string,
+        "reason": string
+      },
+      ...
+    ]
+  },
+  "status": "success"
 }
 ```
 
@@ -430,11 +449,16 @@ Request body:
   "frequency_hours": int   // 1–24, required
 }
 
-Response 200: (empty body)
+Response 200:
+{
+  "data": {},
+  "status": "success"
+}
 
 Response 400:
 {
-  "detail": "frequency_hours is required" | "frequency_hours must be an integer" | "Notification frequency must be between 1 and 24 hours"
+  "detail": "frequency_hours is required" | "frequency_hours must be an integer" | "Notification frequency must be between 1 and 24 hours",
+  "status": "error"
 }
 ```
 
@@ -447,13 +471,17 @@ Get the current notification configuration for this subject.
 ```
 Response 200:
 {
-  "frequency_hours": int | null,   // interval in hours, null if not configured
-  "next_due_at":     string | null // ISO 8601, null if no upcoming notification
+  "data": {
+    "frequency_hours": int | null,   // interval in hours, null if not configured
+    "next_due_at":     string | null // ISO 8601, null if no upcoming notification
+  },
+  "status": "success"
 }
 
 Response 404:
 {
-  "detail": "Not found."
+  "detail": "Not found.",
+  "status": "error"
 }
 ```
 
@@ -495,7 +523,8 @@ Response 300 — name too broad, needs narrowing:
 
 Response 400:
 {
-  "detail": "Name is required." | "You've reached the limit of 5 active subjects. Remove one or complete a subject to add a new one."
+  "detail": "Name is required." | "You've reached the limit of 5 active subjects. Remove one or complete a subject to add a new one.",
+  "status": "error"
 }
 ```
 
@@ -509,23 +538,26 @@ Ordered by most recently enrolled first.
 
 ```
 Response 200:
-[
-  {
-    "id":                          int,
-    "name":                        string,
-    "status":                      string,   // "ACTIVE" | "COMPLETED"
-    "points":                      int,      // total points earned in this subject
-    "level_unlocked":              int,      // highest level the user can access (1-3)
-    "topics_total":                int,      // total topics in the subject's roadmap
-    "topics_passed":               int,      // topics the user has passed (normal + advanced)
-    "topics_advanced_passed":      int,      // subset of topics_passed with advanced passed
-    "percent_complete":            int,      // 0-100, (topics_passed / topics_total) * 100
-    "created_at":                  string,   // ISO 8601, when the user enrolled
-    "notification_frequency_hours": int,     // 1-24
-    "next_due_at":                 string | null
-  },
-  ...
-]
+{
+  "data": [
+    {
+      "id":                          int,
+      "name":                        string,
+      "status":                      string,   // "ACTIVE" | "COMPLETED"
+      "points":                      int,      // total points earned in this subject
+      "level_unlocked":              int,      // highest level the user can access (1-3)
+      "topics_total":                int,      // total topics in the subject's roadmap
+      "topics_passed":               int,      // topics the user has passed (normal + advanced)
+      "topics_advanced_passed":      int,      // subset of topics_passed with advanced passed
+      "percent_complete":            int,      // 0-100, (topics_passed / topics_total) * 100
+      "created_at":                  string,   // ISO 8601, when the user enrolled
+      "notification_frequency_hours": int,     // 1-24
+      "next_due_at":                 string | null
+    },
+    ...
+  ],
+  "status": "success"
+}
 ```
 
 ---
@@ -594,15 +626,18 @@ still affect other users' rank calculations. Tie-breaker: user ID ascending.
 
 ```
 Response 200:
-[
-  {
-    "rank":          int,    // 1-based position
-    "user_id":       int,
-    "display_name":  string, // display_name or email fallback
-    "total_points":  int     // points across all subjects
-  },
-  ...
-]
+{
+  "data": [
+    {
+      "rank":          int,    // 1-based position
+      "user_id":       int,
+      "display_name":  string, // display_name or email fallback
+      "total_points":  int     // points across all subjects
+    },
+    ...
+  ],
+  "status": "success"
+}
 ```
 
 ---
@@ -613,15 +648,18 @@ Per-topic mini-leaderboard — top 20 users by points earned on this specific to
 
 ```
 Response 200:
-[
-  {
-    "rank":         int,    // 1-based position
-    "user_id":      int,
-    "display_name": string,
-    "points":       int     // points on this topic
-  },
-  ...
-]
+{
+  "data": [
+    {
+      "rank":         int,    // 1-based position
+      "user_id":      int,
+      "display_name": string,
+      "points":       int     // points on this topic
+    },
+    ...
+  ],
+  "status": "success"
+}
 ```
 
 ---
@@ -636,15 +674,18 @@ Users with `others_learning_visible = false` are excluded. Max 10 results.
 
 ```
 Response 200:
-[
-  {
-    "user_id":      int,
-    "display_name": string,
-    "status":       string,   // e.g. "ACTIVE", "COMPLETED"
-    "level":        int       // the topic's level (1, 2, or 3)
-  },
-  ...
-]
+{
+  "data": [
+    {
+      "user_id":      int,
+      "display_name": string,
+      "status":       string,   // e.g. "ACTIVE", "COMPLETED"
+      "level":        int       // the topic's level (1, 2, or 3)
+    },
+    ...
+  ],
+  "status": "success"
+}
 ```
 
 ---
@@ -678,11 +719,14 @@ Request body:
 
 Response 200:
 {
-  "id":              int,      // quiz attempt ID (used in submit)
-  "quiz_type":       string,   // "NORMAL" or "ADVANCED"
-  "attempt_number":  int,      // 1-based, increments per retry
-  "questions":       [ /* Question objects — see above */ ],
-  "total_points":    int       // max possible points (normal: 90–110, advanced: 180–220)
+  "data": {
+    "id":              int,      // quiz attempt ID (used in submit)
+    "quiz_type":       string,   // "NORMAL" or "ADVANCED"
+    "attempt_number":  int,      // 1-based, increments per retry
+    "questions":       [ /* Question objects — see above */ ],
+    "total_points":    int       // max possible points (normal: 90–110, advanced: 180–220)
+  },
+  "status": "success"
 }
 
 Response 400:
@@ -690,7 +734,8 @@ Response 400:
   "detail": "Normal quiz already passed for this topic" |
             "Advanced quiz not available: pass the normal quiz and engage with resource links first" |
             "Please wait N minutes before retaking this quiz" |
-            "..."
+            "...",
+  "status": "error"
 }
 ```
 
@@ -710,12 +755,15 @@ Request body:
 
 Response 200:
 {
-  "id":              int,      // quiz attempt ID
-  "passed":          boolean,  // score >= 60% of total_points
-  "score":           int,      // points earned (0 if failed)
-  "total_points":    int,      // max possible points
-  "attempt_number":  int,      // attempt number
-  "quiz_type":       string    // "NORMAL" or "ADVANCED"
+  "data": {
+    "id":              int,      // quiz attempt ID
+    "passed":          boolean,  // score >= 60% of total_points
+    "score":           int,      // points earned (0 if failed)
+    "total_points":    int,      // max possible points
+    "attempt_number":  int,      // attempt number
+    "quiz_type":       string    // "NORMAL" or "ADVANCED"
+  },
+  "status": "success"
 }
 
 Response 400:
@@ -723,7 +771,8 @@ Response 400:
   "detail": "Quiz already submitted" |
             "Expected N answers, got M" |
             "Answer X is not a valid option index" |
-            "..."
+            "...",
+  "status": "error"
 }
 ```
 
@@ -739,8 +788,11 @@ No request body.
 ```
 Response 200:
 {
-  "status":                  string,   // current topic progress status (e.g. "NOT_STARTED", "PASSED")
-  "resource_links_viewed_at": string | null  // ISO 8601 timestamp, null if not yet viewed
+  "data": {
+    "status":                  string,   // current topic progress status (e.g. "NOT_STARTED", "PASSED")
+    "resource_links_viewed_at": string | null  // ISO 8601 timestamp, null if not yet viewed
+  },
+  "status": "success"
 }
 ```
 
@@ -754,21 +806,24 @@ a topic to read the summary and access resource links before taking quizzes.
 ```
 Response 200:
 {
-  "id":              int,
-  "title":           string,
-  "summary":         string,   // AI-generated educational content (empty if not yet generated)
-  "resource_links":  [
-    {
-      "url":   string,
-      "type":  string,   // "wikipedia" | "video" | "article"
-      "title": string
-    }
-  ],
-  "level":           int,
-  "order":           int,
-  "content_status":  string,   // "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
-  "review_status":   string,   // "PENDING" | "PASSED" | "FAILED" | "FLAGGED"
-  "subject_id":      int,
-  "subject_name":    string
+  "data": {
+    "id":              int,
+    "title":           string,
+    "summary":         string,   // AI-generated educational content (empty if not yet generated)
+    "resource_links":  [
+      {
+        "url":   string,
+        "type":  string,   // "wikipedia" | "video" | "article"
+        "title": string
+      }
+    ],
+    "level":           int,
+    "order":           int,
+    "content_status":  string,   // "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
+    "review_status":   string,   // "PENDING" | "PASSED" | "FAILED" | "FLAGGED"
+    "subject_id":      int,
+    "subject_name":    string
+  },
+  "status": "success"
 }
 ```

@@ -1,7 +1,8 @@
 import { SignupForm } from "./signup-form";
 import { typeClassMobile } from "@/lib/typography";
+import { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Sign up · Wicky",
   description: "Create an account to start your almanac of learning.",
 };

@@ -7,3 +7,12 @@ export class ApiRequestError extends Error {
     this.name = "ApiRequestError";
   }
 }
+
+export async function parseErrorDetail(res: Response): Promise<string> {
+  try {
+    const errBody = (await res.json()) as { detail?: string };
+    return errBody.detail ?? `Request failed with status ${res.status}`;
+  } catch {
+    return `Request failed with status ${res.status}`;
+  }
+}

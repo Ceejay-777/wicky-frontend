@@ -1,3 +1,4 @@
+import "@/lib/client-api"
 import { apiClient } from "@wicky/api-client";
 import type {
   AuthSignupRequest,
@@ -7,7 +8,6 @@ import type {
   UserProfile,
   ApiSuccess,
 } from "@wicky/types";
-import { ApiRequestError } from "@/lib/api";
 
 type AuthResponse = ApiSuccess<UserProfile>;
 
@@ -31,4 +31,3 @@ export async function confirmPasswordReset(
   await apiClient.post<ApiSuccess<null>>("/api/auth/password-reset/confirm", input);
 }
 
-export { ApiRequestError };

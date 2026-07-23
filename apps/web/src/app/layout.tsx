@@ -1,3 +1,4 @@
+import "@/lib/client-api"; 
 import type { Metadata } from "next";
 import { Lora, Source_Sans_3, JetBrains_Mono } from "next/font/google";
 import "./globals.css";

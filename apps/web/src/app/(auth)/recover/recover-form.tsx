@@ -9,8 +9,9 @@ import { AuthSubmitButton } from "@/components/auth/auth-submit-button";
 import { AuthFooterLink } from "@/components/auth/auth-footer-link";
 import { AuthFormAlert } from "@/components/auth/auth-form-alert";
 import { requestResetSchema, type RequestResetValues } from "@/lib/auth/schemas";
-import { requestPasswordReset, ApiRequestError } from "@/lib/auth/service";
+import { requestPasswordReset } from "@/lib/auth/service";
 import { authMessages } from "@/lib/auth/messages";
+import { ApiRequestError } from "@wicky/api-client";
 
 export function RecoverForm() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export function RecoverForm() {
   const {
     handleSubmit,
     control,
-    formState: { isSubmitting },
+    // formState: { isSubmitting },
   } = useForm<RequestResetValues>({
     resolver: zodResolver(requestResetSchema),
     mode: "onBlur",

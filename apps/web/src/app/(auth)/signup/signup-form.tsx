@@ -12,8 +12,9 @@ import { OrDivider } from "@/components/auth/or-divider";
 import { AuthFooterLink } from "@/components/auth/auth-footer-link";
 import { AuthFormAlert } from "@/components/auth/auth-form-alert";
 import { signupSchema, type SignupValues } from "@/lib/auth/schemas";
-import { signup, ApiRequestError } from "@/lib/auth/service";
+import { signup } from "@/lib/auth/service";
 import { authMessages } from "@/lib/auth/messages";
+import { ApiRequestError } from "@wicky/api-client";
 
 export function SignupForm() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export function SignupForm() {
   const {
     handleSubmit,
     control,
-    formState: { isSubmitting },
+    // formState: { isSubmitting },
   } = useForm<SignupValues>({
     resolver: zodResolver(signupSchema),
     mode: "onBlur",

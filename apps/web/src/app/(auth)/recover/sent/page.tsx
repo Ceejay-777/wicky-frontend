@@ -2,8 +2,9 @@ import { IconMail } from "@tabler/icons-react";
 import Link from "next/link";
 import { BackLink } from "@/components/auth/back-link";
 import { typeClassMobile } from "@/lib/typography";
+import { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Check your email · Wicky",
   description: "If an account exists, a reset link has been sent.",
 };

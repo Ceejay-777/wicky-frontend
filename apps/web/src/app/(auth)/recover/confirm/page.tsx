@@ -2,8 +2,9 @@ import { Suspense } from "react";
 import { BackLink } from "@/components/auth/back-link";
 import { ConfirmResetForm } from "./confirm-form";
 import { typeClassMobile } from "@/lib/typography";
+import { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Set a new password · Wicky",
   description: "Enter a new password to finish resetting your account.",
 };

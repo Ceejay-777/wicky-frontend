@@ -79,7 +79,7 @@ export function ExploreSubjectsStrip({
         className={cn(
           "flex gap-4 overflow-x-auto pb-2",
           "snap-x snap-mandatory",
-          "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          "[-ms-overflow-style:none] scrollbar-none [&::-webkit-scrollbar]:hidden"
         )}
         role="list"
         aria-label="Subject discovery"
@@ -95,7 +95,7 @@ export function ExploreSubjectsStrip({
       </div>
       {scrollThumb && (
         <div
-          className="mt-2 h-[3px] bg-muted lg:hidden"
+          className="mt-2 h-0.75 bg-muted lg:hidden"
           aria-hidden="true"
         >
           <div

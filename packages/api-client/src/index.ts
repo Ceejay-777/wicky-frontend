@@ -2,8 +2,6 @@
 // All endpoints from api-reference.md will be wired here —
 // the apiClient wraps fetch with JWT cookie auth, base URL, and error handling.
 
-import type { AuthSigninRequest } from "@wicky/types";
-
 interface RequestConfig {
   method: "GET" | "POST" | "PATCH" | "DELETE";
   path: string;
@@ -32,6 +30,4 @@ export const apiClient = {
   delete: <T>(path: string) => _caller<T>({ method: "DELETE", path }),
 };
 
-export { type AuthSigninRequest };
-
-export { ApiRequestError } from "./errors";
+export { ApiRequestError, parseErrorDetail } from "./errors";

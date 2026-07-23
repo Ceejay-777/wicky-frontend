@@ -13,7 +13,8 @@ import { OAuthIconButton } from "@/components/auth/oauth-icon-button";
 import { AuthFooterLink } from "@/components/auth/auth-footer-link";
 import { AuthFormAlert } from "@/components/auth/auth-form-alert";
 import { signinSchema, type SigninValues } from "@/lib/auth/schemas";
-import { signin, ApiRequestError } from "@/lib/auth/service";
+import { signin } from "@/lib/auth/service";
+import { ApiRequestError } from "@wicky/api-client";
 import { authMessages } from "@/lib/auth/messages";
 
 export function SigninForm() {
@@ -24,7 +25,7 @@ export function SigninForm() {
   const {
     handleSubmit,
     control,
-    formState: { isSubmitting },
+    // formState: { isSubmitting },
   } = useForm<SigninValues>({
     resolver: zodResolver(signinSchema),
     mode: "onBlur",

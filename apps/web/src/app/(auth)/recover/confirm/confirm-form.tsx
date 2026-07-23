@@ -9,8 +9,9 @@ import { AuthField } from "@/components/auth/auth-field";
 import { AuthSubmitButton } from "@/components/auth/auth-submit-button";
 import { AuthFormAlert } from "@/components/auth/auth-form-alert";
 import { confirmResetSchema, type ConfirmResetValues } from "@/lib/auth/schemas";
-import { confirmPasswordReset, ApiRequestError } from "@/lib/auth/service";
+import { confirmPasswordReset } from "@/lib/auth/service";
 import { authMessages } from "@/lib/auth/messages";
+import { ApiRequestError } from "@wicky/api-client";
 
 export function ConfirmResetForm() {
   const router = useRouter();
@@ -25,7 +26,7 @@ export function ConfirmResetForm() {
     handleSubmit,
     control,
     register,
-    formState: { isSubmitting },
+    // formState: { isSubmitting },
   } = useForm<ConfirmResetValues>({
     resolver: zodResolver(confirmResetSchema),
     mode: "onBlur",
