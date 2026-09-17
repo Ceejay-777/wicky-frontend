@@ -43,6 +43,7 @@
   --color-border: var(--color-border);
   --color-input: var(--color-border);
   --color-ring: var(--color-oxblood);
+  --color-on-ink: var(--color-on-ink);
 
   /* The almanac is mostly square */
   --radius: 0;
@@ -55,6 +56,19 @@
   --font-sans: var(--font-body);
   --font-mono: var(--font-mono);
   --font-serif: var(--font-display);
+
+  --animate-marquee: marquee 6s ease-in-out infinite;
+}
+
+@keyframes marquee {
+  0%,
+  15% {
+    transform: translateX(0);
+  }
+  85%,
+  100% {
+    transform: translateX(calc(-1 * var(--marquee-overflow, 0px)));
+  }
 }
 
 /* ---------------------------------------------------------------------

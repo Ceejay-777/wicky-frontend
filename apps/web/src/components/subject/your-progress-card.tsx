@@ -38,7 +38,7 @@ export function YourProgressCard({
       </h2>
       <div className="flex items-center justify-between gap-2 border-b border-ink bg-ink px-3 py-2 text-paper sm:px-4 sm:py-2.5">
         <span className="font-display text-base font-semibold sm:text-lg">
-          {subject.name}
+          Your progress
         </span>
       </div>
       <div className="flex items-start justify-between gap-4 bg-card px-4 py-6 sm:px-6 sm:py-8">

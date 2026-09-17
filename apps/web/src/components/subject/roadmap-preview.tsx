@@ -56,13 +56,23 @@ export function RoadmapPreview({
               aria-hidden="true"
               className={cn(
                 "absolute inset-0",
-                lvl.is_unlocked ? "bg-foreground" : "bg-muted",
+                lvl.is_unlocked ? "bg-primary/80" : "bg-muted",
               )}
             />
-            <span className="relative font-mono text-[10px] uppercase tracking-[0.08em] text-paper mix-blend-difference">
+            <span
+              className={cn(
+                "relative font-mono text-xs uppercase tracking-[0.08em]",
+                lvl.is_unlocked ? "text-background" : "text-foreground",
+              )}
+            >
               Level {lvl.level}
             </span>
-            <div className="relative mt-1 font-mono text-[11px] text-paper mix-blend-difference">
+            <div
+              className={cn(
+                "relative mt-1 font-mono text-[13px]",
+                lvl.is_unlocked ? "text-background" : "text-foreground",
+              )}
+            >
               {lvl.passed}/{lvl.total}
             </div>
           </div>

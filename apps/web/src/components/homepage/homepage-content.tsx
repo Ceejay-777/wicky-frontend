@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { Greeting } from "./greeting";
 import { NotificationBell } from "./notification-bell";
 import { CurrentlyLearningList } from "./currently-learning-list";
 import { ExploreSubjectsStrip } from "./explore-subjects-strip";
+import { AddSubjectModal } from "./add-subject-modal";
 import { MAX_SUBJECT_SLOTS } from "@/lib/learning/constants";
 import type { EnrolledSubject, Subject, UserProfile } from "@wicky/types";
 
@@ -14,7 +16,8 @@ type HomepageData = {
 };
 
 export function HomepageContent({ data }: { data: HomepageData }) {
-  const slotsUsed = data.subjects.length;
+  const [modalOpen, setModalOpen] = useState(false);
+  const isFull = data.subjects.length >= MAX_SUBJECT_SLOTS;
 
   return (
     <div className="flex flex-col gap-2">
@@ -29,15 +32,21 @@ export function HomepageContent({ data }: { data: HomepageData }) {
       <Greeting displayName={data.profile.display_name} />
 
       <div className="px-4 sm:px-6 lg:px-8">
-        <CurrentlyLearningList subjects={data.subjects} />
-        <ExploreSubjectsStrip
-          subjects={data.explore}
-          slotsUsed={slotsUsed}
-          slotsTotal={MAX_SUBJECT_SLOTS}
+        <CurrentlyLearningList
+          subjects={data.subjects}
+          isFull={isFull}
+          onAddSubject={() => setModalOpen(true)}
         />
+        <ExploreSubjectsStrip subjects={data.explore} />
       </div>
 
       <div className="h-8 lg:hidden" aria-hidden="true" />
+
+      <AddSubjectModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        isFull={isFull}
+      />
     </div>
   );
 }

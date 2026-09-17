@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="84" height="84" fill="none" aria-hidden="true">
+  <!-- outer rule square (the almanac frame) -->
+  <rect x="6" y="6" width="88" height="88" stroke="#1A1814" stroke-width="2"/>
+  <!-- inner rule -->
+  <rect x="14" y="14" width="72" height="72" stroke="#1A1814" stroke-width="1" opacity="0.45"/>
+  <!-- compass / almanac emblem: a quartered circle with a needle -->
+  <circle cx="50" cy="50" r="26" stroke="#1A1814" stroke-width="1.6"/>
+  <!-- oxblood north quadrant -->
+  <path d="M50 24 A26 26 0 0 1 76 50 L50 50 Z" fill="#7A2E2E"/>
+  <!-- forest east quadrant -->
+  <path d="M76 50 A26 26 0 0 1 50 76 L50 50 Z" fill="#2C4A3E"/>
+  <!-- verified south quadrant (light tint) -->
+  <path d="M50 76 A26 26 0 0 1 24 50 L50 50 Z" fill="#3F6B3A" opacity="0.55"/>
+  <!-- west quadrant empty (ink) -->
+  <path d="M24 50 A26 26 0 0 1 50 24 L50 50 Z" fill="#1A1814"/>
+  <!-- center pivot -->
+  <rect x="47" y="47" width="6" height="6" fill="#F0EDDF" stroke="#1A1814" stroke-width="1"/>
+  <!-- needle tip accent -->
+  <circle cx="50" cy="50" r="2" fill="#F0EDDF"/>
+</svg>

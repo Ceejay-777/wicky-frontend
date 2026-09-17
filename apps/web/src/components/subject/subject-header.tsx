@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { IconChevronLeft } from "@tabler/icons-react";
 import { ShareButton } from "./share-button";
+import { MarqueeText } from "./marquee-text";
 import { cn } from "@/lib/utils";
 
 type SubjectHeaderProps = {
@@ -10,7 +11,7 @@ type SubjectHeaderProps = {
 export function SubjectHeader({ name }: SubjectHeaderProps) {
   return (
     <header>
-      <div className="flex items-center justify-between gap-3 px-4 pt-4 sm:px-6 sm:pt-6 lg:px-8">
+      <div className="flex items-center gap-3 px-4 pt-4 pb-4 sm:px-6 sm:pt-6 sm:pb-5 lg:px-8 lg:pb-6">
         <Link
           href="/"
           aria-label="Back to home"
@@ -22,19 +23,17 @@ export function SubjectHeader({ name }: SubjectHeaderProps) {
         >
           <IconChevronLeft size={20} stroke={1.5} aria-hidden="true" />
         </Link>
-        <ShareButton />
-      </div>
-      <div className="px-4 pb-4 pt-2 sm:px-6 sm:pb-5 sm:pt-3 lg:px-8 lg:pb-6 lg:pt-4">
-        <h1
+        <MarqueeText
+          text={name}
           className={cn(
-            "mt-1 font-display font-semibold tracking-[-0.015em]",
+            "flex-1 min-w-0 text-center",
+            "font-display font-semibold tracking-[-0.015em]",
             "text-[28px] leading-[1.1] text-foreground",
-            "sm:mt-1.5 sm:text-[32px] sm:tracking-[-0.018em]",
+            "sm:text-[32px] sm:tracking-[-0.018em]",
             "lg:text-[36px] lg:tracking-[-0.02em]",
           )}
-        >
-          {name}
-        </h1>
+        />
+        <ShareButton />
       </div>
       <hr className="border-t border-ink" />
     </header>

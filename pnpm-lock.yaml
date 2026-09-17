@@ -38,6 +38,9 @@ importers:
       '@wicky/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@wicky/hooks':
+        specifier: workspace:*
+        version: link:../../packages/hooks
       '@wicky/types':
         specifier: workspace:*
         version: link:../../packages/types

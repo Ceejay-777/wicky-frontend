@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { IconChevronRight } from "@tabler/icons-react";
+import { IconChevronRight, IconPlus } from "@tabler/icons-react";
+import { Button } from "@/components/ui/button";
 import {
   Empty,
   EmptyHeader,
@@ -14,9 +15,15 @@ import type { EnrolledSubject } from "@wicky/types";
 
 type CurrentlyLearningListProps = {
   subjects: EnrolledSubject[];
+  isFull: boolean;
+  onAddSubject: () => void;
 };
 
-export function CurrentlyLearningList({ subjects }: CurrentlyLearningListProps) {
+export function CurrentlyLearningList({
+  subjects,
+  isFull,
+  onAddSubject,
+}: CurrentlyLearningListProps) {
   if (subjects.length === 0) {
     return (
       <section
@@ -36,6 +43,16 @@ export function CurrentlyLearningList({ subjects }: CurrentlyLearningListProps) 
               below to get started.
             </EmptyDescription>
           </EmptyHeader>
+          <Button
+            variant="default"
+            size="lg"
+            disabled={isFull}
+            onClick={onAddSubject}
+            className="mt-4 h-12 font-mono text-[11px] uppercase tracking-[0.04em] rounded-none"
+          >
+            <IconPlus data-icon="inline-start" />
+            Add Subject
+          </Button>
         </Empty>
       </section>
     );
@@ -55,6 +72,9 @@ export function CurrentlyLearningList({ subjects }: CurrentlyLearningListProps) 
             <SubjectRow subject={s} />
           </li>
         ))}
+        <li className="border-b border-ink">
+          <AddSubjectRow isFull={isFull} onAddSubject={onAddSubject} />
+        </li>
       </ul>
     </section>
   );
@@ -93,6 +113,38 @@ function SubjectRow({ subject }: { subject: EnrolledSubject }) {
         />
       </div>
     </Link>
+  );
+}
+
+function AddSubjectRow({
+  isFull,
+  onAddSubject,
+}: {
+  isFull: boolean;
+  onAddSubject: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onAddSubject}
+      disabled={isFull}
+      className={cn(
+        "flex w-full items-center gap-1.5 px-2 py-4 sm:px-4 sm:py-5",
+        "transition-colors hover:bg-accent focus-visible:bg-accent",
+        "focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary",
+        isFull && "pointer-events-none opacity-50"
+      )}
+    >
+      <IconPlus
+        size={16}
+        stroke={2}
+        className="text-accent-foreground"
+        aria-hidden="true"
+      />
+      <span className="font-mono text-[11px] uppercase tracking-[0.04em] text-accent-foreground font-medium">
+        Add Subject
+      </span>
+    </button>
   );
 }
 

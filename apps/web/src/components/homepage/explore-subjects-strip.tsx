@@ -3,20 +3,15 @@
 import { useRef, useCallback, useEffect, useState } from "react";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { SubjectDiscoveryCard } from "./subject-discovery-card";
-import { AddSubjectCard } from "./add-subject-card";
 import { cn } from "@/lib/utils";
 import type { Subject } from "@wicky/types";
 
 type ExploreSubjectsStripProps = {
   subjects: Subject[];
-  slotsUsed: number;
-  slotsTotal: number;
 };
 
 export function ExploreSubjectsStrip({
   subjects,
-  slotsUsed,
-  slotsTotal,
 }: ExploreSubjectsStripProps) {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [scrollThumb, setScrollThumb] = useState<{
@@ -89,9 +84,6 @@ export function ExploreSubjectsStrip({
             <SubjectDiscoveryCard subject={s} />
           </div>
         ))}
-        <div role="listitem" className="shrink-0 snap-start">
-          <AddSubjectCard slotsUsed={slotsUsed} slotsTotal={slotsTotal} />
-        </div>
       </div>
       {scrollThumb && (
         <div

@@ -75,3 +75,19 @@ export interface NotificationStatus {
   frequency_hours: number | null;
   next_due_at: string | null;
 }
+
+export interface SubjectCreateRequest {
+  name: string;
+}
+
+export interface SubjectCreateResolved {
+  action: "resolved";
+  subject: { id: number; name: string };
+}
+
+export interface SubjectCreateNarrow {
+  action: "narrow";
+  suggestion: string;
+}
+
+export type SubjectCreateResponse = SubjectCreateResolved | SubjectCreateNarrow;

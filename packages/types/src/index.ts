@@ -25,6 +25,10 @@ export type {
   SubjectSuggestion,
   ProgressCheckResponse,
   NotificationStatus,
+  SubjectCreateRequest,
+  SubjectCreateResolved,
+  SubjectCreateNarrow,
+  SubjectCreateResponse,
 } from "./subject";
 
 export type {
