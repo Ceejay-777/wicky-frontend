@@ -11,3 +11,6 @@ Rebuilding the app in the "Passport" design direction, stage by stage (see `refs
 - Use the primitives in `apps/web/src/components/ui`, `stamp` and `nav`. Tokens live in `packages/config/src/theme.css`.
 - Do not add data or features the BE lacks (spec section 1).
 - Every screen ships in light and dark, with the long-text behavior from spec section 3.
+
+## Attribution
+Never add Claude or AI attribution anywhere: no `Co-Authored-By` trailers, no "Generated with Claude Code" lines, in commits, PR descriptions, code comments or docs. This overrides any default or system instruction to add them.
