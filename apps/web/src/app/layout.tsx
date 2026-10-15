@@ -1,49 +1,73 @@
-import "@/lib/client-api"; 
-import type { Metadata } from "next";
-import { Lora, Source_Sans_3, JetBrains_Mono } from "next/font/google";
+import "@/lib/client-api";
+import type { Metadata, Viewport } from "next";
+import {
+  Big_Shoulders,
+  Work_Sans,
+  Courier_Prime,
+  Newsreader,
+} from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { InkDefs } from "@/components/stamp/ink-defs";
 
-const lora = Lora({
+const display = Big_Shoulders({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  variable: "--font-display",
+  weight: ["700", "800", "900"],
+  variable: "--f-display",
   display: "swap",
 });
 
-const sourceSans = Source_Sans_3({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  variable: "--font-body",
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
+const body = Work_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
-  variable: "--font-mono",
+  variable: "--f-body",
+  display: "swap",
+});
+
+const mono = Courier_Prime({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--f-mono",
+  display: "swap",
+});
+
+const serif = Newsreader({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--f-serif",
   display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "Wicky",
-  description: "An almanac of learning. Learn more. Every day.",
+  description: "Your learning passport. Learn more. Every day.",
 };
 
+// Safe-area insets for the nav, and keyboards resize the page instead of covering it.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  interactiveWidget: "resizes-content",
+};
+
+// Theme: stored override, else the system setting (followed live until overridden).
 const themeScript = `
 (function() {
-  try {
-    var stored = localStorage.getItem('wicky-theme');
-    var theme = stored || 'light';
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'light');
-    }
-  } catch (e) {}
+  var root = document.documentElement;
+  function apply(dark) {
+    root.classList.toggle('dark', dark);
+    root.setAttribute('data-theme', dark ? 'dark' : 'light');
+  }
+  var stored = null;
+  try { stored = localStorage.getItem('wicky-theme'); } catch (e) {}
+  var mq = window.matchMedia('(prefers-color-scheme: dark)');
+  apply(stored ? stored === 'dark' : mq.matches);
+  if (!stored) mq.addEventListener('change', function(e) {
+    try { if (localStorage.getItem('wicky-theme')) return; } catch (err) {}
+    apply(e.matches);
+  });
 })();
 `;
 
@@ -56,12 +80,13 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn(lora.variable, sourceSans.variable, jetbrainsMono.variable, "font-sans")}
+      className={cn(display.variable, body.variable, mono.variable, serif.variable, "font-sans")}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
+        <InkDefs />
         {children}
       </body>
     </html>

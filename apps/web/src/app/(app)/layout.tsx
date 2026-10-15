@@ -1,8 +1,20 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { preconnect } from "react-dom";
-import { BottomNav } from "@/components/nav/bottom-nav";
-import { cn } from "@/lib/utils";
+import { AppShell } from "@/components/nav/app-shell";
+import type { NavProfile } from "@/components/nav/app-nav";
+import { getProfile } from "@/lib/auth/service.server";
+
+// Chrome only: a failed profile fetch must not take the whole shell down.
+async function navProfile(): Promise<NavProfile> {
+  try {
+    const { display_name } = await getProfile();
+    const initials = display_name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+    return { name: display_name, initials: initials || "?" };
+  } catch {
+    return null;
+  }
+}
 
 export default async function AppLayout({
   children,
@@ -16,17 +28,5 @@ export default async function AppLayout({
     redirect("/signin");
   }
 
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <main
-        className={cn(
-          "pb-16",
-          "lg:pb-0 lg:pl-60"
-        )}
-      >
-        {children}
-      </main>
-      <BottomNav />
-    </div>
-  );
+  return <AppShell profile={await navProfile()}>{children}</AppShell>;
 }

@@ -1,80 +1,42 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { IconSun, IconMoon } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 
-type Theme = "light" | "dark";
-
 const STORAGE_KEY = "wicky-theme";
 
+// The root layout script owns the initial theme (stored override, else system);
+// this just reads <html data-theme> and writes the manual override.
+function subscribe(onChange: () => void) {
+  const obs = new MutationObserver(onChange);
+  obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  return () => obs.disconnect();
+}
+
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>("light");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
-    const initial: Theme = stored ?? "light";
-    setTheme(initial);
-    applyTheme(initial);
-  }, []);
-
-  const applyTheme = (next: Theme) => {
-    const root = document.documentElement;
-    if (next === "dark") {
-      root.classList.add("dark");
-      root.setAttribute("data-theme", "dark");
-    } else {
-      root.classList.remove("dark");
-      root.setAttribute("data-theme", "light");
-    }
-  };
+  const dark = useSyncExternalStore(
+    subscribe,
+    () => document.documentElement.dataset.theme === "dark",
+    () => false
+  );
 
   const toggle = () => {
-    const next: Theme = theme === "light" ? "dark" : "light";
-    setTheme(next);
-    applyTheme(next);
+    const next = dark ? "light" : "dark";
+    const root = document.documentElement;
+    root.classList.toggle("dark", next === "dark");
+    root.setAttribute("data-theme", next);
     try {
       localStorage.setItem(STORAGE_KEY, next);
     } catch {
-      // ignore storage errors (private browsing, etc.)
+      // storage can be blocked (private browsing); the theme still applies for this visit
     }
   };
 
-  if (!mounted) {
-    return (
-      <Button
-        variant="outline"
-        size="sm"
-        aria-label="Toggle theme"
-        className="font-mono"
-      >
-        <IconSun data-icon="inline-start" />
-        Light
-      </Button>
-    );
-  }
-
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={toggle}
-      aria-label="Toggle theme"
-      className="font-mono"
-    >
-      {theme === "light" ? (
-        <>
-          <IconMoon data-icon="inline-start" />
-          Dark
-        </>
-      ) : (
-        <>
-          <IconSun data-icon="inline-start" />
-          Light
-        </>
-      )}
+    <Button variant="outline" size="sm" onClick={toggle} aria-label="Toggle theme" className="font-mono">
+      {dark ? <IconSun /> : <IconMoon />}
+      {dark ? "Light" : "Dark"}
     </Button>
   );
 }

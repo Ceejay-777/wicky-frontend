@@ -1,8 +1,8 @@
 /* =====================================================================
-   Wicky — Almanac theme · Tailwind v4 (CSS-first)
-   Single source of truth: packages/config/src/theme.css
-   This file wires shadcn's semantic tokens to the almanac CSS vars,
-   then sets typography defaults that carry the almanac voice.
+   Wicky — Passport theme · Tailwind v4 (CSS-first)
+   Tokens live in packages/config/src/theme.css (plain vars like --ink).
+   `@theme inline` below exposes them as utilities (bg-paper, text-ink,
+   border-ink, text-tomato …) and wires shadcn's semantic names.
    ===================================================================== */
 
 @import "tailwindcss";
@@ -10,54 +10,56 @@
 @import "shadcn/tailwind.css";
 @import "@wicky/config/theme.css";
 
-/* ---------------------------------------------------------------------
-   shadcn semantic tokens → almanac CSS variables
-   The `inline` keyword tells Tailwind v4 to read these as `var(...)`
-   references so light/dark switching works at runtime.
-   --------------------------------------------------------------------- */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme inline {
-  --color-background: var(--color-paper);
-  --color-foreground: var(--color-ink);
+  --color-paper: var(--paper);
+  --color-kraft: var(--kraft);
+  --color-field: var(--field);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted-ink: var(--muted);
+  --color-frame: var(--frame);
+  --color-tomato: var(--tomato);
+  --color-cobalt: var(--cobalt);
+  --color-pine: var(--pine);
+  --color-gold: var(--gold);
+  --color-on-tomato: var(--on-tomato);
 
-  --color-card: var(--color-surface);
-  --color-card-foreground: var(--color-ink);
+  /* shadcn semantic names */
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --color-card: var(--field);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--paper);
+  --color-popover-foreground: var(--ink);
+  --color-primary: var(--tomato);
+  --color-primary-foreground: var(--on-tomato);
+  --color-secondary: var(--kraft);
+  --color-secondary-foreground: var(--ink);
+  --color-muted: var(--kraft);
+  --color-muted-foreground: var(--muted);
+  --color-accent: var(--kraft);
+  --color-accent-foreground: var(--ink);
+  --color-destructive: var(--tomato);
+  --color-destructive-foreground: var(--on-tomato);
+  --color-border: var(--ink);
+  --color-input: var(--ink);
+  --color-ring: var(--cobalt);
 
-  --color-popover: var(--color-paper);
-  --color-popover-foreground: var(--color-ink);
+  --radius-sm: 3px;
+  --radius-md: var(--radius-field);
+  --radius-lg: var(--radius-button);
+  --radius-xl: var(--radius-card);
 
-  --color-primary: var(--color-oxblood);
-  --color-primary-foreground: var(--color-on-oxblood);
-
-  --color-secondary: var(--color-forest);
-  --color-secondary-foreground: var(--color-on-forest);
-
-  --color-muted: var(--color-surface);
-  --color-muted-foreground: var(--color-ink-muted);
-
-  --color-accent: var(--color-oxblood-soft);
-  --color-accent-foreground: var(--color-oxblood);
-
-  --color-destructive: var(--color-oxblood);
-  --color-destructive-foreground: var(--color-on-oxblood);
-
-  --color-border: var(--color-border);
-  --color-input: var(--color-border);
-  --color-ring: var(--color-oxblood);
-  --color-on-ink: var(--color-on-ink);
-
-  /* The almanac is mostly square */
-  --radius: 0;
-  --radius-sm: 4px;
-  --radius-md: 0;
-  --radius-lg: 0;
-  --radius-xl: 0;
-
+  --font-display: var(--f-display), "Arial Narrow", sans-serif;
   --font-heading: var(--font-display);
-  --font-sans: var(--font-body);
-  --font-mono: var(--font-mono);
-  --font-serif: var(--font-display);
+  --font-sans: var(--f-body), system-ui, sans-serif;
+  --font-mono: var(--f-mono), ui-monospace, monospace;
+  --font-serif: var(--f-serif), Georgia, serif;
 
   --animate-marquee: marquee 6s ease-in-out infinite;
+  --animate-stamp-press: stamp-press var(--duration-slow) var(--ease-out-quart) both;
 }
 
 @keyframes marquee {
@@ -71,40 +73,51 @@
   }
 }
 
-/* ---------------------------------------------------------------------
-   Dark mode — toggled by the .dark class on <html>.
-   The almanac CSS variables in @wicky/config/theme.css already swap
-   when [data-theme="dark"] is set; the .dark block below makes sure
-   shadcn's utility classes also resolve correctly.
-   --------------------------------------------------------------------- */
-@custom-variant dark (&:where(.dark, .dark *));
+/* A stamp lands: starts big and faint, presses down to its final state. */
+@keyframes stamp-press {
+  from {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 
-/* ---------------------------------------------------------------------
-   Base typography — the almanac voice.
-   --------------------------------------------------------------------- */
 @layer base {
   * {
-    border-color: var(--color-border);
+    border-color: var(--ink);
   }
 
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    color-scheme: light;
   }
 
+  html[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  /* Faint diagonal hatch, subtle in both themes. */
   body {
-    background-color: var(--color-paper);
-    color: var(--color-ink);
-    font-family: var(--font-body);
-    font-feature-settings: "kern" 1, "liga" 1;
+    background-color: var(--paper);
+    background-image:
+      repeating-linear-gradient(45deg, var(--hatch-a) 0, var(--hatch-a) 1px, transparent 1px, transparent 7px),
+      repeating-linear-gradient(-45deg, var(--hatch-b) 0, var(--hatch-b) 1px, transparent 1px, transparent 7px);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    font-weight: 600;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 0.95;
   }
 
   code, kbd, samp, pre {
@@ -112,19 +125,21 @@
   }
 
   ::selection {
-    background-color: var(--color-oxblood);
-    color: var(--color-on-oxblood);
+    background-color: var(--tomato);
+    color: var(--on-tomato);
   }
 
   *:focus-visible {
-    outline: 2px solid var(--color-oxblood);
+    outline: 2px solid var(--cobalt);
     outline-offset: 2px;
   }
 }
 
-/* ---------------------------------------------------------------------
-   Reduced motion — every animation collapses to instant.
-   --------------------------------------------------------------------- */
+/* Ink effect is decorative: flat stamps under reduced motion. */
+.stamp-ink {
+  filter: url(#ink-2);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -132,5 +147,9 @@
     animation-duration: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0ms !important;
+  }
+
+  .stamp-ink {
+    filter: none;
   }
 }
