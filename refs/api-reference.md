@@ -13,7 +13,7 @@ All endpoints marked "Auth required" will return `401` if the access token is mi
 
 ### `GET /api/health/`
 
-No auth required. Returns a simple liveness check.
+No auth required. Checks database, Redis (Celery broker) and Celery workers. Results are cached for 5 seconds.
 
 ```
 Response 200:
@@ -52,7 +52,8 @@ Request body:
   "password":     string,   // required, Django password validators enforced
   "display_name": string,   // max 100 chars
   "avatar":       string,   // optional, URL
-  "bio":          string    // optional
+  "bio":          string,   // optional
+  "auto_select_subjects_enabled": boolean  // optional, default false
 }
 
 Response 201:
@@ -104,7 +105,8 @@ Response 401:
 ### `POST /api/auth/refresh`
 
 Refresh an expiring access token. Reads the `refresh_token` cookie (no request body).
-Sets new `access_token` and `refresh_token` cookies.
+Sets new `access_token` and `refresh_token` cookies **and** returns the new token values in the JSON body.
+The frontend Edge middleware reads tokens from the body because Set-Cookie headers cannot be reliably parsed in the Edge runtime.
 
 No request body needed — token is read from the `refresh_token` cookie.
 
@@ -112,7 +114,9 @@ No request body needed — token is read from the `refresh_token` cookie.
 Response 200:
 {
   "detail": "Token refreshed.",
-  "status": "success"
+  "status": "success",
+  "access_token":  string,   // new JWT access token (same value set in cookie)
+  "refresh_token": string    // new JWT refresh token (same value set in cookie)
 }
 
 Response 401:
@@ -178,19 +182,23 @@ Response 200:
 
 Response 400 (validation errors):
 {
-  "token":   ["Token has expired."],
-  "email":   ["Invalid token or email."],
-  "password":["This password is too common.", ...]
+  "detail": "Token has expired." | "Invalid token or email.",
+  "status": "error"
+}
+
+Response 400 (password validation):
+{
+  "password": ["This password is too common.", ...]
 }
 ```
 
 ---
 
-## Profile — `/api/auth/profile/`
+## Profile — `/api/auth/profile`
 
 Auth required (CookieJWTAuthentication — reads `access_token` cookie).
 
-### `GET /api/auth/profile/`
+### `GET /api/auth/profile`
 
 Get the current user's profile.
 
@@ -215,7 +223,7 @@ Response 200:
 
 ---
 
-### `PATCH /api/auth/profile/`
+### `PATCH /api/auth/profile`
 
 Update the current user's profile. Partial updates allowed — send only the fields you want to change.
 Privacy settings (`leaderboard_visible`, `others_learning_visible`) and `auto_select_subjects_enabled`
@@ -247,11 +255,15 @@ Response 200:
 
 All learning endpoints require auth (standard `IsAuthenticated` permission — reads `access_token` cookie).
 
+**Roadmap status:** a subject's roadmap is generated in the background. `roadmap_status` is one of
+`NOT_GENERATED` | `GENERATING` | `READY` | `FAILED`. See [Realtime events](#realtime-events--apievents)
+for live updates and `POST /api/learning/subjects/<subject_id>/roadmap/retry` to retry a failed one.
+
 ---
 
 ### `GET /api/learning/explore`
 
-Browse all available subjects, ordered by popularity (enrollment count descending).
+Browse subjects that have a roadmap (at least one topic), ordered by popularity (active enrollment count descending, then name).
 
 ```
 Response 200:
@@ -304,7 +316,7 @@ Response 204: (empty body)
 ### `GET /api/learning/explore/<subject_id>`
 
 Preview a subject before enrolling. Returns the subject metadata, enrollment stats,
-and the full topic roadmap so users can see what they'll learn before committing.
+and the full topic roadmap (`levels`/`topics` are empty if the roadmap has not been generated) so users can see what they'll learn before committing.
 No user progress data is included — this works for any authenticated user
 (enrolled or not).
 
@@ -347,8 +359,8 @@ Response 404:
 
 ### `GET /api/learning/subjects/suggestions`
 
-Get personalized subject suggestions. Prioritizes subjects the user has marked interest in,
-then popular subjects.
+Get personalized subject suggestions (up to 5 popular ones, plus any subjects the user marked interest in).
+Interest-marked subjects come first; enrolled subjects are excluded.
 
 ```
 Response 200:
@@ -369,14 +381,18 @@ Response 200:
 
 ### `POST /api/learning/subjects/<subject_id>/add`
 
-Enroll in a subject. If the subject has no roadmap yet, one is generated (LLM call).
+Enroll in a subject. Returns immediately. If the subject has no roadmap yet, generation is queued
+in the background (watch `roadmap_status` / SSE). Enrolling in a subject you are already enrolled in
+is a no-op and still returns 201.
 
 No request body.
 
 ```
 Response 201:
 {
-  "data": {},
+  "data": {
+    "roadmap_status": "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
+  },
   "status": "success"
 }
 
@@ -410,6 +426,8 @@ Response 404:
 ### `POST /api/learning/subjects/<subject_id>/progress/check`
 
 Check if the user has completed enough topics in the current level to advance.
+Returns `action: "none"` if the level has no topics yet (roadmap not generated). Only `PASSED` topics
+count toward the threshold. On `subject_completed` the enrollment becomes `COMPLETED`.
 
 No request body.
 
@@ -492,7 +510,8 @@ Response 404:
 Create a new subject or resolve an existing one by name. If the name exactly matches
 an existing subject, that subject is returned. If it's close (semantic similarity),
 the existing subject is resolved. If it's too broad (e.g. "Science"), a suggestion
-for a narrower term is returned (HTTP 300). The user is automatically enrolled on success.
+for a narrower term is returned (HTTP 200 with `action: "narrow"`). The user is automatically
+enrolled on success and the roadmap is generated in the background — the response does not wait for it.
 
 ```
 Request body:
@@ -505,14 +524,15 @@ Response 200 — resolved (matched or created):
   "data": {
     "action": "resolved",
     "subject": {
-      "id":   int,
-      "name": string
+      "id":             int,
+      "name":           string,
+      "roadmap_status": "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
     }
   },
   "status": "success"
 }
 
-Response 300 — name too broad, needs narrowing:
+Response 200 — name too broad, needs narrowing:
 {
   "data": {
     "action": "narrow",
@@ -552,7 +572,8 @@ Response 200:
       "percent_complete":            int,      // 0-100, (topics_passed / topics_total) * 100
       "created_at":                  string,   // ISO 8601, when the user enrolled
       "notification_frequency_hours": int,     // 1-24
-      "next_due_at":                 string | null
+      "next_due_at":                 string | null,
+      "roadmap_status":              string    // "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
     },
     ...
   ],
@@ -569,7 +590,8 @@ rollups, and the complete topic roadmap with per-topic user status. Topic
 content (summary, resource links) is NOT included — call
 `GET /api/learning/topics/<topic_id>` separately when the user opens a topic.
 
-Returns 404 if the user is not enrolled in this subject or the subject does not exist.
+While the roadmap is not `READY`, `topics` is empty and every level has `total: 0`.
+Returns 404 if the user is not enrolled in this subject.
 
 ```
 Response 200:
@@ -583,12 +605,13 @@ Response 200:
     "created_at":                  string,   // ISO 8601
     "notification_frequency_hours": int,     // 1-24
     "next_due_at":                 string | null,
+    "roadmap_status":              string,   // "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
     "levels": [
       {
         "level":       int,        // 1, 2, or 3
         "total":       int,        // topics in this level
         "passed":      int,        // topics the user has passed in this level
-        "threshold":   int,        // 80% of total (or total-1 for small levels)
+        "threshold":   int,        // topics to pass to advance: ceil(80% of total), capped at total-1, min 1 (0 if level empty)
         "is_unlocked": boolean     // true if user's level_unlocked >= this level
       }
     ],
@@ -610,6 +633,29 @@ Response 200:
 }
 
 Response 404:
+{
+  "detail": "Not found.",
+  "status": "error"
+}
+```
+
+---
+
+### `POST /api/learning/subjects/<subject_id>/roadmap/retry`
+
+Retry roadmap generation for an enrolled subject (use after `roadmap_status == "FAILED"`).
+No-op if the subject already has topics or generation is already running. No request body.
+
+```
+Response 200:
+{
+  "data": {
+    "roadmap_status": "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
+  },
+  "status": "success"
+}
+
+Response 404 (not enrolled):
 {
   "detail": "Not found.",
   "status": "error"
@@ -737,6 +783,12 @@ Response 400:
             "...",
   "status": "error"
 }
+
+Response 503:
+{
+  "detail": "The AI service is temporarily unavailable. Please try again shortly.",
+  "status": "error"
+}
 ```
 
 ---
@@ -825,5 +877,31 @@ Response 200:
     "subject_name":    string
   },
   "status": "success"
+}
+```
+
+---
+
+## Realtime events — `/api/events`
+
+### `GET /api/events`
+
+Server-Sent Events stream (`text/event-stream`), authenticated by the `access_token` cookie
+(use `new EventSource(url, { withCredentials: true })`). Each user is automatically subscribed to
+their own channel `user-<id>`; any `?channel=` query is ignored. Unauthenticated requests are rejected (403).
+
+Events are **not replayable** — the database is the source of truth. After (re)connecting, refetch
+`GET /api/learning/subjects/<id>` to reconcile.
+
+### Event: `roadmap.status`
+
+Sent to every enrolled user when a subject's roadmap status changes (generation finished or failed).
+
+```
+event: roadmap.status
+data: {
+  "subject_id":     int,
+  "roadmap_status": "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED",
+  "topic_count":    int
 }
 ```

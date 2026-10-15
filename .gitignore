@@ -7,7 +7,4 @@ dist/
 .env.local
 .env.*.local
 
-.superpowers/
 docs
-refs
-.commandcode
