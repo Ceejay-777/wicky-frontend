@@ -1,8 +1,7 @@
 import "server-only";
 import {
   configureApiClient,
-  parseErrorDetail,
-  ApiRequestError,
+  parseApiError,
   type ApiCaller,
 } from "@wicky/api-client";
 import { cookies } from "next/headers";
@@ -27,7 +26,7 @@ const caller: ApiCaller = async ({ method, path, body }) => {
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
   if (!res.ok) {
-    throw new ApiRequestError(await parseErrorDetail(res), res.status);
+    throw await parseApiError(res);
   }
 
     if (res.status === 204) return undefined as never;

@@ -1,7 +1,6 @@
 import {
   configureApiClient,
-  ApiRequestError,
-  parseErrorDetail,
+  parseApiError,
   type ApiCaller,
 } from "@wicky/api-client";
 import type { ApiSuccess } from "@wicky/types";
@@ -15,7 +14,7 @@ const caller: ApiCaller = (async ({ method, path, body }) => {
   });
 
   if (!res.ok) {
-    throw new ApiRequestError(await parseErrorDetail(res), res.status);
+    throw await parseApiError(res);
   }
 
   if (res.status === 204) return undefined as never;

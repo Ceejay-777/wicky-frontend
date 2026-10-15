@@ -1,35 +1,20 @@
 "use client";
 
-import { useEffect } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export default function AuthError({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
-  useEffect(() => {
-    console.error(error);
-  }, [error]);
-
+export default function AuthError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
-    <div className="mx-auto w-full max-w-sm px-4 py-8 text-center sm:px-6 sm:py-12 lg:px-8">
-      <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
-        Something went wrong
-      </p>
-      <h1 className="mt-3 font-display text-[24px] font-semibold leading-[1.1] tracking-[-0.015em] sm:text-[28px]">
-        That didn&rsquo;t work.
-      </h1>
-      <p className="mt-3 font-body text-[15px] text-muted-foreground">
-        Give it another try, or go back to sign in.
-      </p>
-      <div className="mt-6">
-        <Button onClick={reset} variant="default">
-          Try again
-        </Button>
-      </div>
+    <div className="mx-auto flex min-h-dvh w-full max-w-[460px] flex-col justify-center px-[22px] py-10">
+      <p className="font-mono text-[11px] font-bold tracking-[0.12em] text-muted-ink uppercase">Something went wrong</p>
+      <h1 className="mt-2 font-display text-[54px] leading-[0.86] font-black uppercase">That did not work</h1>
+      <p className="mt-3 text-base text-ink-2">Give it another try, or head back to sign in.</p>
+      <Button onClick={reset} className="mt-6">
+        Try again
+      </Button>
+      <Link href="/signin" className="mt-3 inline-block py-3 text-center font-semibold text-ink underline">
+        Back to sign in
+      </Link>
     </div>
   );
 }

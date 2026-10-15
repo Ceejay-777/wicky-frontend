@@ -1,24 +1,30 @@
+import type { Metadata } from "next";
+import { AuthFooterLink, AuthShell } from "@/components/auth/auth-shell";
+import { OfficeStamp } from "@/components/auth/auth-art";
 import { SigninForm } from "./signin-form";
-import { typeClassMobile } from "@/lib/typography";
-import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sign in · Wicky",
-  description: "Sign in to continue your almanac of learning.",
+  title: "Welcome back · Wicky",
+  description: "Sign in to pick up where you left off.",
 };
+
+const stamp = (className: string) => (
+  <OfficeStamp top="WICKY RE-ENTRY" main="WELCOME BACK" sub="ENTRY PERMITTED" mainSize={44} className={className} />
+);
 
 export default function SigninPage() {
   return (
-    <div className="flex-1 flex flex-col justify-center px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-      <div className="mx-auto w-full max-w-sm">
-        <div className="mb-6 sm:mb-8 text-center">
-          <h1 className={typeClassMobile("h1")}>Wicky</h1>
-          <p className="mt-2 font-display text-[16px] italic text-muted-foreground sm:text-[18px]">
-            Welcome back.
-          </p>
-        </div>
-        <SigninForm />
-      </div>
-    </div>
+    <AuthShell
+      link={{ href: "/signup", label: "Sign up" }}
+      eyebrow="Re-entry"
+      title="Welcome back"
+      titleClass="text-[64px] leading-[0.84]"
+      intro="Your stamps are right where you left them."
+      inlineArt={stamp("mr-1 w-[150px]")}
+      panelArt={stamp("w-[360px]")}
+      footer={<>New here? <AuthFooterLink href="/signup">Apply for a passport</AuthFooterLink></>}
+    >
+      <SigninForm />
+    </AuthShell>
   );
 }

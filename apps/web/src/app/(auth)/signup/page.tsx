@@ -1,24 +1,25 @@
+import type { Metadata } from "next";
+import { AuthFooterLink, AuthShell } from "@/components/auth/auth-shell";
+import { PassportCover } from "@/components/auth/auth-art";
 import { SignupForm } from "./signup-form";
-import { typeClassMobile } from "@/lib/typography";
-import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sign up · Wicky",
-  description: "Create an account to start your almanac of learning.",
+  title: "Apply for your passport · Wicky",
+  description: "Create your Wicky account and start collecting stamps.",
 };
 
 export default function SignupPage() {
   return (
-    <div className="flex-1 flex flex-col justify-center px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-      <div className="mx-auto w-full max-w-sm">
-        <div className="mb-6 sm:mb-8 text-center">
-          <h1 className={typeClassMobile("h1")}>Wicky</h1>
-          <p className="mt-2 font-display text-[16px] italic text-muted-foreground sm:text-[18px]">
-            An almanac of learning.
-          </p>
-        </div>
-        <SignupForm />
-      </div>
-    </div>
+    <AuthShell
+      link={{ href: "/signin", label: "Sign in" }}
+      eyebrow="Application form"
+      title="Apply for your passport"
+      titleClass="max-w-[min(210px,calc(100%-84px))] text-[42px] min-[360px]:text-[50px] leading-[0.86] md:max-w-none xl:text-[56px]"
+      titleArt={<PassportCover className="mr-1.5 w-[clamp(72px,24vw,98px)]" />}
+      panelArt={<PassportCover className="w-[250px]" />}
+      footer={<>Already have a passport? <AuthFooterLink href="/signin">Sign in</AuthFooterLink></>}
+    >
+      <SignupForm />
+    </AuthShell>
   );
 }

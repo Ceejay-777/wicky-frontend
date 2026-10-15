@@ -140,6 +140,10 @@
   filter: url(#ink-2);
 }
 
+.stamp-foil {
+  filter: url(#foil-2);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -149,7 +153,8 @@
     transition-duration: 0ms !important;
   }
 
-  .stamp-ink {
+  .stamp-ink,
+  .stamp-foil {
     filter: none;
   }
 }

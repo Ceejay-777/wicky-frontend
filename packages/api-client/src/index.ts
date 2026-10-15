@@ -30,4 +30,4 @@ export const apiClient = {
   delete: <T>(path: string) => _caller<T>({ method: "DELETE", path }),
 };
 
-export { ApiRequestError, parseErrorDetail } from "./errors";
+export { ApiRequestError, parseApiError, parseErrorDetail, type FieldErrors } from "./errors";

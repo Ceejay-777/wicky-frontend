@@ -9,6 +9,8 @@ type FieldProps = Omit<React.ComponentProps<"input">, "id"> & {
   /** Sits inside the box, top-left, in the mono label style. */
   label: string;
   error?: string;
+  /** Flag the box as wrong without a message (the message lives in a form alert). */
+  invalid?: boolean;
   /** Helper text under the box (e.g. the password rule). */
   hint?: string;
   /** Right-hand control inside the box (e.g. a show/hide button). */
@@ -22,6 +24,7 @@ type FieldProps = Omit<React.ComponentProps<"input">, "id"> & {
 function Field({
   label,
   error,
+  invalid,
   hint,
   trailing,
   trailingSpace = "pr-3.5",
@@ -33,6 +36,7 @@ function Field({
   const id = useId();
   const noteId = `${id}-note`;
   const note = error ?? hint;
+  const flagged = !!error || !!invalid;
 
   return (
     <div className={wrapperClassName}>
@@ -41,7 +45,7 @@ function Field({
           htmlFor={id}
           className={cn(
             "pointer-events-none absolute top-[9px] right-12 left-3.5 truncate font-mono text-[10px] font-bold tracking-[0.12em] uppercase",
-            error ? "text-tomato" : "text-muted-ink"
+            flagged ? "text-tomato" : "text-muted-ink"
           )}
         >
           {label}
@@ -49,13 +53,13 @@ function Field({
         <input
           id={id}
           readOnly={readOnly}
-          aria-invalid={error ? true : undefined}
+          aria-invalid={flagged || undefined}
           aria-describedby={note ? noteId : undefined}
           className={cn(
             "h-[62px] w-full truncate rounded-md bg-field pt-[25px] pb-1.5 pl-3.5 font-sans text-[17px] font-medium text-ink outline-none",
             "placeholder:text-muted-ink/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt",
             readOnly ? "border-[1.5px] border-dashed border-ink bg-transparent pr-11 text-ink-2" : trailingSpace,
-            !readOnly && (error ? "border-2 border-tomato" : "border-[1.5px] border-ink"),
+            !readOnly && (flagged ? "border-2 border-tomato" : "border-[1.5px] border-ink"),
             className
           )}
           {...props}

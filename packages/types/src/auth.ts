@@ -14,6 +14,7 @@ export interface AuthSignupRequest {
   display_name: string;
   avatar?: string;
   bio?: string;
+  auto_select_subjects_enabled?: boolean;
 }
 
 export interface AuthSigninRequest {
