@@ -1,19 +1,23 @@
-export type TypeRole = "h1" | "h2" | "h3" | "body" | "caption" | "mono";
+export type TypeRole = "h1" | "h2" | "h3" | "body" | "caption" | "mono" | "label";
 
+// Passport type: Big Shoulders headlines, Work Sans body, Courier Prime labels.
+// Page titles step up from mobile (56) to tablet (64) and desktop (72).
 export function typeClass(role: TypeRole): string {
   switch (role) {
     case "h1":
-      return "font-display text-[28px] sm:text-[36px] lg:text-[44px] font-semibold leading-[1.1] sm:leading-[1.08] lg:leading-[1.05] tracking-[-0.015em] sm:tracking-[-0.018em] lg:tracking-[-0.02em]";
+      return "font-display font-black uppercase leading-[0.85] text-[56px] md:text-[64px] xl:text-[72px]";
     case "h2":
-      return "font-display text-[22px] sm:text-[24px] lg:text-[26px] font-semibold leading-[1.15] tracking-[-0.012em] sm:tracking-[-0.014em] lg:tracking-[-0.015em]";
+      return "font-display font-black uppercase leading-[0.9] text-[32px] md:text-[34px]";
     case "h3":
-      return "font-display text-[18px] lg:text-[20px] font-medium leading-[1.2] tracking-[-0.008em] lg:tracking-[-0.01em]";
+      return "font-display font-extrabold uppercase leading-none text-[22px] md:text-[24px]";
     case "body":
-      return "text-[15px] leading-[1.6]";
+      return "text-[16px] leading-[1.5]";
     case "caption":
-      return "text-[12px] italic text-muted-foreground";
+      return "text-[13px] leading-[1.45] text-ink-2";
     case "mono":
-      return "font-mono text-[13px] font-medium";
+      return "font-mono text-[13px] font-bold";
+    case "label":
+      return "font-mono text-[11px] font-bold uppercase tracking-[0.12em] text-muted-ink";
     default:
       return "";
   }
@@ -22,18 +26,12 @@ export function typeClass(role: TypeRole): string {
 export function typeClassMobile(role: TypeRole): string {
   switch (role) {
     case "h1":
-      return "font-display text-[28px] font-semibold leading-[1.1] tracking-[-0.015em]";
+      return "font-display font-black uppercase leading-[0.85] text-[56px]";
     case "h2":
-      return "font-display text-[22px] font-semibold leading-[1.15] tracking-[-0.012em]";
+      return "font-display font-black uppercase leading-[0.9] text-[32px]";
     case "h3":
-      return "font-display text-[18px] font-medium leading-[1.2] tracking-[-0.008em]";
-    case "body":
-      return "text-[15px] leading-[1.6]";
-    case "caption":
-      return "text-[12px] italic text-muted-foreground";
-    case "mono":
-      return "font-mono text-[13px] font-medium";
+      return "font-display font-extrabold uppercase leading-none text-[22px]";
     default:
-      return "";
+      return typeClass(role);
   }
 }

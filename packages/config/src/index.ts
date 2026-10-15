@@ -1,3 +1,3 @@
-export { theme, almanacRules } from "./theme";
-export type { Theme } from "./theme";
-export { wickyFonts, buildGoogleFontsUrl } from "./fonts";
+export { theme, subjectAccents } from "./theme";
+export type { Theme, SubjectAccent } from "./theme";
+export { wickyFonts } from "./fonts";
