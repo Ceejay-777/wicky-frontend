@@ -124,19 +124,23 @@ Purpose: pick up where you left off, and discover new subjects.
 
 ## 7. Subjects
 
-### 7.1 Subjects index
-- Two parts: the learner's active subjects (with progress and a status) and an explore list of subjects from the BE.
-- Explore rows show name, learner count (enrollment count) and an interest star. Rows show an ENROLLED or COMPLETED chip from the BE flags. The star toggles interest and must be optimistic with rollback on failure.
-- Tapping an explore row opens the explore preview.
-- Long names clamp to 2 lines on rows, with the chip and star never shrinking.
+### 7.1 Subjects index ("my subjects")
+- The Subjects tab is the learner's own list, not a catalogue. Home is unchanged and keeps its own explore row.
+- Three sections in order: ACTIVE (a card per active subject with progress, plus an "Add a subject" card and the "N of 5 slots" count), STARRED (subjects the learner marked with the interest star, each with an ADD action), and COMPLETED (subjects with the COMPLETED status, shown as compact rows).
+- When all 5 slots are used, the "Add a subject" card is replaced by a notice that a subject must be completed or removed. ADD on starred rows must not offer an action that will fail in that state.
+- Exploring the wider catalogue is not on this page. It lives inside the Add subject flow (7.3).
+- Long names clamp to 2 lines on rows, with chips and action buttons never shrinking. Hide a section when it is empty.
+- Content not confirmed by the BE: the completed row's "N of N topics" line, and whether the starred and completed lists can be fetched as dedicated lists. Derive from the subject status and interest flags, and confirm.
 
 ### 7.2 Explore preview
 - Shows the subject's levels with topic counts, and the topic list as a roadmap. All of it comes from the explore preview endpoint.
 - Primary action: add to my subjects. When the learner has 5 active subjects, the action is replaced with an explanation and a path to free a slot. Never offer an action that will fail.
 - Show whether the learner is already enrolled or has completed it.
+- Reached from an Explore row inside Add subject. Back returns to Add subject.
 
 ### 7.3 Add subject
 A sheet or screen with a single input that finds or creates a subject by name.
+- Below the input, an EXPLORE list shows subjects from the BE explore list: name, learner count, interest star, and ENROLLED or COMPLETED chips. The star toggles interest and must be optimistic with rollback on failure. Tapping a row opens the explore preview (7.2).
 - Typed input leads to the "find or create" request. While the BE works, show a calm "writing the roadmap" waiting state, because creation can take a moment.
 - Outcomes to design for, all required:
   1. Resolved: the subject is created or matched, and the learner lands on its overview.
@@ -324,13 +328,13 @@ Scope and state coverage
 
 Navigation shell
 - Mobile and tablet use the bottom navigation with five tabs (Home, Subjects, Quiz, Metrics, Profile). Tablet keeps the same 78 px bar.
-- Desktop replaces it with a fixed left sidebar, 264 px wide: wordmark on top, the same five items with an active state (tomato text, raised field background, ink border), and a user chip pinned to the bottom that links to Profile.
+- Desktop replaces it with a fixed left sidebar, 264 px wide: wordmark on top, the same five items with an active state (tomato text, raised field background, ink border), a theme toggle and a user chip pinned to the bottom. The toggle is a two-option segmented control (Light, Dark) with sun and moon icons; the active option is filled in ink. It exists on desktop only. Mobile and tablet have no theme toggle in the design. The choice must persist and the app should default to the system setting. The user chip links to Profile.
 - Screens that hide the nav on mobile also hide it on tablet and desktop: auth, recovery, topic reading, quiz, result, review, level up and subject complete, and the global leaderboard. Profile sub pages keep the nav with Profile active and a "Back to profile" link in the header.
 - Breakpoints: below 768 px the mobile layout; 768 to 1279 px the tablet layout; 1280 px and up the desktop layout. Between the designed sizes, let content columns flex and keep the nav model of the nearest design.
 
 Layout rules
 - Content gutters grow from 22 px on mobile to 48 px on tablet and 56 px on desktop. Headline sizes grow with the page title scale (mobile 56 px, tablet 64 px, desktop 72 px).
-- Card lists that are one column on mobile become two columns on tablet. On desktop, pages split into a main column and a secondary column (Home: subjects at two thirds, explore at one third; Subjects: current subjects and explore side by side; Subject overview: current topic and progress on the left, roadmap preview on the right).
+- Card lists that are one column on mobile become two columns on tablet. On desktop, pages split into a main column and a secondary column (Home: subjects at two thirds, explore at one third; Subjects: active subjects at two thirds, starred and completed at one third; Subject overview: current topic and progress on the left, roadmap preview on the right).
 - Subject roadmap: tablet uses two columns (level 1 and 3 on the left, level 2 on the right), desktop uses three columns, one per level.
 - Topic reading: reading column of 620 px on tablet and 680 px on desktop, serif body text. Desktop adds a right rail of 320 px holding the further study links and the stamp or advanced quiz card. The top bar and the pinned footer actions stay fixed.
 - Quiz, result and review: a centered column (620 to 720 px for questions, about 600 to 640 px for the result). Review uses one column on tablet and two columns on desktop.

@@ -41,7 +41,12 @@ const TABS: Tab[] = [
 // Immersive screens hide the nav on every width: topic reading, quiz in progress,
 // result and review (/quiz/…), and the global leaderboard. The /quiz hub keeps it.
 export function isImmersive(pathname: string) {
-  return pathname.startsWith("/topics/") || pathname.startsWith("/quiz/") || pathname.startsWith("/leaderboard");
+  return (
+    pathname.startsWith("/topics/") ||
+    pathname.startsWith("/quiz/") ||
+    pathname.startsWith("/leaderboard") ||
+    /^\/subjects\/[^/]+\/moment/.test(pathname)
+  );
 }
 
 export const NAV_HEIGHT = 78; // px, mobile and tablet bar

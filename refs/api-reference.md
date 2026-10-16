@@ -230,6 +230,7 @@ Get the current user's profile.
 Response 200:
 {
   "data": {
+    "id":                       int,      // matches `user_id` on leaderboard rows
     "email":                    string,
     "display_name":             string,
     "avatar":                   string,
@@ -292,6 +293,7 @@ Subjects the user is enrolled in (active or completed) are always excluded.
 
 Query params:
 - `limit` (optional, int 1–50): max subjects returned. Values above 50 are clamped to 50. `0`, negative or non-numeric values return 400. Home uses `?limit=8`.
+- `interested` (optional, `true` | `false`): `true` returns only subjects the current user starred (`is_interested` is true on every item). The filter is applied before `limit`, so a starred subject is never cut off by the 50 cap. Any other value returns 400. This is the source for the Starred list. Starred subjects the user has since enrolled in are excluded like everywhere else on this endpoint.
 
 ```
 Response 200:
@@ -625,6 +627,11 @@ content (summary, resource links) is NOT included — call
 While the roadmap is not `READY`, `topics` is empty and every level has `total: 0`.
 Returns 404 if the user is not enrolled in this subject.
 
+Topic ordering: `order` is one running number per subject (1..N across all three
+levels), not per level. The server does not gate topic access by order. The
+"current" topic is a client convention: the first unpassed topic by `order` in an
+unlocked level, the same rule `GET /subjects` uses for `current_topic`.
+
 ```
 Response 200:
 {
@@ -638,6 +645,7 @@ Response 200:
     "notification_frequency_hours": int,     // 1-24
     "next_due_at":                 string | null,
     "roadmap_status":              string,   // "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
+    "percent_complete":            int,      // 0-100, rounded down; same value as GET /subjects
     "levels": [
       {
         "level":       int,        // 1, 2, or 3
@@ -711,6 +719,29 @@ Response 200:
       "user_id":       int,
       "display_name":  string, // display_name or email fallback
       "total_points":  int     // points across all subjects
+    },
+    ...
+  ],
+  "status": "success"
+}
+```
+
+---
+
+### `GET /api/learning/subjects/<subject_id>/leaderboard`
+
+Per-subject leaderboard — top 20 users by points earned in this subject. Users with
+`leaderboard_visible = false` are hidden. Does not require enrollment.
+
+```
+Response 200:
+{
+  "data": [
+    {
+      "rank":         int,    // 1-based position
+      "user_id":      int,
+      "display_name": string,
+      "points":       int     // points in this subject
     },
     ...
   ],

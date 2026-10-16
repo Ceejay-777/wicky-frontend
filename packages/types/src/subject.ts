@@ -54,6 +54,8 @@ export interface SubjectDetail {
   created_at: string;
   notification_frequency_hours: number;
   next_due_at: string | null;
+  roadmap_status: ContentStatus;
+  percent_complete: number;
   levels: SubjectLevelProgress[];
   topics: SubjectTopicItem[];
 }

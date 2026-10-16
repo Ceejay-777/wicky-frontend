@@ -1,10 +1,14 @@
 export interface UserProfile {
+  id: number;
   email: string;
   display_name: string;
   avatar: string;
   bio: string;
-  leaderboard_visible: boolean;
-  others_learning_visible: boolean;
+  preferences: {
+    leaderboard_visible: boolean;
+    others_learning_visible: boolean;
+    auto_select_subjects_enabled: boolean;
+  };
   date_joined: string;
 }
 
