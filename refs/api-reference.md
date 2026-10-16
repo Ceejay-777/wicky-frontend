@@ -288,10 +288,13 @@ Response 200:
   "data": [
     {
       "id":                int,      // subject ID
+Subjects the user is enrolled in (active or completed) are always excluded.
+
+Query params:
+- `limit` (optional, int 1–50): max subjects returned. Values above 50 are clamped to 50. `0`, negative or non-numeric values return 400. Home uses `?limit=8`.
       "name":              string,   // subject name
       "enrollment_count":  int,      // active learners
-      "is_enrolled":       boolean,  // current user is enrolled
-      "is_completed":      boolean,  // current user completed this subject
+      "topic_count":       int,      // topics in the roadmap
       "is_interested":     boolean   // current user marked interest
     },
     ...
@@ -307,6 +310,8 @@ Response 200:
 Mark interest in a subject (does not enroll, just signals interest for suggestions).
 
 No request body.
+`is_enrolled` and `is_completed` are not in this list (they would always be false). `GET /explore/<id>` still returns them.
+
 
 ```
 Response 201:
@@ -590,7 +595,10 @@ Response 200:
       "created_at":                  string,   // ISO 8601, when the user enrolled
       "notification_frequency_hours": int,     // 1-24
       "next_due_at":                 string | null,
-      "roadmap_status":              string    // "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
+      "roadmap_status":              string,   // "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
+      "current_topic":               { "id": int, "title": string } | null
+      // First topic by order in an unlocked level (level <= level_unlocked) not yet passed (normal or advanced).
+      // null if all unlocked topics are passed, or the roadmap has no topics yet.
     },
     ...
   ],

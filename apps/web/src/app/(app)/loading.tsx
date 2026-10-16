@@ -1,95 +1,31 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { IconBell } from "@tabler/icons-react";
-import { cn } from "@/lib/utils";
 
+// Shaped like the final Home: greeting, subject cards, explore row.
 export default function AppLoading() {
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between px-4 pt-4 sm:px-6 sm:pt-6 lg:px-8">
-        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-primary">
-          An Almanac of Learning
-        </span>
-        <span
-          aria-hidden="true"
-          className="relative inline-flex size-11 items-center justify-center border border-ink bg-background text-ink"
-        >
-          <IconBell size={20} stroke={1.5} aria-hidden="true" />
-        </span>
-      </div>
-      <hr className="border-t border-ink" />
+    <div className="px-[22px] pt-[30px] md:px-12 md:pt-11 xl:px-14" aria-busy="true" aria-label="Loading">
+      <Skeleton className="h-8 w-24 md:hidden" />
+      <Skeleton className="mt-[26px] h-3 w-28 md:mt-0" />
+      <Skeleton className="mt-2 h-14 w-56 md:h-16" />
 
-      <header className="px-4 pt-6 sm:px-6 sm:pt-8 lg:px-8 lg:pt-10">
-        <Skeleton className="h-9 w-72 sm:h-10 sm:w-96" />
-        <Skeleton className="mt-3 h-5 w-64 sm:h-6 sm:w-80" />
-      </header>
-
-      <div className="px-4 sm:px-6 lg:px-8">
-        <Skeleton className="mt-8 h-3 w-40 sm:mt-10" />
-        <div className="mt-3 border-t border-ink">
-          <CurrentlyLearningRow maxNameWidth={180} pointsWidth={20} />
-          <CurrentlyLearningRow maxNameWidth={140} pointsWidth={20} />
-          <CurrentlyLearningRow maxNameWidth={200} pointsWidth={20} />
+      <div className="xl:grid xl:grid-cols-[2fr_1fr] xl:gap-12">
+        <div>
+          <Skeleton className="mt-7 mb-3 h-3 w-40 md:mt-[30px]" />
+          <div className="grid gap-3 md:grid-cols-2">
+            {[0, 1, 2].map((i) => (
+              <Skeleton key={i} className="h-[142px] rounded-xl" />
+            ))}
+          </div>
         </div>
-
-        <Skeleton className="mt-10 h-3 w-40 sm:mt-12" />
-        <div
-          className={cn(
-            "mt-3 flex gap-4 overflow-x-auto pb-2",
-            "[-ms-overflow-style:none] scrollbar-none [&::-webkit-scrollbar]:hidden"
-          )}
-        >
-          <DiscoveryCardSkeleton nameMaxWidth={140} />
-          <DiscoveryCardSkeleton nameMaxWidth={110} />
-          <DiscoveryCardSkeleton nameMaxWidth={160} />
-          <DiscoveryCardSkeleton nameMaxWidth={120} />
-          <AddSubjectCardSkeleton />
+        <div>
+          <Skeleton className="mt-7 mb-3 h-3 w-36 md:mt-[30px]" />
+          <div className="-mr-[22px] flex gap-2.5 overflow-hidden md:mr-0 md:grid md:grid-cols-4 md:gap-3 xl:grid-cols-2">
+            {[0, 1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-[158px] w-[142px] shrink-0 rounded-xl md:w-auto" />
+            ))}
+          </div>
         </div>
       </div>
-
-      <div className="h-8 lg:hidden" aria-hidden="true" />
-    </div>
-  );
-}
-
-function CurrentlyLearningRow({
-  maxNameWidth,
-  pointsWidth,
-}: {
-  maxNameWidth: number;
-  pointsWidth: number;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-4 border-b border-ink px-2 py-4 sm:px-4 sm:py-5">
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <Skeleton
-          className="h-4.5 w-full"
-          style={{ maxWidth: maxNameWidth }}
-        />
-        <Skeleton className="h-3 w-24" />
-      </div>
-      <div className="flex shrink-0 items-center gap-3">
-        <Skeleton className="h-3.5" style={{ width: pointsWidth * 4 }} />
-        <Skeleton className="size-4.5" />
-      </div>
-    </div>
-  );
-}
-
-function DiscoveryCardSkeleton({ nameMaxWidth }: { nameMaxWidth: number }) {
-  return (
-    <div className="flex h-26.5 w-50 shrink-0 flex-col justify-between border border-ink bg-background p-4">
-      <Skeleton className="h-4.5 w-full" style={{ maxWidth: nameMaxWidth }} />
-      <Skeleton className="h-3 w-20" />
-    </div>
-  );
-}
-
-function AddSubjectCardSkeleton() {
-  return (
-    <div className="flex h-26.5 w-50 shrink-0 flex-col items-center justify-center border border-dashed border-ink bg-background p-4">
-      <Skeleton className="size-7" />
-      <Skeleton className="mt-3 h-4 w-24" />
-      <Skeleton className="mt-1 h-3 w-24" />
     </div>
   );
 }

@@ -20,7 +20,7 @@ export const getEnrolledSubjects = cache(
 
 export const getExploreSubjects = cache(
   async (): Promise<Subject[]> => {
-    const res = await apiClient.get<ApiSuccess<Subject[]>>("/api/learning/explore");
+    const res = await apiClient.get<ApiSuccess<Subject[]>>("/api/learning/explore?limit=8");
     return res.data;
   },
 );

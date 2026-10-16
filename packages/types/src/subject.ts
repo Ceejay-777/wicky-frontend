@@ -1,11 +1,11 @@
 import type { ContentStatus, ReviewStatus, SubjectStatus } from "./common";
 
+// GET /explore item: enrolled subjects are excluded by the BE, so no enrolled/completed flags.
 export interface Subject {
   id: number;
   name: string;
   enrollment_count: number;
-  is_enrolled: boolean;
-  is_completed: boolean;
+  topic_count: number;
   is_interested: boolean;
 }
 
@@ -22,6 +22,7 @@ export interface EnrolledSubject {
   created_at: string;
   notification_frequency_hours: number;
   next_due_at: string | null;
+  current_topic: { id: number; title: string } | null;
 }
 
 export interface SubjectTopicItem {
