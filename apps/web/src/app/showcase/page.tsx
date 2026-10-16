@@ -10,7 +10,7 @@ import { Stepper } from "@/components/ui/stepper";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Stamp } from "@/components/stamp/stamp";
 import { TopBar } from "@/components/nav/top-bar";
-import { ThemeToggle } from "./theme-toggle";
+import { ThemeToggle } from "@/components/nav/theme-toggle";
 
 const LONG = "The Rise and Fall of the Hanseatic League's Baltic Trade Monopoly";
 

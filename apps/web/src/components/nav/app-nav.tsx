@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "./theme-toggle";
 
 export type NavProfile = { name: string; initials: string } | null;
 
@@ -100,9 +101,11 @@ export function AppNav({ pathname, profile }: { pathname: string; profile: NavPr
             </Link>
           );
         })}
-        <Link
-          href="/profile"
-          className="mt-auto flex min-h-14 items-center gap-3 rounded-lg border-[1.5px] border-ink bg-field p-3 text-ink"
+        <div className="mt-auto flex flex-col gap-3.5">
+          <ThemeToggle />
+          <Link
+            href="/profile"
+            className="flex min-h-14 items-center gap-3 rounded-lg border-[1.5px] border-ink bg-field p-3 text-ink"
         >
           <span
             aria-hidden="true"
@@ -114,7 +117,8 @@ export function AppNav({ pathname, profile }: { pathname: string; profile: NavPr
             <span className="block truncate text-[15px] leading-tight font-semibold">{profile?.name ?? "Your profile"}</span>
             <span className="block font-mono text-[10px] font-bold tracking-[0.1em] text-muted-ink">VIEW PASSPORT</span>
           </span>
-        </Link>
+          </Link>
+        </div>
       </aside>
     </>
   );
