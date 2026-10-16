@@ -174,6 +174,11 @@ There is also a limit of 30 requests/hour per IP. Always use `retry_after` from 
 hardcoding these numbers; on a 200, start a 60s cooldown on the resend button, and on a 429 show a
 countdown from `retry_after`.
 
+**The email link** points at the frontend, not the API:
+`{FRONTEND_URL}/reset-password?u=<email>&s=<token>` (`u` = email, `s` = token, both URL-encoded;
+`URLSearchParams` decodes them). That page should POST `{email: u, token: s, password}` to
+`/api/auth/password-reset/confirm`.
+
 A 200 means the request was accepted, not that the email arrived (delivery is retried in the background
 up to 3 times). Tell users to check spam and to resend once the cooldown ends.
 
@@ -182,6 +187,8 @@ up to 3 times). Tell users to check spam and to resend once the cooldown ends.
 ### `POST /api/auth/password-reset/confirm`
 
 Complete a password reset using the token received via email. Tokens expire after 1 hour.
+A successful reset invalidates every other pending reset token for that user **and signs out all existing
+sessions**: old `access_token` / `refresh_token` cookies stop working (401), so send the user to sign in again.
 
 ```
 Request body:
@@ -281,6 +288,10 @@ for live updates and `POST /api/learning/subjects/<subject_id>/roadmap/retry` to
 ### `GET /api/learning/explore`
 
 Browse subjects that have a roadmap (at least one topic), ordered by popularity (active enrollment count descending, then name).
+Subjects the user is enrolled in (active or completed) are always excluded.
+
+Query params:
+- `limit` (optional, int 1–50): max subjects returned. Values above 50 are clamped to 50. `0`, negative or non-numeric values return 400. Home uses `?limit=8`.
 
 ```
 Response 200:
@@ -288,10 +299,6 @@ Response 200:
   "data": [
     {
       "id":                int,      // subject ID
-Subjects the user is enrolled in (active or completed) are always excluded.
-
-Query params:
-- `limit` (optional, int 1–50): max subjects returned. Values above 50 are clamped to 50. `0`, negative or non-numeric values return 400. Home uses `?limit=8`.
       "name":              string,   // subject name
       "enrollment_count":  int,      // active learners
       "topic_count":       int,      // topics in the roadmap
@@ -303,6 +310,8 @@ Query params:
 }
 ```
 
+`is_enrolled` and `is_completed` are not in this list (they would always be false). `GET /explore/<id>` still returns them.
+
 ---
 
 ### `POST /api/learning/explore/<subject_id>/interest`
@@ -310,8 +319,6 @@ Query params:
 Mark interest in a subject (does not enroll, just signals interest for suggestions).
 
 No request body.
-`is_enrolled` and `is_completed` are not in this list (they would always be false). `GET /explore/<id>` still returns them.
-
 
 ```
 Response 201:

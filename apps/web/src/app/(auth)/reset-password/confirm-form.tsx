@@ -22,8 +22,8 @@ const reissue = (className: string) => (
 export function ConfirmResetForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const token = params.get("token") ?? "";
-  const email = params.get("email") ?? "";
+  const token = params.get("s") ?? "";
+  const email = params.get("u") ?? "";
   const {
     form: {
       register,
@@ -80,7 +80,7 @@ export function ConfirmResetForm() {
         </Button>
       </form>
       <div className="mt-6 rounded-md border-[1.5px] border-dashed border-muted-ink p-3.5 text-sm leading-snug text-ink-2">
-        {incomplete ? "This link is incomplete." : "Link expired or already used?"}{" "}
+        {incomplete ? "This link is invalid." : "Link expired or already used?"}{" "}
         <Link href="/recover" className="inline-block px-1.5 py-3 font-semibold text-ink underline">
           Ask for a new one
         </Link>
