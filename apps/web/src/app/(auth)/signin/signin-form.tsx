@@ -1,59 +1,32 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ApiRequestError } from "@wicky/api-client";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, PasswordField } from "@/components/ui/field";
-import { signinSchema, type SigninValues } from "@/lib/auth/schemas";
-import { signin } from "@/lib/auth/service";
+import { signinAction } from "@/lib/auth/actions";
 import { authMessages } from "@/lib/auth/messages";
+import { signinSchema, type SigninValues } from "@/lib/auth/schemas";
+import { useActionForm } from "@/lib/auth/use-action-form";
 
 export function SigninForm() {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [topError, setTopError] = useState<string | null>(null);
-
   const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<SigninValues>({
-    resolver: zodResolver(signinSchema),
-    mode: "onBlur",
-    defaultValues: { email: "", password: "" },
-  });
-
-  const onSubmit = handleSubmit((values) => {
-    setTopError(null);
-    startTransition(async () => {
-      try {
-        await signin(values);
-        router.push("/");
-        router.refresh();
-      } catch (err) {
-        if (!(err instanceof ApiRequestError)) return setTopError(authMessages.errors.network);
-        setTopError(
-          err.status === 401
-            ? authMessages.errors.invalidCredentials
-            : err.status === 429
-              ? authMessages.errors.rateLimited
-              : authMessages.errors.unknown
-        );
-      }
-    });
-  });
+    form: {
+      register,
+      formState: { errors },
+    },
+    formAction,
+    onSubmit,
+    state,
+    isPending,
+  } = useActionForm<SigninValues>(signinAction, signinSchema, { email: "", password: "" });
 
   // A wrong-details failure marks both fields without saying which one is wrong.
-  const wrong = topError === authMessages.errors.invalidCredentials;
+  const wrong = state?.error === authMessages.errors.invalidCredentials;
 
   return (
-    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-3">
-      {topError && <Alert variant="destructive">{topError}</Alert>}
+    <form action={formAction} onSubmit={onSubmit} noValidate className="flex flex-col gap-3">
+      {state?.error && <Alert variant="destructive">{state.error}</Alert>}
       <Field
         label="Email"
         type="email"
@@ -74,7 +47,7 @@ export function SigninForm() {
           Forgot your password?
         </Link>
       </div>
-      <Button type="submit" disabled={isPending}>
+      <Button type="submit" loading={isPending}>
         {isPending ? "Opening…" : "Open my passport"}
       </Button>
     </form>

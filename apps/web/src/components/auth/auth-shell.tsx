@@ -71,7 +71,7 @@ export function AuthShell({ link, eyebrow, title, titleClass, intro, titleArt, i
             </div>
 
             {(intro || inlineArt) && (
-              <div className="mt-3 flex items-center justify-between gap-2">
+              <div className={`mt-3 flex items-center gap-2 ${intro ? "justify-between" : "justify-center"}`}>
                 {intro && (
                   <div className="max-w-[170px] min-w-0 text-[15px] leading-[1.45] text-ink-2 md:max-w-none md:text-base">{intro}</div>
                 )}

@@ -158,7 +158,24 @@ Response 200:
   "detail": "If that email exists, a reset link has been sent.",
   "status": "success"
 }
+
+Response 429 (too many requests):
+{
+  "detail": "Request was throttled. Expected available in 60 seconds.",
+  "status": "error",
+  "retry_after": 60      // seconds until the next request is allowed; also sent as the Retry-After header
+}
 ```
+
+**Rate limiting (per email, case-insensitive; applies whether or not the account exists):**
+the wait before you may request again doubles after every request:
+60s → 2m → 4m → 8m → 16m → 32m → 60m (cap). The counter resets after 24h without requests.
+There is also a limit of 30 requests/hour per IP. Always use `retry_after` from the 429 rather than
+hardcoding these numbers; on a 200, start a 60s cooldown on the resend button, and on a 429 show a
+countdown from `retry_after`.
+
+A 200 means the request was accepted, not that the email arrived (delivery is retried in the background
+up to 3 times). Tell users to check spam and to resend once the cooldown ends.
 
 ---
 

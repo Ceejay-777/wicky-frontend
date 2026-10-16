@@ -4,7 +4,6 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IconLoader2 } from "@tabler/icons-react";
 import { ApiRequestError } from "@wicky/api-client";
 import { useMediaQuery } from "@wicky/hooks";
 import { Button } from "@/components/ui/button";
@@ -95,7 +94,8 @@ export function AddSubjectModal({
   });
 
   const formContent = (
-    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
+    // Only reachable after hydration (it lives in a modal), so `action` runs the validated handler.
+    <form action={() => onSubmit()} noValidate className="flex flex-col gap-5">
       {alertMessage ? (
         <AuthFormAlert title={alertMessage} />
       ) : null}
@@ -122,17 +122,11 @@ export function AddSubjectModal({
         type="submit"
         variant="default"
         size="lg"
-        disabled={isPending || (isFull && isError)}
+        loading={isPending}
+        disabled={isFull && isError}
         className="h-12 w-full font-mono text-[11px] uppercase tracking-[0.04em] rounded-none"
       >
-        {isPending ? (
-          <>
-            <IconLoader2 data-icon="inline-start" className="animate-spin" />
-            <span>Working…</span>
-          </>
-        ) : (
-          "Create subject"
-        )}
+        Create subject
       </Button>
     </form>
   );

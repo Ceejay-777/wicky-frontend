@@ -10,6 +10,7 @@ Rebuilding the app in the "Passport" design direction, stage by stage (see `refs
 ## Rules
 - Use the primitives in `apps/web/src/components/ui`, `stamp` and `nav`. Tokens live in `packages/config/src/theme.css`.
 - Do not add data or features the BE lacks (spec section 1).
+- Forms: every `<form>` has an `action` (a Server Action); lint enforces it. Credential and auth calls go through Server Actions in `lib/auth/actions.ts`, never `onSubmit` plus `fetch`, so nothing ever reaches the URL.
 - Every screen ships in light and dark, with the long-text behavior from spec section 3.
 
 ## Attribution

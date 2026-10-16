@@ -1,21 +1,19 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { ApiRequestError } from "@wicky/api-client";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { OfficeStamp } from "@/components/auth/auth-art";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
 import { PasswordField } from "@/components/ui/field";
-import { confirmResetSchema, type ConfirmResetValues } from "@/lib/auth/schemas";
-import { confirmPasswordReset } from "@/lib/auth/service";
+import { confirmResetAction } from "@/lib/auth/actions";
 import { authMessages } from "@/lib/auth/messages";
+import { confirmResetSchema, type ConfirmResetValues } from "@/lib/auth/schemas";
+import { useActionForm } from "@/lib/auth/use-action-form";
 
 const reissue = (className: string) => (
   <OfficeStamp top="WICKY OFFICE" main="REISSUE" sub="PASSWORD DESK" mainSize={50} className={className} />
@@ -26,35 +24,22 @@ export function ConfirmResetForm() {
   const params = useSearchParams();
   const token = params.get("token") ?? "";
   const email = params.get("email") ?? "";
-  const [isPending, startTransition] = useTransition();
-  const [topError, setTopError] = useState<string | null>(null);
-
   const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors },
-  } = useForm<ConfirmResetValues>({
-    resolver: zodResolver(confirmResetSchema),
-    mode: "onBlur",
-    defaultValues: { password: "" },
-  });
+    form: {
+      register,
+      formState: { errors },
+    },
+    formAction,
+    onSubmit,
+    state,
+    isPending,
+  } = useActionForm<ConfirmResetValues>(confirmResetAction, confirmResetSchema, { password: "" });
 
-  const onSubmit = handleSubmit(({ password }) => {
-    setTopError(null);
-    startTransition(async () => {
-      try {
-        await confirmPasswordReset({ email, token, password });
-        toast.success(authMessages.confirmReset.success);
-        router.push("/signin");
-      } catch (err) {
-        if (!(err instanceof ApiRequestError)) return setTopError(authMessages.errors.network);
-        if (err.fields?.password) return setError("password", { message: err.fields.password[0] });
-        // "Token has expired." and "Invalid token or email." both mean: ask for a new link.
-        setTopError(err.status === 400 ? authMessages.errors.expiredLink : authMessages.errors.unknown);
-      }
-    });
-  });
+  useEffect(() => {
+    if (!state?.done) return;
+    toast.success(authMessages.confirmReset.success);
+    router.push("/signin");
+  }, [state, router]);
 
   const incomplete = !token || !email;
 
@@ -78,8 +63,10 @@ export function ConfirmResetForm() {
           For {email}
         </Chip>
       )}
-      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-3">
-        {topError && <Alert variant="destructive">{topError}</Alert>}
+      <form action={formAction} onSubmit={onSubmit} noValidate className="flex flex-col gap-3">
+        <input type="hidden" name="email" value={email} />
+        <input type="hidden" name="token" value={token} />
+        {state?.error && <Alert variant="destructive">{state.error}</Alert>}
         <PasswordField
           label="New password"
           autoComplete="new-password"
@@ -88,7 +75,7 @@ export function ConfirmResetForm() {
           error={errors.password?.message}
           {...register("password")}
         />
-        <Button type="submit" disabled={isPending || incomplete}>
+        <Button type="submit" loading={isPending} disabled={incomplete}>
           {isPending ? "Saving…" : "Save new password"}
         </Button>
       </form>

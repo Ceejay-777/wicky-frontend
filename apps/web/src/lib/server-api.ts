@@ -5,6 +5,7 @@ import {
   type ApiCaller,
 } from "@wicky/api-client";
 import { cookies } from "next/headers";
+import { parseSetCookie } from "@/lib/auth/set-cookie";
 
 const API_BASE = (process.env.API_BASE ?? "").replace(/\/$/, "");
 
@@ -29,11 +30,15 @@ const caller: ApiCaller = async ({ method, path, body }) => {
     throw await parseApiError(res);
   }
 
-    if (res.status === 204) return undefined as never;
+  // Sign up / sign in: hand the BE's session cookies to the browser. Only Server Actions may
+  // set cookies, and only auth endpoints send any, so reads during render never reach this.
+  for (const header of res.headers.getSetCookie()) {
+    const { name, value, ...options } = parseSetCookie(header);
+    cookieStore.set(name, value, options);
+  }
 
-    const json = await res.json();
-    console.log(`[server-api] ${method} ${path} →`, JSON.stringify(json, null, 2));   // ← temp
-return json;
+  if (res.status === 204) return undefined as never;
+  return await res.json();
 };
 
 configureApiClient(caller);
