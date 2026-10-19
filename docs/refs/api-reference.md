@@ -458,7 +458,11 @@ Response 404:
 
 Check if the user has completed enough topics in the current level to advance.
 Returns `action: "none"` if the level has no topics yet (roadmap not generated). Only `PASSED` topics
-count toward the threshold. On `subject_completed` the enrollment becomes `COMPLETED`.
+count toward the threshold (`PASSED` and `ADVANCED_PASSED`). On `subject_completed` the enrollment becomes `COMPLETED`.
+
+**You usually do not need to call this.** `POST /topics/<id>/quiz/submit` runs the same check after a
+passed normal quiz and returns the result as `level_check`. If that already unlocked the level, this
+endpoint returns `action: "none"` afterwards, so take the level-up data from `level_check`.
 
 No request body.
 
@@ -885,6 +889,7 @@ Response 503:
 
 Submit answers to a quiz and get results. Points are only earned if the user passes (≥60%).
 Submission is one-time — re-submitting the same attempt_id returns an error.
+A passed **normal** quiz also checks level progression, so the next level can unlock inside this call.
 The attempt must belong to the signed-in user and to this topic, otherwise `404`
 (plus the 404 / 403 access rules above).
 
@@ -903,7 +908,16 @@ Response 200:
     "score":           int,      // points earned (0 if failed)
     "total_points":    int,      // max possible points
     "attempt_number":  int,      // attempt number
-    "quiz_type":       string    // "NORMAL" or "ADVANCED"
+    "quiz_type":       string,   // "NORMAL" or "ADVANCED"
+    // Set only after a passed NORMAL quiz, else null. Same shape as the data of
+    // POST /subjects/<id>/progress/check. A level-up happens here, so that endpoint would now say "none".
+    "level_check": {
+      "action":                  "none" | "level_up" | "subject_completed",
+      "new_level_unlocked":      int,        // only when level_up
+      "slots_available":         int,        // only when level_up
+      "needs_subject_selection": boolean,    // only when subject_completed
+      "suggestions":             [ { "id": int, "name": string, "reason": string } ]  // level_up / subject_completed
+    } | null
   },
   "status": "success"
 }
@@ -985,8 +999,10 @@ Response 200:
       "advanced_passed":          boolean,
       "completed_at":             string | null, // when the normal quiz was passed
       "resource_links_viewed_at": string | null, // when a resource link was opened
-      "advanced_quiz_available":  boolean,       // normal passed + links viewed + advanced not yet passed (ignores the 1h retake cooldown)
-      "next_topic": { "id": int, "title": string } | null  // next topic by `order`; null on the last topic. May be in a locked level: check the roadmap's `is_unlocked`.
+      "advanced_quiz_available":  boolean,       // eligibility only: normal passed + links viewed + advanced not yet passed (ignores the retake cooldown)
+      "normal_quiz_available_at":   string | null, // ISO 8601; null = the normal quiz can be generated now
+      "advanced_quiz_available_at": string | null, // same, for the advanced quiz (its cooldown is separate)
+      "next_topic": { "id": int, "title": string, "is_unlocked": boolean } | null  // next topic by `order`; null on the last topic. is_unlocked is false when it sits in a level the learner has not unlocked (opening it would 403).
     }
   },
   "status": "success"
@@ -997,6 +1013,13 @@ Response 404: { "detail": "Not found.", "status": "error" }   // not enrolled in
 ```
 
 `order` is the topic number (a running 1..N across the subject), so it can be shown directly.
+
+**Quiz cooldown.** After a quiz is generated, the same type cannot be generated again for 1 hour
+(normal and advanced are counted separately). `*_quiz_available_at` is when that ends, or `null` when
+the quiz can be generated now. Show a disabled button with a countdown while it is in the future.
+It does not say whether the quiz is allowed at all: also check `is_passed` for the normal quiz and
+`advanced_quiz_available` for the advanced one. There is no "AI is down" flag; a 503 from
+`quiz/generate` is the only signal.
 
 ---
 
@@ -1031,6 +1054,11 @@ their own channel `user-<id>`; any `?channel=` query is ignored. Unauthenticated
 
 Events are **not replayable** — the database is the source of truth. After (re)connecting, refetch
 the page's data (`GET /api/learning/subjects/<id>` or `GET /api/learning/topics/<id>`) to reconcile.
+
+**Keep-alive and buffering.** The server sends a `keep-alive` event (`event: keep-alive`, empty
+data) every 20 seconds while the stream is idle; `EventSource` ignores it unless you listen for it.
+Responses carry `Cache-Control: no-cache` and `X-Accel-Buffering: no`, and the backend does not
+compress this route. Any proxy in front (including a framework rewrite) must not buffer it.
 
 **How to use events**
 
