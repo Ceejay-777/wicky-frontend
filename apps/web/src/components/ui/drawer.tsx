@@ -32,35 +32,35 @@ const DrawerContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <Drawer.Portal>
     <DrawerBackdrop />
-    <Drawer.Popup
-      ref={ref}
-      className={cn(
-        "fixed inset-x-0 bottom-0 z-50 mt-24 flex flex-col",
-        "border border-ink bg-muted",
-        "max-h-[85vh]",
-        "data-[open]:slide-in-from-bottom",
-        "data-[closed]:slide-out-to-bottom",
-        className
-      )}
-      {...props}
-    />
+    <Drawer.Viewport className="fixed inset-0 z-50">
+      <Drawer.Popup
+        ref={ref}
+        className={cn(
+          "fixed inset-x-0 bottom-0 z-50 mt-24 flex flex-col",
+          "border border-ink bg-muted",
+          "max-h-[85vh]",
+          "data-[open]:slide-in-from-bottom",
+          "data-[closed]:slide-out-to-bottom",
+          className
+        )}
+        {...props}
+      />
+    </Drawer.Viewport>
   </Drawer.Portal>
 ));
 DrawerContent.displayName = "DrawerContent";
 
-const DrawerHandle = React.forwardRef<
-  React.ComponentRef<typeof Drawer.Handle>,
-  React.ComponentPropsWithoutRef<typeof Drawer.Handle>
->(({ className, ...props }, ref) => (
-  <Drawer.Handle
-    ref={ref}
-    className={cn(
-      "mx-auto mt-4 h-1 w-10 rounded-full bg-muted-foreground/30",
-      className
-    )}
-    {...props}
-  />
-));
+// Base UI's Drawer.Handle is a programmatic trigger handle, not a grab bar, so this is a plain element.
+const DrawerHandle = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<"div">>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      aria-hidden="true"
+      className={cn("mx-auto mt-4 h-1 w-10 rounded-full bg-muted-foreground/30", className)}
+      {...props}
+    />
+  )
+);
 DrawerHandle.displayName = "DrawerHandle";
 
 const DrawerTitle = React.forwardRef<
