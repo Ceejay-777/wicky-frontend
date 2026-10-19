@@ -35,8 +35,12 @@ export type {
   ResourceLink,
   Topic,
   TopicDetail,
+  TopicProgress,
+  ProgressStatus,
   OthersLearningEntry,
 } from "./topic";
+
+export type { TopicStatusEvent, RoadmapStatusEvent } from "./events";
 
 export type {
   QuizQuestion,

@@ -34,7 +34,9 @@ export interface SubjectTopicItem {
   review_status: ReviewStatus;
   user_progress_status: string | null;
   is_passed: boolean;
+  advanced_passed: boolean;
   completed_at: string | null;
+  resource_links_viewed_at: string | null;
 }
 
 export interface SubjectLevelProgress {

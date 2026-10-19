@@ -1,26 +1,21 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useRefetchOnEvent } from "@/lib/events/use-refetch-on-event";
 import { retryRoadmap } from "@/lib/learning/service";
 import type { ContentStatus } from "@wicky/types";
 
-const POLL_MS = 5000;
-
-// Roadmaps are written in the background. Poll while it is being prepared; offer retry if it failed.
+// Roadmaps are written in the background. Wait for roadmap.status while it is being prepared; offer retry if it failed.
 export function RoadmapStatusNotice({ subjectId, status }: { subjectId: number; status: ContentStatus }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState(false);
   const preparing = status === "NOT_GENERATED" || status === "GENERATING";
 
-  useEffect(() => {
-    if (!preparing) return;
-    const t = setInterval(() => router.refresh(), POLL_MS);
-    return () => clearInterval(t);
-  }, [preparing, router]);
+  useRefetchOnEvent({ active: preparing, event: "roadmap.status", match: (p) => p.subject_id === subjectId, onChange: () => router.refresh() });
 
   if (status === "READY") return null;
 

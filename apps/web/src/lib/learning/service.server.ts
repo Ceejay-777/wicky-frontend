@@ -10,6 +10,7 @@ import type {
   OthersLearningEntry,
   Subject,
   SubjectDetail,
+  TopicDetail,
   TopicLeaderboardEntry,
 } from "@wicky/types";
 
@@ -60,6 +61,13 @@ export const getTopicLeaderboard = cache(
 export const getOthersLearning = cache(
   async (topicId: number): Promise<OthersLearningEntry[]> => {
     const res = await apiClient.get<ApiSuccess<OthersLearningEntry[]>>(`/api/learning/topics/${topicId}/others-learning`);
+    return res.data;
+  },
+);
+
+export const getTopicDetail = cache(
+  async (id: number): Promise<TopicDetail> => {
+    const res = await apiClient.get<ApiSuccess<TopicDetail>>(`/api/learning/topics/${id}`);
     return res.data;
   },
 );

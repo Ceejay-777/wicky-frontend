@@ -33,3 +33,17 @@ export async function checkProgress(id: number): Promise<ProgressCheckResponse> 
   );
   return res.data;
 }
+
+// Restarts a FAILED topic; the result is normally GENERATING. Completion arrives as a topic.status event.
+export async function retryTopic(id: number): Promise<ContentStatus> {
+  const res = await apiClient.post<ApiSuccess<{ content_status: ContentStatus }>>(`/api/learning/topics/${id}/retry`);
+  return res.data.content_status;
+}
+
+// Prerequisite for the advanced quiz. Null until the BE has recorded a view.
+export async function markResourceLinksViewed(topicId: number): Promise<string | null> {
+  const res = await apiClient.post<ApiSuccess<{ resource_links_viewed_at: string | null }>>(
+    `/api/learning/topics/${topicId}/resource-links-viewed`,
+  );
+  return res.data.resource_links_viewed_at;
+}
