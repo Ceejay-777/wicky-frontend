@@ -2,11 +2,14 @@
 
 Rebuilding the app in the "Passport" design direction, stage by stage (see `docs/refs/DESIGN_SPEC.md` section 19).
 
-## Read first, every session
+## Docs (open the one you need, not all of them)
 - `docs/refs/DESIGN_SPEC.md`: behaviors, BE limits, delivery order. Where it and a design disagree, ask.
-- `docs/refs/designs.md`: index of every screen and the design canvas link. Before building or rebuilding a page, open the matching board from that canvas with the Artifact `read` action (file `project/<Board>.dc.html`). The boards are visual reference only; rebuild them as real, accessible UI.
-- `docs/refs/api-reference.md` for endpoints, `docs/refs/wicky-overview.md` for product context.
-- `docs/realtime-events.md` before touching anything that waits on the BE (SSE events, no polling).
+- `docs/refs/designs.md`: every screen and the design canvas link. Open it when building or rebuilding a page.
+- `docs/refs/api-reference.md`: BE endpoints.
+- `docs/refs/wicky-overview.md`: product context.
+- `docs/realtime-events.md`: anything that waits on the BE (SSE, no polling).
+- `docs/dev-server.md`: running, probing or scripting against the dev server.
+- `docs/screenshots/README.md`: capturing screenshots.
 
 ## Rules
 - Use the primitives in `apps/web/src/components/ui`, `stamp` and `nav`. Tokens live in `packages/config/src/theme.css`.

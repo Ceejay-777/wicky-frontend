@@ -187,7 +187,7 @@ Goal: a calm, distraction free reading surface that works for very short and ver
 ### 9.1 Content
 - Title, the topic summary (a text blob from the BE), and resource links (url, type wikipedia, video or article, title).
 - The summary is treated as plain paragraphs. If the BE later sends structured text, revisit.
-- Display derived read time from word count, and label it as an estimate. Do not show key facts, subtitles or similar fields, because the BE does not provide them.
+- Display derived read time from word count at 200 words per minute, rounded, minimum 1 minute (`readMinutes` in `lib/learning/reading.ts`). The BE has accepted this: it will not send a read time, and the FE owns the figure. Label it as an estimate. Do not show key facts, subtitles or similar fields, because the BE does not provide them.
 - Show the topic's subject, level and order as small context labels.
 
 ### 9.2 Layout and reading comfort
