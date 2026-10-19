@@ -1050,7 +1050,9 @@ Response 200:
 
 Server-Sent Events stream (`text/event-stream`), authenticated by the `access_token` cookie
 (use `new EventSource(url, { withCredentials: true })`). Each user is automatically subscribed to
-their own channel `user-<id>`; any `?channel=` query is ignored. Unauthenticated requests are rejected (403).
+their own channel `user-<id>`; any `?channel=` query is ignored. Unauthenticated requests (no cookie, or an invalid or expired one) get a plain
+`401 {"detail": "Authentication required.", "status": "error"}` and no stream, so `EventSource` stops
+retrying (`onerror` fires with `readyState === CLOSED`). Refresh the token, then open a new `EventSource`.
 
 Events are **not replayable** — the database is the source of truth. After (re)connecting, refetch
 the page's data (`GET /api/learning/subjects/<id>` or `GET /api/learning/topics/<id>`) to reconcile.
