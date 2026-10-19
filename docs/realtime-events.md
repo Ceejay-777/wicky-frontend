@@ -1,8 +1,10 @@
 # Realtime events (SSE)
 
 Status: contract is live on the BE (`docs/refs/api-reference.md`, "Realtime events"). The FE hook in "Receiving" is built
-(`apps/web/src/lib/events/use-refetch-on-event.ts`) and used by `PreparingView` and `RoadmapStatusNotice`. Not yet
-exercised against a live stream through the Next `/api` rewrite.
+(`apps/web/src/lib/events/use-refetch-on-event.ts`) and used by `PreparingView` and `RoadmapStatusNotice`. The Next
+`/api` rewrite was tested against a mock BE sending the BE's headers: with the default config Next gzipped the stream
+and nothing reached the client, so `compress: false` is set in `next.config.ts` and events now arrive as sent. Not yet
+tested against the real BE or a deployed proxy.
 
 Events tell the page that **something changed**. They never carry data to render. The database is the source of
 truth, so every event is answered by re-fetching.
@@ -10,7 +12,7 @@ truth, so every event is answered by re-fetching.
 ## Sending (BE)
 
 - `GET /api/events`: Server-Sent Events (`text/event-stream`), authenticated by the `access_token` cookie.
-- Each user is subscribed to their own channel automatically. `?channel=` is ignored. Unauthenticated: 403.
+- Each user is subscribed to their own channel automatically. `?channel=` is ignored. Unauthenticated (missing, invalid or expired cookie): plain `401` JSON `{"detail": "Authentication required."}` with no stream, so `EventSource` stops retrying (`readyState === CLOSED`). The access token lasts 15 minutes and a stream cannot refresh it, so a long-open page loses live events at that point. The 60s safety net below still calls `router.refresh()`, which goes through `proxy.ts` (refreshes the token) or redirects to sign in if the refresh fails; the page then simply has no live stream until it is reloaded or remounted.
 - Events are not replayable. Anything missed while disconnected is only recoverable by re-fetching.
 - Only users enrolled in the subject get its events. A subject previewed with `GET /explore/<id>` emits none.
 
@@ -83,5 +85,8 @@ GET /topics/<id>
 
 - A proxy that buffers responses hides events. The `/api` rewrite and any reverse proxy must pass SSE through
   unbuffered, and the BE should send a periodic keep-alive comment.
+- BE sends `Cache-Control: no-cache`, `X-Accel-Buffering: no`, no compression, and a named `event: keep-alive` with empty data every 20 seconds while idle. It is not a `:` comment line, so `EventSource` ignores it unless listened for; the hook does not need it.
+- Verified through our `/api` rewrite against the real BE: no gzip and no delay (production build), and the unauthenticated `401` arrives unchanged (status, `application/json`, body). Verified in a real browser on the HTTPS dev server (2026-10-19): signed out, `onerror` fires once with `readyState === CLOSED` and no reconnect loop; signed in, `open` then a `keep-alive` every 20 seconds, still arriving after 3 minutes. Not tested behind a deployed proxy or CDN.
 - Do not keep the stream open on finished pages; it is a connection per tab for nothing.
 - Dev server on https: `EventSource` must use a relative URL so it follows the page origin.
+- With `pnpm dev:https` the dev server only speaks HTTPS, and plain `http://` requests (curl, scripts) are dropped. See `docs/dev-server.md`.
