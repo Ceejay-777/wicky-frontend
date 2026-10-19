@@ -6,9 +6,8 @@ import { PreparingView } from "@/components/topic/preparing-view";
 import { ReadingView } from "@/components/topic/reading-view";
 import { RetryButton } from "@/components/topic/retry-button";
 import { TopicStateScreen } from "@/components/topic/topic-state-screen";
-import { loadSubject } from "@/lib/learning/load-subject";
 import { loadTopic } from "@/lib/learning/load-topic";
-import { isHttpUrl, quizNotice, readMinutes, toParagraphs } from "@/lib/learning/reading";
+import { isHttpUrl, quizNotice, readMinutes, toParagraphs, waitMinutes } from "@/lib/learning/reading";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Reading · Wicky" };
@@ -74,13 +73,8 @@ export default async function TopicPage({
     return <PreparingView topicId={topic.id} title={topic.title} subjectId={topic.subject_id} subjectName={topic.subject_name} level={topic.level} number={topic.order} />;
   }
 
-  // next_topic can sit in a level the learner has not opened, which only the subject's levels tell.
-  let nextHref: string | null = null;
-  if (progress.is_passed && progress.next_topic) {
-    const subject = await loadSubject(String(topic.subject_id));
-    const next = subject.topics.find((t) => t.id === progress.next_topic?.id);
-    if (next && next.level <= subject.level_unlocked) nextHref = `/topics/${next.id}`;
-  }
+  const next = progress.next_topic;
+  const nextHref = progress.is_passed && next?.is_unlocked ? `/topics/${next.id}` : null;
   return (
     <ReadingView
       topicId={topic.id}
@@ -96,6 +90,8 @@ export default async function TopicPage({
       advancedPassed={progress.advanced_passed}
       advancedAvailable={progress.advanced_quiz_available}
       nextHref={nextHref}
+      quizWait={waitMinutes(progress.normal_quiz_available_at)}
+      advancedWait={waitMinutes(progress.advanced_quiz_available_at)}
       underReview={topic.review_status === "FLAGGED" || topic.review_status === "FAILED"}
       quizNotice={progress.is_passed ? null : quizNotice(await searchParams)}
     />

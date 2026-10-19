@@ -28,10 +28,14 @@ export interface TopicProgress {
   advanced_passed: boolean;
   completed_at: string | null;
   resource_links_viewed_at: string | null;
-  /** Normal passed, links viewed, advanced not passed. Ignores the 1h retake cooldown. */
+  /** Eligibility only: normal passed, links viewed, advanced not passed. Ignores the 1h retake cooldown. */
   advanced_quiz_available: boolean;
-  /** Next topic by `order`; may sit in a locked level. Null on the last topic. */
-  next_topic: { id: number; title: string } | null;
+  /** ISO end of the 1h cooldown; null when the normal quiz can be generated now. */
+  normal_quiz_available_at: string | null;
+  /** Same for the advanced quiz; its cooldown is separate. */
+  advanced_quiz_available_at: string | null;
+  /** Next topic by `order`. `is_unlocked` is false when it sits in a level the learner has not opened. Null on the last topic. */
+  next_topic: { id: number; title: string; is_unlocked: boolean } | null;
 }
 
 export interface TopicDetail {

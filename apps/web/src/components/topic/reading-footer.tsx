@@ -9,6 +9,9 @@ type Props = {
   passed: boolean;
   nextHref: string | null;
   advancedReady: boolean;
+  /** Minutes left of each quiz's retake cooldown; 0 when open. */
+  quizWait?: number;
+  advancedWait?: number;
   advancedPassed?: boolean;
   hasLinks: boolean;
   notice: string | null;
@@ -18,9 +21,10 @@ type Props = {
 };
 
 const action = "h-[52px] flex-1 text-base";
+const waitLabel = (m: number) => `Retake in ${m} min`;
 
 // Sticky footer with the one primary action. The page reserves space equal to its height.
-export function ReadingFooter({ topicId, backHref, passed, nextHref, advancedReady, advancedPassed, hasLinks, notice, disabled, footerRef }: Props) {
+export function ReadingFooter({ topicId, backHref, passed, nextHref, advancedReady, quizWait = 0, advancedWait = 0, advancedPassed, hasLinks, notice, disabled, footerRef }: Props) {
   return (
     <div
       ref={footerRef}
@@ -43,13 +47,13 @@ export function ReadingFooter({ topicId, backHref, passed, nextHref, advancedRea
                 <Button variant="outline" disabled className={cn(action, "border-gold text-gold disabled:opacity-100")}>
                   Advanced passed
                 </Button>
-              ) : advancedReady ? (
+              ) : advancedReady && !advancedWait ? (
                 <Link href={`/topics/${topicId}/quiz?type=advanced`} className={cn(buttonVariants(), action)}>
                   Advanced quiz
                 </Link>
               ) : (
                 <Button variant="outline" disabled className={cn(action, "border-dashed border-muted-ink text-muted-ink disabled:opacity-100")}>
-                  Advanced quiz
+                  {advancedReady ? waitLabel(advancedWait) : "Advanced quiz"}
                 </Button>
               )}
             </>
@@ -65,9 +69,9 @@ export function ReadingFooter({ topicId, backHref, passed, nextHref, advancedRea
                   <span className="font-mono text-[9px] font-bold tracking-[0.08em]">STUDY</span>
                 </a>
               )}
-              {disabled ? (
+              {disabled || quizWait ? (
                 <Button variant="outline" disabled className={cn(action, "border-dashed border-muted-ink text-muted-ink disabled:opacity-100")}>
-                  Take the quiz
+                  {quizWait ? waitLabel(quizWait) : "Take the quiz"}
                 </Button>
               ) : (
                 <Link href={`/topics/${topicId}/quiz`} className={cn(buttonVariants(), action)}>

@@ -31,6 +31,9 @@ type Props = {
   /** BE says the advanced quiz is open (normal passed, links viewed, advanced not passed). */
   advancedAvailable: boolean;
   nextHref: string | null;
+  /** Minutes left of each quiz's retake cooldown; 0 when open. */
+  quizWait: number;
+  advancedWait: number;
   underReview: boolean;
   quizNotice: string | null;
 };
@@ -41,7 +44,7 @@ const noopSubscribe = () => () => {};
 // "13 OCT" in the learner's own zone and locale.
 const shortDate = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short" }).toUpperCase();
 
-export function ReadingView({ topicId, title, subjectId, subjectName, level, number, paragraphs, minutes, links, passedAt, advancedPassed, advancedAvailable, nextHref, underReview, quizNotice }: Props) {
+export function ReadingView({ topicId, title, subjectId, subjectName, level, number, paragraphs, minutes, links, passedAt, advancedPassed, advancedAvailable, nextHref, quizWait, advancedWait, underReview, quizNotice }: Props) {
   const passed = passedAt !== null;
   const [size, pickSize] = useTextSize();
   const [sheet, setSheet] = useState(false);
@@ -212,6 +215,8 @@ export function ReadingView({ topicId, title, subjectId, subjectName, level, num
         passed={passed}
         nextHref={nextHref}
         advancedReady={linksViewed}
+        quizWait={quizWait}
+        advancedWait={advancedWait}
         advancedPassed={advancedPassed}
         hasLinks={links.length > 0}
         notice={quizNotice}

@@ -4,10 +4,16 @@ export type TextSize = "small" | "medium" | "large";
 export const TEXT_SIZES: Record<TextSize, number> = { small: 16, medium: 18, large: 21 };
 export const TEXT_SIZE_KEY = "wicky:reading-size";
 
-// Derived on the client (spec section 18): the BE sends no read time. About 200 words a minute.
+// Derived on the client (spec section 18): the BE sends no read time and has accepted this. 200 words a minute.
 export function readMinutes(paragraphs: string[]): number {
   const words = paragraphs.join(" ").split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
+}
+
+// Whole minutes left of a quiz cooldown, rounded up; 0 when the quiz can be generated now.
+export function waitMinutes(availableAt: string | null): number {
+  if (!availableAt) return 0;
+  return Math.max(0, Math.ceil((new Date(availableAt).getTime() - Date.now()) / 60000));
 }
 
 // The summary is one text blob, treated as plain paragraphs (spec section 18).
