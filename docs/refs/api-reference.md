@@ -663,9 +663,11 @@ Response 200:
         "order":               int,
         "content_status":      string,        // "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
         "review_status":       string,        // "PENDING" | "PASSED" | "FAILED" | "FLAGGED"
-        "user_progress_status": string | null, // null if user hasn't started this topic
-        "is_passed":           boolean,
-        "completed_at":        string | null
+        "user_progress_status": string | null, // null if user hasn't started this topic; else "NOT_STARTED" | "PASSED" | "ADVANCED_PASSED" (see Progress statuses)
+        "is_passed":           boolean,       // true for PASSED and ADVANCED_PASSED
+        "advanced_passed":     boolean,       // true only for ADVANCED_PASSED
+        "completed_at":        string | null, // when the normal quiz was passed
+        "resource_links_viewed_at": string | null  // when the learner opened a resource link; null if never
       }
     ]
   },
@@ -678,6 +680,15 @@ Response 404:
   "status": "error"
 }
 ```
+
+**Progress statuses.** A topic's progress status is one of `NOT_STARTED` (no activity, or only
+links viewed), `PASSED` (normal quiz passed), `ADVANCED_PASSED` (advanced quiz passed). The
+statuses `READING` and `QUIZ_READY` exist in the schema but are never set; treat anything that
+is not `PASSED` / `ADVANCED_PASSED` as "not passed yet".
+
+The advanced quiz is unlocked on a roadmap row when
+`is_passed && resource_links_viewed_at != null && !advanced_passed`
+(the topic GET returns this as `progress.advanced_quiz_available`).
 
 ---
 
@@ -799,10 +810,24 @@ Response 200:
 
 ---
 
+### Topic access rules (all `/topics/<topic_id>/...` endpoints below)
+
+`GET /topics/<id>`, `quiz/generate`, `quiz/submit`, `resource-links-viewed` and `retry` require
+that the user is enrolled in the topic's subject and has unlocked its level:
+
+- Not enrolled in the subject: `404 {"detail": "Not found.", "status": "error"}`.
+- Topic's `level` is above the user's `level_unlocked`:
+  `403 {"detail": "This level is locked.", "status": "error"}`.
+
+Use `GET /explore/<subject_id>` (titles only, no content) to preview a subject you are not
+enrolled in. The topic leaderboard and `others-learning` endpoints are not gated.
+
+---
+
 ### `POST /api/learning/topics/<topic_id>/quiz/generate`
 
 Generate a quiz for a topic. The questions are created by an LLM and validated
-against a JSON schema before being returned.
+against a JSON schema before being returned. Returns 404 / 403 per the access rules above.
 
 **Cooldown:** 1 hour between quiz generations for the same user + topic + quiz type.
 
@@ -860,6 +885,8 @@ Response 503:
 
 Submit answers to a quiz and get results. Points are only earned if the user passes (≥60%).
 Submission is one-time — re-submitting the same attempt_id returns an error.
+The attempt must belong to the signed-in user and to this topic, otherwise `404`
+(plus the 404 / 403 access rules above).
 
 ```
 Request body:
@@ -896,7 +923,9 @@ Response 400:
 ### `POST /api/learning/topics/<topic_id>/resource-links-viewed`
 
 Mark that the user has read/viewed the resource links for a topic. This is a
-prerequisite for taking the advanced quiz.
+prerequisite for taking the advanced quiz. Returns 404 / 403 per the access rules above.
+`GET /topics/<id>` returns this timestamp as `progress.resource_links_viewed_at`, so it
+survives a reload.
 
 No request body.
 
@@ -904,7 +933,7 @@ No request body.
 Response 200:
 {
   "data": {
-    "status":                  string,   // current topic progress status (e.g. "NOT_STARTED", "PASSED")
+    "status":                  string,   // "NOT_STARTED" | "PASSED" | "ADVANCED_PASSED"
     "resource_links_viewed_at": string | null  // ISO 8601 timestamp, null if not yet viewed
   },
   "status": "success"
@@ -915,8 +944,20 @@ Response 200:
 
 ### `GET /api/learning/topics/<topic_id>`
 
-Get a topic's metadata and generated content. Use this when the user opens
-a topic to read the summary and access resource links before taking quizzes.
+Get a topic's metadata, generated content and the current user's progress. Use this when
+the user opens a topic to read the summary and access resource links before taking quizzes.
+One request is enough for the topic page: no need to also fetch the subject detail for
+`is_passed`, `completed_at` or the next topic. Returns 404 / 403 per the access rules above.
+
+**Opening a topic starts content generation.** If this topic's content is `NOT_GENERATED`, the
+call queues generation for it, and for the next two topics (by `order`), so they are ready by
+the time the learner gets there. The returned `content_status` already reflects this (it will be
+`GENERATING`). It is safe to call repeatedly: refreshes do not queue extra work. A `FAILED`
+topic is not restarted by this call; use `POST /topics/<id>/retry`.
+
+While `content_status` is `NOT_GENERATED` or `GENERATING`, `summary` is empty and
+`resource_links` is `[]`. Wait for the `topic.status` event (see
+[Realtime events](#realtime-events--apievents)) and re-fetch.
 
 ```
 Response 200:
@@ -937,7 +978,42 @@ Response 200:
     "content_status":  string,   // "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
     "review_status":   string,   // "PENDING" | "PASSED" | "FAILED" | "FLAGGED"
     "subject_id":      int,
-    "subject_name":    string
+    "subject_name":    string,
+    "progress": {                      // the signed-in user's progress on this topic
+      "status":                   string,        // "NOT_STARTED" | "PASSED" | "ADVANCED_PASSED"
+      "is_passed":                boolean,       // normal quiz passed (also true after the advanced pass)
+      "advanced_passed":          boolean,
+      "completed_at":             string | null, // when the normal quiz was passed
+      "resource_links_viewed_at": string | null, // when a resource link was opened
+      "advanced_quiz_available":  boolean,       // normal passed + links viewed + advanced not yet passed (ignores the 1h retake cooldown)
+      "next_topic": { "id": int, "title": string } | null  // next topic by `order`; null on the last topic. May be in a locked level: check the roadmap's `is_unlocked`.
+    }
+  },
+  "status": "success"
+}
+
+Response 403: { "detail": "This level is locked.", "status": "error" }
+Response 404: { "detail": "Not found.", "status": "error" }   // not enrolled in the subject
+```
+
+`order` is the topic number (a running 1..N across the subject), so it can be shown directly.
+
+---
+
+### `POST /api/learning/topics/<topic_id>/retry`
+
+Restart content generation for a topic whose `content_status` is `FAILED` (the topic equivalent
+of `POST /subjects/<id>/roadmap/retry`). Safe to call repeatedly: it does nothing if generation
+is already running or the content is ready. No request body. Returns 404 / 403 per the access rules.
+
+Returns right away with the new status (normally `GENERATING`); wait for the `topic.status`
+event to know when it finishes.
+
+```
+Response 200:
+{
+  "data": {
+    "content_status": "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
   },
   "status": "success"
 }
@@ -954,7 +1030,20 @@ Server-Sent Events stream (`text/event-stream`), authenticated by the `access_to
 their own channel `user-<id>`; any `?channel=` query is ignored. Unauthenticated requests are rejected (403).
 
 Events are **not replayable** — the database is the source of truth. After (re)connecting, refetch
-`GET /api/learning/subjects/<id>` to reconcile.
+the page's data (`GET /api/learning/subjects/<id>` or `GET /api/learning/topics/<id>`) to reconcile.
+
+**How to use events**
+
+1. Treat an event as "something changed", not as data. On an event for what is on screen, re-GET
+   it and render the response. Do not build UI from the event payload.
+2. Subscribe first, then GET. If the work finished before the stream connected, the GET shows it.
+3. Open the stream only while something is pending (roadmap `GENERATING`, or the open topic is not
+   `READY`) and close it when nothing is. Each open stream is one connection per tab.
+4. After any reconnect, re-GET the current page.
+5. As a safety net for a blocked stream, re-GET once if no event has arrived after about 60 seconds
+   (instead of polling every few seconds).
+6. Events only go to users enrolled in the subject. There are none for a subject previewed with
+   `GET /explore/<id>`.
 
 ### Event: `roadmap.status`
 
@@ -968,3 +1057,25 @@ data: {
   "topic_count":    int
 }
 ```
+
+### Event: `topic.status`
+
+Sent to every user enrolled in the topic's subject when a topic's content reaches a final state
+or is reset: `READY` (content generated and reviewed), `FAILED` (generation failed; use
+`POST /topics/<id>/retry`), or `NOT_GENERATED` (a stuck generation was reset by the server;
+re-GET the topic and opening it starts generation again). It is not sent for `GENERATING`: the
+GET that started generation already returns that.
+
+```
+event: topic.status
+data: {
+  "subject_id":     int,
+  "topic_id":       int,
+  "content_status": "NOT_GENERATED" | "READY" | "FAILED",
+  "review_status":  "PENDING" | "PASSED" | "FAILED" | "FLAGGED"
+}
+```
+
+Typical flow on the topic page: `GET /topics/<id>` → if `content_status` is not `READY`, show
+"preparing" and listen for `topic.status` with that `topic_id` → on `READY` (or `FAILED`),
+re-GET the topic. If it is `FAILED`, offer "Try again" that calls `POST /topics/<id>/retry`.
