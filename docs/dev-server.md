@@ -38,7 +38,7 @@ If `http` resets and `https` returns 200, the server is fine and is running `dev
 
 - Before calling the dev server broken, probe it with `curl -k https://localhost:3000/...` as well as `http://`.
 - Anything that talks to the dev server must use the right origin:
-  - `docs/screenshots/capture.cjs` defaults to `http://localhost:3000`. With `dev:https`, pass `BASE_URL=https://localhost:3000`
+  - the `capture.cjs` script in `docs/screenshots.md` defaults to `http://localhost:3000`. With `dev:https`, pass `BASE_URL=https://localhost:3000`
     and expect a certificate warning to need handling (the dev certificate is self-signed).
   - `EventSource` and `fetch` in the app use relative URLs, so they follow the page origin (`docs/realtime-events.md`).
 - The BE on port 8000 is plain HTTP. Only the web dev server changes.

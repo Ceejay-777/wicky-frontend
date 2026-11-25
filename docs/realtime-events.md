@@ -1,7 +1,7 @@
 # Realtime events (SSE)
 
 Status: contract is live on the BE (`docs/refs/api-reference.md`, "Realtime events"). The FE hook in "Receiving" is built
-(`apps/web/src/lib/events/use-refetch-on-event.ts`) and used by `PreparingView` and `RoadmapStatusNotice`. The Next
+(`apps/web/src/lib/events/use-refetch-on-event.ts`) and used by `PreparingView`, `RoadmapStatusNotice` and the quiz page (`QuizFlow`). The Next
 `/api` rewrite was tested against a mock BE sending the BE's headers: with the default config Next gzipped the stream
 and nothing reached the client, so `compress: false` is set in `next.config.ts` and events now arrive as sent. Not yet
 tested against the real BE or a deployed proxy.
@@ -20,6 +20,7 @@ truth, so every event is answered by re-fetching.
 | --- | --- | --- |
 | `roadmap.status` | A subject's roadmap finishes or fails | `{subject_id, roadmap_status, topic_count}` |
 | `topic.status` | A topic becomes `READY` or `FAILED`, or a stuck generation is reset to `NOT_GENERATED` | `{subject_id, topic_id, content_status, review_status}` |
+| `quiz.status` | A quiz attempt becomes `READY` or `FAILED` (also when the server fails one stuck for 15 minutes). Only the learner who started the quiz gets it. | `{subject_id, topic_id, attempt_id, quiz_type, status}` |
 
 `topic.status` is never sent for `GENERATING`. The `GET /topics/<id>` that starts generation already returns it.
 
@@ -33,7 +34,7 @@ One hook, so no page touches `EventSource` directly (`lib/events/use-refetch-on-
 ```ts
 useRefetchOnEvent({
   active: boolean,                       // open the stream only while something is pending
-  event: "topic.status" | "roadmap.status",
+  event: "topic.status" | "roadmap.status" | "quiz.status",
   match: (payload) => boolean,           // e.g. p.topic_id === topicId
   onChange: () => void,                  // re-fetch; pages pass () => router.refresh()
 });
@@ -68,6 +69,19 @@ GET /topics/<id>
                                        POST /topics/<id>/retry -> {content_status}
                                        then refresh (shows PreparingView, stream opens, waits for the event)
 ```
+
+### Quiz page (`/topics/[id]/quiz`)
+
+```
+POST /topics/<id>/quiz/generate     (safe on every page load: returns the unfinished attempt if there is one)
+  ├─ 400 "Please wait N minutes..."  -> back to the topic with the busy notice
+  ├─ READY (200)                    -> questions; restore saved picks when `resumed` is true
+  ├─ GENERATING (202)               -> "Writing your quiz": active=true, match attempt_id, onChange = GET quiz/attempts/<id>
+  └─ FAILED (200)                   -> "Not ready yet", "Try again" calls generate again (same attempt)
+```
+
+The hook's read on every `open` is the "GET right after generate" the BE asks for, so a quiz that finished before the stream
+connected is still picked up. Questions carry no answers; they come back in `results[]` after `quiz/submit`.
 
 ### Subject roadmap
 

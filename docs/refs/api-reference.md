@@ -609,9 +609,16 @@ Response 200:
       "notification_frequency_hours": int,     // 1-24
       "next_due_at":                 string | null,
       "roadmap_status":              string,   // "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
-      "current_topic":               { "id": int, "title": string } | null
+      "current_topic": {
+        "id":                       int,
+        "title":                    string,
+        "level":                    int,            // 1-3
+        "order":                    int,            // topic number, a running 1..N across the subject
+        "normal_quiz_available_at": string | null   // ISO 8601; null = the normal quiz can be generated now
+      } | null
       // First topic by order in an unlocked level (level <= level_unlocked) not yet passed (normal or advanced).
       // null if all unlocked topics are passed, or the roadmap has no topics yet.
+      // Enough to render a hub card without GET /topics/<id> (which also starts content generation).
     },
     ...
   ],
@@ -816,7 +823,7 @@ Response 200:
 
 ### Topic access rules (all `/topics/<topic_id>/...` endpoints below)
 
-`GET /topics/<id>`, `quiz/generate`, `quiz/submit`, `resource-links-viewed` and `retry` require
+`GET /topics/<id>`, `quiz/generate`, `quiz/submit`, `quiz/attempts/...`, `resource-links-viewed` and `retry` require
 that the user is enrolled in the topic's subject and has unlocked its level:
 
 - Not enrolled in the subject: `404 {"detail": "Not found.", "status": "error"}`.
@@ -828,42 +835,62 @@ enrolled in. The topic leaderboard and `others-learning` endpoints are not gated
 
 ---
 
+### Quiz attempt object
+
+`quiz/generate`, `quiz/submit` and both `quiz/attempts` endpoints return the same object
+(`submit` adds `level_check`, `generate` adds `resumed`).
+
+```
+{
+  "id":             int,
+  "status":         "GENERATING" | "READY" | "FAILED",
+  "quiz_type":      "NORMAL" | "ADVANCED",
+  "attempt_number": int,                    // 1-based, per topic and quiz type
+  "questions": [                            // [] until status is READY
+    {
+      "question": string,
+      "options":  [string, string, string, string]
+    }
+  ],
+  "total_points":   int,                    // 0 until READY; then normal 90-110, advanced 180-220
+  "answers":        [int, ...] | null,      // the learner's picks; null until submitted
+  "score":          int,                    // points earned (0 until submitted, or if failed)
+  "passed":         boolean,
+  "submitted_at":   string | null,          // ISO 8601; null until submitted (and on attempts submitted before this field existed)
+  "results": [                              // null until submitted
+    {
+      "selected_index": int,
+      "correct_index":  int,
+      "is_correct":     boolean,
+      "explanation":    string
+    }
+  ] | null,
+  "correct_count":  int | null,             // null until submitted
+  "question_count": int                     // 0 until READY. Not fixed: 4-6 for normal, 9-12 for advanced
+}
+```
+
+**Answers are never sent before submit.** `questions` has only `question` and `options`;
+`correct_index` and `explanation` come back in `results` after `quiz/submit`, and from the attempts
+endpoints once the attempt is submitted.
+
+---
+
 ### `POST /api/learning/topics/<topic_id>/quiz/generate`
 
-Generate a quiz for a topic. The questions are created by an LLM and validated
-against a JSON schema before being returned. Returns 404 / 403 per the access rules above.
-
-**Cooldown:** 1 hour between quiz generations for the same user + topic + quiz type.
-
-**Question shape** (the `questions` array in the response):
-```
-[
-  {
-    "question":       string,   // the question text
-    "options":        [string, string, string, string],  // 4 choices
-    "correct_index":  int,      // 0–3, index of correct option
-    "explanation":    string    // why the correct answer is right
-  },
-  ...
-]
-```
+Start a quiz, or get the unfinished one back. **It does not wait for the AI**: it returns right away
+and the questions are written in the background. Returns 404 / 403 per the access rules above.
 
 ```
 Request body:
 {
   "quiz_type":              "NORMAL" | "ADVANCED",   // optional, defaults to "NORMAL"
-  "prior_missed_questions": [string, ...]             // optional, for targeted retry
+  "prior_missed_questions": [string, ...]             // optional, max 20 items of 500 chars; steers a NEW quiz, ignored when an existing one is returned
 }
 
-Response 200:
+Response 202 (status GENERATING) or 200 (status READY or FAILED):
 {
-  "data": {
-    "id":              int,      // quiz attempt ID (used in submit)
-    "quiz_type":       string,   // "NORMAL" or "ADVANCED"
-    "attempt_number":  int,      // 1-based, increments per retry
-    "questions":       [ /* Question objects — see above */ ],
-    "total_points":    int       // max possible points (normal: 90–110, advanced: 180–220)
-  },
+  "data": { /* Quiz attempt object */, "resumed": boolean },
   "status": "success"
 }
 
@@ -872,23 +899,86 @@ Response 400:
   "detail": "Normal quiz already passed for this topic" |
             "Advanced quiz not available: pass the normal quiz and engage with resource links first" |
             "Please wait N minutes before retaking this quiz" |
+            "\"EXPERT\" is not a valid choice." |     // invalid quiz_type (first validation message)
             "...",
   "status": "error"
 }
+```
 
-Response 503:
+**What each call does.** There is at most one unfinished attempt per learner, topic and quiz type.
+
+| State of the learner's unfinished attempt | Result | `resumed` |
+|---|---|---|
+| none | new attempt, `GENERATING` (202), AI starts | `false` |
+| `GENERATING` (a request is already in flight, or another tab) | same attempt, still `GENERATING` (202) | `true` |
+| `READY` | same attempt with its questions (200) | `true` |
+| `FAILED` | same attempt, same `attempt_number`, set to `GENERATING` again (202) | `false` |
+
+So calling generate on page load is safe and idempotent: double clicks, two tabs and reloads all end
+up on one attempt and one AI call. **To retry a failed quiz, call generate again.** There is no
+separate retry endpoint.
+
+`resumed` is `true` only when the call started no generation. Use it to decide whether to restore
+locally saved picks: a resumed `READY` quiz may have some; a new quiz or a retry has none.
+
+**Getting the questions.** When `status` is `GENERATING`:
+1. Keep the [event stream](#realtime-events--apievents) open and wait for a `quiz.status` event with
+   this `attempt_id`.
+2. Right after generate returns, and after any reconnect, also `GET /quiz/attempts/<id>` once
+   (events are not replayable, and the quiz may have finished before the stream connected).
+3. On `READY`, `GET /quiz/attempts/<id>` for the questions. On `FAILED`, offer "Try again" that calls
+   generate again.
+4. Safety net: if no event arrives after about 60 seconds, `GET` the attempt once.
+
+Generation usually takes a few seconds, longer if the AI has to fall back to another model. A quiz
+stuck for 15 minutes is marked `FAILED` by the server.
+
+**Cooldown.** 1 hour between quizzes of the same type on the same topic, counted from when the
+previous quiz was generated, and only once that quiz has been **submitted**. An unfinished quiz never
+blocks you: generate returns it. See `normal_quiz_available_at` / `advanced_quiz_available_at` on the topic.
+
+---
+
+### `GET /api/learning/topics/<topic_id>/quiz/attempts/<attempt_id>`
+
+Read one attempt: a quiz in progress (questions only), or a finished one with the learner's picks and
+the per-question results. Works from any tab or device. Returns `404` if the attempt does not exist,
+belongs to someone else, or belongs to a different topic (plus the 404 / 403 access rules above).
+
+```
+Response 200:
 {
-  "detail": "The AI service is temporarily unavailable. Please try again shortly.",
-  "status": "error"
+  "data": { /* Quiz attempt object */ },
+  "status": "success"
 }
+```
+
+---
+
+### `GET /api/learning/topics/<topic_id>/quiz/attempts/latest`
+
+The newest **submitted** attempt of a quiz type, for the result and review pages when you do not have
+an attempt id (new tab, another device).
+
+Query params:
+- `quiz_type` (optional, `NORMAL` | `ADVANCED`, default `NORMAL`).
+
+```
+Response 200:
+{
+  "data": { /* Quiz attempt object */ },
+  "status": "success"
+}
+
+Response 404: no submitted attempt of that type yet   // { "detail": "Not found.", "status": "error" }
 ```
 
 ---
 
 ### `POST /api/learning/topics/<topic_id>/quiz/submit`
 
-Submit answers to a quiz and get results. Points are only earned if the user passes (≥60%).
-Submission is one-time — re-submitting the same attempt_id returns an error.
+Submit answers to a quiz and get results. Points are only earned if the user passes (>=60%).
+Submission is one-time: re-submitting the same attempt_id returns an error.
 A passed **normal** quiz also checks level progression, so the next level can unlock inside this call.
 The attempt must belong to the signed-in user and to this topic, otherwise `404`
 (plus the 404 / 403 access rules above).
@@ -897,18 +987,14 @@ The attempt must belong to the signed-in user and to this topic, otherwise `404`
 Request body:
 {
   "attempt_id": int,         // ID returned by quiz/generate
-  "answers":    [int, ...]   // selected option index (0–3) for each question, same order
+  "answers":    [int, ...]   // selected option index (0-3) for each question, same order
 }
 
 Response 200:
 {
   "data": {
-    "id":              int,      // quiz attempt ID
-    "passed":          boolean,  // score >= 60% of total_points
-    "score":           int,      // points earned (0 if failed)
-    "total_points":    int,      // max possible points
-    "attempt_number":  int,      // attempt number
-    "quiz_type":       string,   // "NORMAL" or "ADVANCED"
+    /* Quiz attempt object: status READY, answers, score, passed, submitted_at,
+       results[], correct_count and question_count are all filled in */
     // Set only after a passed NORMAL quiz, else null. Same shape as the data of
     // POST /subjects/<id>/progress/check. A level-up happens here, so that endpoint would now say "none".
     "level_check": {
@@ -922,15 +1008,19 @@ Response 200:
   "status": "success"
 }
 
+Response 404: attempt not found, not yours, or for another topic
 Response 400:
 {
   "detail": "Quiz already submitted" |
+            "Quiz is not ready" |                      // status is still GENERATING or FAILED
             "Expected N answers, got M" |
             "Answer X is not a valid option index" |
             "...",
   "status": "error"
 }
 ```
+
+The "N of M correct" line comes from `correct_count` and `question_count`; do not count locally.
 
 ---
 
@@ -998,6 +1088,7 @@ Response 200:
       "is_passed":                boolean,       // normal quiz passed (also true after the advanced pass)
       "advanced_passed":          boolean,
       "completed_at":             string | null, // when the normal quiz was passed
+      "advanced_completed_at":    string | null, // when the advanced quiz was passed; null if not passed, or passed before this field existed
       "resource_links_viewed_at": string | null, // when a resource link was opened
       "advanced_quiz_available":  boolean,       // eligibility only: normal passed + links viewed + advanced not yet passed (ignores the retake cooldown)
       "normal_quiz_available_at":   string | null, // ISO 8601; null = the normal quiz can be generated now
@@ -1014,12 +1105,13 @@ Response 404: { "detail": "Not found.", "status": "error" }   // not enrolled in
 
 `order` is the topic number (a running 1..N across the subject), so it can be shown directly.
 
-**Quiz cooldown.** After a quiz is generated, the same type cannot be generated again for 1 hour
-(normal and advanced are counted separately). `*_quiz_available_at` is when that ends, or `null` when
-the quiz can be generated now. Show a disabled button with a countdown while it is in the future.
-It does not say whether the quiz is allowed at all: also check `is_passed` for the normal quiz and
-`advanced_quiz_available` for the advanced one. There is no "AI is down" flag; a 503 from
-`quiz/generate` is the only signal.
+**Quiz cooldown.** After a quiz is submitted, the same type cannot be generated again for 1 hour
+(counted from when that quiz was generated; normal and advanced are separate). `*_quiz_available_at`
+is when that ends, or `null` when the quiz can be generated now, which is also the case while an
+unfinished quiz exists (generate returns it). Show a disabled button with a countdown while it is in
+the future. It does not say whether the quiz is allowed at all: also check `is_passed` for the normal
+quiz and `advanced_quiz_available` for the advanced one. AI trouble shows up as a quiz with
+`status: "FAILED"`, not as an HTTP error.
 
 ---
 
@@ -1067,12 +1159,13 @@ compress this route. Any proxy in front (including a framework rewrite) must not
 1. Treat an event as "something changed", not as data. On an event for what is on screen, re-GET
    it and render the response. Do not build UI from the event payload.
 2. Subscribe first, then GET. If the work finished before the stream connected, the GET shows it.
-3. Open the stream only while something is pending (roadmap `GENERATING`, or the open topic is not
-   `READY`) and close it when nothing is. Each open stream is one connection per tab.
+3. Open the stream only while something is pending (roadmap `GENERATING`, the open topic is not
+   `READY`, or a quiz is `GENERATING`) and close it when nothing is. Each open stream is one connection per tab.
 4. After any reconnect, re-GET the current page.
 5. As a safety net for a blocked stream, re-GET once if no event has arrived after about 60 seconds
    (instead of polling every few seconds).
-6. Events only go to users enrolled in the subject. There are none for a subject previewed with
+6. `roadmap.status` and `topic.status` go to every user enrolled in the subject; `quiz.status` goes
+   only to the learner who started the quiz. There are none for a subject previewed with
    `GET /explore/<id>`.
 
 ### Event: `roadmap.status`
@@ -1109,3 +1202,23 @@ data: {
 Typical flow on the topic page: `GET /topics/<id>` → if `content_status` is not `READY`, show
 "preparing" and listen for `topic.status` with that `topic_id` → on `READY` (or `FAILED`),
 re-GET the topic. If it is `FAILED`, offer "Try again" that calls `POST /topics/<id>/retry`.
+
+### Event: `quiz.status`
+
+Sent only to the learner who requested the quiz, when an attempt becomes `READY` or `FAILED`
+(also when the server fails a quiz that has been stuck for 15 minutes). Not sent for `GENERATING`:
+the `quiz/generate` response already says so.
+
+```
+event: quiz.status
+data: {
+  "subject_id": int,
+  "topic_id":   int,
+  "attempt_id": int,
+  "quiz_type":  "NORMAL" | "ADVANCED",
+  "status":     "READY" | "FAILED"
+}
+```
+
+Typical flow: `POST quiz/generate` -> `GENERATING` -> wait for `quiz.status` with that `attempt_id` ->
+`GET quiz/attempts/<id>` -> render the questions (or "Try again" on `FAILED`, which calls generate again).

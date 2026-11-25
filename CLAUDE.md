@@ -9,7 +9,7 @@ Rebuilding the app in the "Passport" design direction, stage by stage (see `docs
 - `docs/refs/wicky-overview.md`: product context.
 - `docs/realtime-events.md`: anything that waits on the BE (SSE, no polling).
 - `docs/dev-server.md`: running, probing or scripting against the dev server.
-- `docs/screenshots/README.md`: capturing screenshots.
+- `docs/screenshots.md`: capturing screenshots.
 
 ## Rules
 - Use the primitives in `apps/web/src/components/ui`, `stamp` and `nav`. Tokens live in `packages/config/src/theme.css`.
