@@ -27,6 +27,8 @@ export interface TopicProgress {
   is_passed: boolean;
   advanced_passed: boolean;
   completed_at: string | null;
+  /** When the advanced quiz was passed; null if not passed, or passed before the BE added the field. */
+  advanced_completed_at: string | null;
   resource_links_viewed_at: string | null;
   /** Eligibility only: normal passed, links viewed, advanced not passed. Ignores the 1h retake cooldown. */
   advanced_quiz_available: boolean;

@@ -1,6 +1,6 @@
 import "@/lib/client-api";
 import { apiClient } from "@wicky/api-client";
-import type { ApiSuccess, ContentStatus, ProgressCheckResponse, SubjectCreateResponse } from "@wicky/types";
+import type { ApiSuccess, ContentStatus, ProgressCheckResponse, QuizAttempt, QuizGenerateResponse, QuizSubmitResponse, QuizType, SubjectCreateResponse } from "@wicky/types";
 
 export async function createSubject(
   name: string,
@@ -46,4 +46,23 @@ export async function markResourceLinksViewed(topicId: number): Promise<string |
     `/api/learning/topics/${topicId}/resource-links-viewed`,
   );
   return res.data.resource_links_viewed_at;
+}
+
+// Starts a quiz or hands back the learner's unfinished one, so calling it on page load is safe. It does not wait
+// for the AI: GENERATING (202) means the questions arrive later, with a quiz.status event.
+// To retry a FAILED quiz, call it again.
+export async function generateQuiz(topicId: number, quizType: QuizType): Promise<QuizGenerateResponse> {
+  const res = await apiClient.post<ApiSuccess<QuizGenerateResponse>>(`/api/learning/topics/${topicId}/quiz/generate`, { quiz_type: quizType });
+  return res.data;
+}
+
+export async function getQuizAttempt(topicId: number, attemptId: number): Promise<QuizAttempt> {
+  const res = await apiClient.get<ApiSuccess<QuizAttempt>>(`/api/learning/topics/${topicId}/quiz/attempts/${attemptId}`);
+  return res.data;
+}
+
+// One time per attempt: the BE refuses a second submit of the same attempt.
+export async function submitQuiz(topicId: number, attemptId: number, answers: number[]): Promise<QuizSubmitResponse> {
+  const res = await apiClient.post<ApiSuccess<QuizSubmitResponse>>(`/api/learning/topics/${topicId}/quiz/submit`, { attempt_id: attemptId, answers });
+  return res.data;
 }

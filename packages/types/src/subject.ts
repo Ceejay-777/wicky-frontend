@@ -22,7 +22,16 @@ export interface EnrolledSubject {
   created_at: string;
   notification_frequency_hours: number;
   next_due_at: string | null;
-  current_topic: { id: number; title: string } | null;
+  /** Enough to draw a quiz card without opening the topic (opening a topic starts its content generation). */
+  current_topic: {
+    id: number;
+    title: string;
+    level: number;
+    /** Topic number, a running 1..N across the subject. */
+    order: number;
+    /** ISO end of the normal quiz cooldown; null when a quiz can start. */
+    normal_quiz_available_at: string | null;
+  } | null;
 }
 
 export interface SubjectTopicItem {

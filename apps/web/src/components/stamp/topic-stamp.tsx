@@ -8,6 +8,8 @@ type TopicStampProps = {
   ghost?: boolean;
   /** Width in px; height follows. */
   size?: number;
+  /** Ink of an earned stamp: pine, or gold for an advanced pass. */
+  tone?: "pine" | "gold";
   className?: string;
 };
 
@@ -29,10 +31,10 @@ function lines(title: string): [string, string?] {
 
 const fit = (text: string, perChar: number, max: number) => Math.min(max, Math.round(text.length * perChar));
 
-export function TopicStamp({ title, date, ghost = false, size = 104, className }: TopicStampProps) {
+export function TopicStamp({ title, date, ghost = false, size = 104, tone = "pine", className }: TopicStampProps) {
   const [a, b] = lines(title);
   const label = ghost ? `Stamp for ${title}, not yet earned` : `Stamp earned: ${title}`;
-  const color = ghost ? "var(--tomato)" : "var(--pine)";
+  const color = ghost ? "var(--tomato)" : `var(--${tone})`;
   const display = { fontFamily: "var(--f-display)", fontWeight: 900 } as const;
   const mono = { fontFamily: "var(--f-mono)", fontWeight: 700 } as const;
 
@@ -67,7 +69,7 @@ export function TopicStamp({ title, date, ghost = false, size = 104, className }
             <text x="80" y="29" fontSize="8.5" letterSpacing="2.4" style={mono}>WICKY ENTRY</text>
             <text x="80" y={b ? 50 : 56} fontSize="21" textLength={fit(a, 9.6, b ? 105 : 112)} lengthAdjust="spacingAndGlyphs" style={display}>{a}</text>
             {b && <text x="80" y="71" fontSize="21" textLength={fit(b, 10.4, 105)} lengthAdjust="spacingAndGlyphs" style={display}>{b}</text>}
-            {date && <text x="80" y="82" fontSize="9" letterSpacing="2.2" style={mono}>{`PASSED ${date}`}</text>}
+            <text x="80" y="82" fontSize="9" letterSpacing="2.2" style={mono}>{date ? `PASSED ${date}` : "PASSED"}</text>
           </g>
         </g>
       )}

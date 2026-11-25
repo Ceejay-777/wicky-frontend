@@ -40,10 +40,13 @@ export type {
   OthersLearningEntry,
 } from "./topic";
 
-export type { TopicStatusEvent, RoadmapStatusEvent } from "./events";
+export type { TopicStatusEvent, RoadmapStatusEvent, QuizStatusEvent } from "./events";
 
 export type {
   QuizQuestion,
+  QuizStatus,
+  QuizResult,
+  QuizAttempt,
   QuizGenerateRequest,
   QuizGenerateResponse,
   QuizSubmitRequest,

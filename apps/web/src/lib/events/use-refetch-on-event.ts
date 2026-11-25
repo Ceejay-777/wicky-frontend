@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { RoadmapStatusEvent, TopicStatusEvent } from "@wicky/types";
+import type { QuizStatusEvent, RoadmapStatusEvent, TopicStatusEvent } from "@wicky/types";
 
-type Events = { "topic.status": TopicStatusEvent; "roadmap.status": RoadmapStatusEvent };
+type Events = { "topic.status": TopicStatusEvent; "roadmap.status": RoadmapStatusEvent; "quiz.status": QuizStatusEvent };
 
 // No event for this long means a blocked stream, so look once anyway (docs/realtime-events.md).
 const SAFETY_MS = 60_000;

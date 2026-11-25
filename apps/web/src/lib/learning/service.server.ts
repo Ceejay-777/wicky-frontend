@@ -8,6 +8,8 @@ import type {
   ApiSuccess,
   EnrolledSubject,
   OthersLearningEntry,
+  QuizAttempt,
+  QuizType,
   Subject,
   SubjectDetail,
   TopicDetail,
@@ -68,6 +70,21 @@ export const getOthersLearning = cache(
 export const getTopicDetail = cache(
   async (id: number): Promise<TopicDetail> => {
     const res = await apiClient.get<ApiSuccess<TopicDetail>>(`/api/learning/topics/${id}`);
+    return res.data;
+  },
+);
+
+export const getQuizAttempt = cache(
+  async (topicId: number, attemptId: number): Promise<QuizAttempt> => {
+    const res = await apiClient.get<ApiSuccess<QuizAttempt>>(`/api/learning/topics/${topicId}/quiz/attempts/${attemptId}`);
+    return res.data;
+  },
+);
+
+// The newest submitted attempt of a type; 404 when there is none yet.
+export const getLatestQuizAttempt = cache(
+  async (topicId: number, quizType: QuizType): Promise<QuizAttempt> => {
+    const res = await apiClient.get<ApiSuccess<QuizAttempt>>(`/api/learning/topics/${topicId}/quiz/attempts/latest?quiz_type=${quizType}`);
     return res.data;
   },
 );
