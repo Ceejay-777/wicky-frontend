@@ -32,7 +32,7 @@ export function ResourceLinkRow({ link, onOpen }: Props) {
     >
       <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-[10px] border-[1.5px] border-cobalt text-cobalt">{type.icon}</span>
       <span className="min-w-0 flex-1">
-        <span className="line-clamp-2 block text-[15px] leading-[1.3] font-semibold [hyphens:auto] [overflow-wrap:break-word]">{link.title}</span>
+        <span className="line-clamp-2 text-[15px] leading-[1.3] font-semibold [hyphens:auto] [overflow-wrap:break-word]">{link.title}</span>
         <span className="mt-[3px] block truncate font-mono text-[10px] font-bold tracking-[0.08em] text-muted-ink">
           {type.label}
           {site && <> &middot; {site.toUpperCase()}</>}
