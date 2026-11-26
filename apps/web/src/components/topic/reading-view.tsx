@@ -18,6 +18,7 @@ import { READING_GRID, READING_RAIL } from "./reading-layout";
 type Props = {
   topicId: number;
   title: string;
+  description: string;
   subjectId: number;
   subjectName: string;
   level: number;
@@ -34,7 +35,6 @@ type Props = {
   /** Minutes left of each quiz's retake cooldown; 0 when open. */
   quizWait: number;
   advancedWait: number;
-  underReview: boolean;
   quizNotice: string | null;
 };
 
@@ -44,7 +44,7 @@ const noopSubscribe = () => () => {};
 // "13 OCT" in the learner's own zone and locale.
 const shortDate = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short" }).toUpperCase();
 
-export function ReadingView({ topicId, title, subjectId, subjectName, level, number, paragraphs, minutes, links, passedAt, advancedPassed, advancedAvailable, nextHref, quizWait, advancedWait, underReview, quizNotice }: Props) {
+export function ReadingView({ topicId, title, description, subjectId, subjectName, level, number, paragraphs, minutes, links, passedAt, advancedPassed, advancedAvailable, nextHref, quizWait, advancedWait, quizNotice }: Props) {
   const passed = passedAt !== null;
   const [size, pickSize] = useTextSize();
   const [sheet, setSheet] = useState(false);
@@ -120,6 +120,7 @@ export function ReadingView({ topicId, title, subjectId, subjectName, level, num
               level={level}
               number={number}
               title={title}
+              description={description}
               meta={`~${minutes} MIN READ`}
               passed={passed}
               passedDate={date}
@@ -133,11 +134,6 @@ export function ReadingView({ topicId, title, subjectId, subjectName, level, num
                 )
               }
             />
-            {underReview && (
-              <div role="status" className="mx-[22px] mt-5 rounded-[10px] border-[1.5px] border-dashed border-muted-ink px-3.5 py-3 text-sm leading-[1.45] text-muted-ink">
-                This reading is still being reviewed. You can keep reading.
-              </div>
-            )}
             <div className="px-[22px] pt-[22px] pb-1">
               {paragraphs.map((p, i) => {
                 const [first, ...rest] = Array.from(p);

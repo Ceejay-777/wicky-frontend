@@ -37,6 +37,8 @@ export interface EnrolledSubject {
 export interface SubjectTopicItem {
   id: number;
   title: string;
+  /** One-sentence goal of the topic; "" when the roadmap has none. */
+  description: string;
   level: number;
   order: number;
   content_status: ContentStatus;

@@ -673,7 +673,7 @@ Response 200:
         "level":               int,
         "order":               int,
         "content_status":      string,        // "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
-        "review_status":       string,        // "PENDING" | "PASSED" | "FAILED" | "FLAGGED"
+        "review_status":       string,        // "PENDING" | "PASSED" | "FIXED" | "UNREVIEWED" | "REJECTED"
         "user_progress_status": string | null, // null if user hasn't started this topic; else "NOT_STARTED" | "PASSED" | "ADVANCED_PASSED" (see Progress statuses)
         "is_passed":           boolean,       // true for PASSED and ADVANCED_PASSED
         "advanced_passed":     boolean,       // true only for ADVANCED_PASSED
@@ -1080,7 +1080,7 @@ Response 200:
     "level":           int,
     "order":           int,
     "content_status":  string,   // "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED"
-    "review_status":   string,   // "PENDING" | "PASSED" | "FAILED" | "FLAGGED"
+    "review_status":   string,   // "PENDING" | "PASSED" | "FIXED" | "UNREVIEWED" | "REJECTED"
     "subject_id":      int,
     "subject_name":    string,
     "progress": {                      // the signed-in user's progress on this topic
@@ -1195,7 +1195,7 @@ data: {
   "subject_id":     int,
   "topic_id":       int,
   "content_status": "NOT_GENERATED" | "READY" | "FAILED",
-  "review_status":  "PENDING" | "PASSED" | "FAILED" | "FLAGGED"
+  "review_status":  "PENDING" | "PASSED" | "FIXED" | "UNREVIEWED" | "REJECTED"
 }
 ```
 

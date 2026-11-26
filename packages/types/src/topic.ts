@@ -43,6 +43,8 @@ export interface TopicProgress {
 export interface TopicDetail {
   id: number;
   title: string;
+  /** One-sentence goal of the topic; "" when the roadmap has none. */
+  description: string;
   summary: string;
   resource_links: ResourceLink[];
   level: number;

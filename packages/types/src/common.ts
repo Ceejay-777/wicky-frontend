@@ -12,6 +12,6 @@ export interface ApiError {
 export type ApiResponse<T> = ApiSuccess<T> | ApiError;
 
 export type ContentStatus = "NOT_GENERATED" | "GENERATING" | "READY" | "FAILED";
-export type ReviewStatus = "PENDING" | "PASSED" | "FAILED" | "FLAGGED";
+export type ReviewStatus = "PENDING" | "PASSED" | "FIXED" | "UNREVIEWED" | "REJECTED";
 export type SubjectStatus = "ACTIVE" | "COMPLETED";
 export type QuizType = "NORMAL" | "ADVANCED";

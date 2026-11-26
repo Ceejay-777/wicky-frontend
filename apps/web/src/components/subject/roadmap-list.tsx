@@ -24,9 +24,10 @@ function TopicRow({ topic, current }: { topic: RoadmapTopic; current: React.Ref<
       <span aria-hidden="true" className="w-[18px] shrink-0 font-mono text-xs font-bold text-muted-ink">{String(topic.number).padStart(2, "0")}</span>
       {icon}
       <span className="min-w-0 flex-1">
-        <span className={cn("line-clamp-2 block font-display text-[22px] leading-none font-black uppercase [hyphens:auto] [overflow-wrap:break-word]", locked && "text-muted-ink")}>
+        <span className={cn("line-clamp-2 font-display text-[22px] leading-none font-black uppercase [hyphens:auto] [overflow-wrap:break-word]", locked && "text-muted-ink")}>
           {topic.title}
         </span>
+        {topic.description && <span className="mt-1 line-clamp-2 text-[13px] leading-[1.35] text-ink-2">{topic.description}</span>}
         <span className="mt-[3px] block text-xs text-ink-2">
           {topic.state === "passed" ? (
             <>Passed{topic.completed_at && <> <LocalTime iso={topic.completed_at} mode="date" /></>}</>

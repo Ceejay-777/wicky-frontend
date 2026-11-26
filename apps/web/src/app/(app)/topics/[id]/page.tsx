@@ -59,7 +59,11 @@ export default async function TopicPage({
         stamp="NOT READY"
         eyebrow="READING UNAVAILABLE"
         title="Not ready yet"
-        text="We could not prepare this reading. Check your connection and try again."
+        text={
+          topic.review_status === "REJECTED"
+            ? "We could not write a reading that fits this topic. You can try again."
+            : "We could not prepare this reading. Check your connection and try again."
+        }
       >
         <RetryButton topicId={topic.id} />
         <Link href={roadmapHref} className={cn(buttonVariants({ variant: "outline" }), action)}>
@@ -79,6 +83,7 @@ export default async function TopicPage({
     <ReadingView
       topicId={topic.id}
       title={topic.title}
+      description={topic.description}
       subjectId={topic.subject_id}
       subjectName={topic.subject_name}
       level={topic.level}
@@ -92,7 +97,6 @@ export default async function TopicPage({
       nextHref={nextHref}
       quizWait={waitMinutes(progress.normal_quiz_available_at)}
       advancedWait={waitMinutes(progress.advanced_quiz_available_at)}
-      underReview={topic.review_status === "FLAGGED" || topic.review_status === "FAILED"}
       quizNotice={progress.is_passed ? null : quizNotice(await searchParams)}
     />
   );
